@@ -1,5 +1,4 @@
-import { client } from "@/sanity/client";
-import { urlForImage } from "@/sanity/image";
+import { client, urlForImage } from "@/sanity/client";
 import { type SanityDocument as NextSanityDocument } from "next-sanity";
 import { PortableTextBlock } from '@portabletext/types';
 
