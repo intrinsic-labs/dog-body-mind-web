@@ -1,7 +1,5 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/home/HeroSection";
-import EmailSignupBar from "@/components/home/EmailSignupBar";
-import BlogSection from "@/components/home/BlogSection";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -10,9 +8,6 @@ export default function Home() {
       <Header />
       <main className="flex flex-col items-center w-full">
         <HeroSection />
-        <EmailSignupBar />
-        <BlogSection />
-        <EmailSignupBar /> 
       </main>
       <Footer />
     </div>

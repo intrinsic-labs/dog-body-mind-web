@@ -198,7 +198,7 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
                 <FaXTwitter />
               </a>
               <a 
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&hashtag=%23sophronstudies`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&hashtag=%23dogbodymind`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-olive/50 text-neutral-800 hover:bg-olive hover:text-secondary transition-colors duration-300"

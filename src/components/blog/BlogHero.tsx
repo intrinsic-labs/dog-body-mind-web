@@ -26,9 +26,9 @@ const BlogHero = () => {
   }, []);
 
   // Default content if nothing is in the CMS yet
-  const title = heroData?.title || "The Sophron Blog";
+  const title = heroData?.title || "Dog Body Mind";
   const description = heroData?.description || 
-    "With Melissa McPhail";
+    "Tagline Here";
 
   return (
     <div className="flex flex-col gap-4 mx-4">
