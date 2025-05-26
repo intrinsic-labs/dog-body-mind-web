@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { BlogPost } from '@/lib/blog';
 import { PortableText, PortableTextComponents } from '@portabletext/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaXTwitter } from "react-icons/fa6";
-import Image from 'next/image';
-import YouTubeEmbed from './YouTubeEmbed';
+import ScrollableImage from './ScrollableImage';
+import YouTubeEmbedSanity from './YouTubeEmbedSanity';
 
 interface BlogPostContentProps {
   post: BlogPost;
@@ -20,66 +21,6 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Regex to detect markdown-style images: ![alt text](url)
-  const processMarkdownImages = (text: string) => {
-    if (!text) return text;
-    
-    const imgRegex = /!\[(.*?)\]\((.*?)\)/g;
-    const parts: (string | { type: string; alt: string; src: string })[] = [];
-    let lastIndex = 0;
-    let match;
-    
-    while ((match = imgRegex.exec(text)) !== null) {
-      // Add text before the image
-      if (match.index > lastIndex) {
-        parts.push(text.substring(lastIndex, match.index));
-      }
-      
-      const [fullMatch, alt, src] = match;
-      // Push the image as a special object that we'll render separately
-      parts.push({ type: 'markdown-image', alt, src });
-      
-      lastIndex = match.index + fullMatch.length;
-    }
-    
-    // Add any remaining text after the last image
-    if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex));
-    }
-    
-    return parts;
-  };
-
-  // Process YouTube links with syntax: [youtube](URL) or [yt](URL)
-  const processYouTubeLinks = (text: string) => {
-    if (!text) return text;
-    
-    const youtubeRegex = /\[(youtube|yt)\]\(((?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\)]+)\)/g;
-    const parts: (string | { type: string; url: string })[] = [];
-    let lastIndex = 0;
-    let match;
-    
-    while ((match = youtubeRegex.exec(text)) !== null) {
-      // Add text before the YouTube link
-      if (match.index > lastIndex) {
-        parts.push(text.substring(lastIndex, match.index));
-      }
-      
-      const [fullMatch, , url] = match;
-      // Push the YouTube link as a special object
-      parts.push({ type: 'youtube-embed', url });
-      
-      lastIndex = match.index + fullMatch.length;
-    }
-    
-    // Add any remaining text after the last YouTube link
-    if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex));
-    }
-    
-    return parts;
-  };
 
   // Define components for PortableText
   const components: PortableTextComponents = {
@@ -101,6 +42,21 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
           </div>
         );
       },
+      inlineImage: ({ value }: { 
+        value: {
+          asset: { _ref: string; _type: string };
+          alt?: string;
+          caption?: string;
+          enableOverflow?: boolean;
+          hotspot?: { x: number; y: number; height: number; width: number };
+        }
+      }) => {
+        return <ScrollableImage value={value} />;
+      },
+      youtubeEmbed: ({ value }: { value: { url: string; title?: string } }) => {
+        console.log('BlogPostContent youtubeEmbed type received:', value); // Debug logging
+        return <YouTubeEmbedSanity value={value} />;
+      },
     },
     block: {
       h1: ({ children }) => (
@@ -112,75 +68,9 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
       h3: ({ children }) => (
         <h3 className="mt-8 mb-4 text-primary">{children}</h3>
       ),
-      normal: ({ children }) => {
-        // Special case: check if children contains any string that might have markdown images or YouTube links
-        if (Array.isArray(children)) {
-          const processedChildren = children.map((child, index) => {
-            if (typeof child === 'string' && (child.includes('![') || child.includes('[youtube]') || child.includes('[yt]'))) {
-              // First process YouTube links, then markdown images
-              const parts = processYouTubeLinks(child);
-              
-              // Process each part for markdown images if it's a string
-              const finalParts = [];
-              for (const part of parts) {
-                if (typeof part === 'string') {
-                  const imageParts = processMarkdownImages(part);
-                  if (Array.isArray(imageParts)) {
-                    finalParts.push(...imageParts);
-                  } else {
-                    finalParts.push(imageParts);
-                  }
-                } else {
-                  finalParts.push(part);
-                }
-              }
-              
-              // Check if we have any media content
-              const hasMediaContent = finalParts.some(part => 
-                typeof part === 'object' && (part.type === 'markdown-image' || part.type === 'youtube-embed')
-              );
-              
-              const content = finalParts.map((part: string | { type: string; alt?: string; src?: string; url?: string }, i: number) => {
-                if (typeof part === 'string') {
-                  return <span key={`${index}-${i}`}>{part}</span>;
-                } else if (part.type === 'markdown-image') {
-                  return (
-                    <div key={`${index}-${i}`} className="my-4 w-full">
-                      <Image 
-                        src={part.src || ''} 
-                        alt={part.alt || ''} 
-                        width={800}
-                        height={600}
-                        className="w-full" 
-                        loading="lazy"
-                      />
-                    </div>
-                  );
-                } else if (part.type === 'youtube-embed') {
-                  return (
-                    <div key={`${index}-${i}`} className="my-4 w-full">
-                      <YouTubeEmbed url={part.url || ''} />
-                    </div>
-                  );
-                }
-                return null;
-              });
-              
-              // If we have media content, use a div container instead of p
-              if (hasMediaContent) {
-                return <div key={index} className="text-primary mb-6">{content}</div>;
-              } else {
-                return <span key={index}>{content}</span>;
-              }
-            }
-            return child;
-          });
-          
-          return <p className="text-primary mb-6">{processedChildren}</p>;
-        }
-        
-        return <p className="text-primary mb-6">{children}</p>;
-      },
+      normal: ({ children }) => (
+        <p className="text-primary mb-6">{children}</p>
+      ),
       blockquote: ({ children }) => (
         <blockquote className="border-l-4 border-black/30 pl-4 italic text-primary my-6">{children}</blockquote>
       ),
