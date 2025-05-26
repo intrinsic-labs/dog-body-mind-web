@@ -6,9 +6,6 @@
   --blue: #265F80;
   --orange: #F17F19;
   --slate: #2B2B2B;
-
-  /* --font-rubik: rubik; */
-  --font-helvetica: Helvetica, Arial, sans-serif;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -29,18 +26,76 @@
 
   /* Fonts */
   --font-sans: var(--font-helvetica);
-  --font-heading: rubik;
-  --font-rubik: rubik;
+  --font-helvetica: var(--font-helvetica);
+  --font-heading: var(--font-rubik);
+  --font-rubik: var(--font-rubik);
 
 }
 
 @layer base {
+  /* Base body styles */
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-helvetica);
     font-size: 16px;
     line-height: 20px;
     letter-spacing: 0;
+  }
+
+  /* Heading styles - All use Rubik Medium */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-rubik);
+    font-weight: 500; /* Medium weight */
+    color: var(--foreground);
+  }
+
+  h1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  h2 {
+    font-size: 20px;
+    line-height: 24px;
+  }
+
+  h3 {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  /* Body text styles */
+  p {
+    font-family: var(--font-helvetica);
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  /* Blockquote styles - Rubik Regular */
+  blockquote {
+    font-family: var(--font-rubik);
+    font-weight: 400; /* Regular weight */
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--foreground);
+  }
+
+  /* Additional text elements using Helvetica */
+  span, div, a, li, td, th {
+    font-family: var(--font-helvetica);
+  }
+
+  /* Ensure links inherit proper styling */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* List styles */
+  ul, ol {
+    font-family: var(--font-helvetica);
+    font-size: 16px;
+    line-height: 20px;
   }
 }

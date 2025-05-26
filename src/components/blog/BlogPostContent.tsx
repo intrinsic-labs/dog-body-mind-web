@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { FiInstagram, FiFacebook } from 'react-icons/fi';
 import { FaXTwitter } from "react-icons/fa6";
 import Image from 'next/image';
+import YouTubeEmbed from './YouTubeEmbed';
 
 interface BlogPostContentProps {
   post: BlogPost;
@@ -50,6 +51,36 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
     return parts;
   };
 
+  // Process YouTube links with syntax: [youtube](URL) or [yt](URL)
+  const processYouTubeLinks = (text: string) => {
+    if (!text) return text;
+    
+    const youtubeRegex = /\[(youtube|yt)\]\(((?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[^\)]+)\)/g;
+    const parts: (string | { type: string; url: string })[] = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = youtubeRegex.exec(text)) !== null) {
+      // Add text before the YouTube link
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index));
+      }
+      
+      const [fullMatch, , url] = match;
+      // Push the YouTube link as a special object
+      parts.push({ type: 'youtube-embed', url });
+      
+      lastIndex = match.index + fullMatch.length;
+    }
+    
+    // Add any remaining text after the last YouTube link
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+    
+    return parts;
+  };
+
   // Define components for PortableText
   const components: PortableTextComponents = {
     types: {
@@ -73,49 +104,82 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
     },
     block: {
       h1: ({ children }) => (
-        <h1 className="text-3xl font-bold mt-12 mb-6 text-primary">{children}</h1>
+        <h1 className="mt-12 mb-6 text-primary">{children}</h1>
       ),
       h2: ({ children }) => (
-        <h2 className="text-2xl font-bold mt-10 mb-4 text-primary">{children}</h2>
+        <h2 className="mt-10 mb-4 text-primary">{children}</h2>
       ),
       h3: ({ children }) => (
-        <h3 className="text-xl font-bold mt-8 mb-4 text-primary">{children}</h3>
+        <h3 className="mt-8 mb-4 text-primary">{children}</h3>
       ),
       normal: ({ children }) => {
-        // Special case: check if children contains any string that might have markdown images
+        // Special case: check if children contains any string that might have markdown images or YouTube links
         if (Array.isArray(children)) {
           const processedChildren = children.map((child, index) => {
-            if (typeof child === 'string' && child.includes('![')) {
-              const parts = processMarkdownImages(child);
-              if (Array.isArray(parts)) {
-                return parts.map((part: string | { type: string; alt: string; src: string }, i: number) => {
-                  if (typeof part === 'string') {
-                    return <span key={`${index}-${i}`}>{part}</span>;
+            if (typeof child === 'string' && (child.includes('![') || child.includes('[youtube]') || child.includes('[yt]'))) {
+              // First process YouTube links, then markdown images
+              const parts = processYouTubeLinks(child);
+              
+              // Process each part for markdown images if it's a string
+              const finalParts = [];
+              for (const part of parts) {
+                if (typeof part === 'string') {
+                  const imageParts = processMarkdownImages(part);
+                  if (Array.isArray(imageParts)) {
+                    finalParts.push(...imageParts);
                   } else {
-                    // Render markdown image with standard HTML img tag
-                    return (
-                      <span key={`${index}-${i}`} className="inline-block my-8 w-full">
-                        <Image 
-                          src={part.src} 
-                          alt={part.alt || ''} 
-                          width={800}
-                          height={600}
-                          className="w-full" 
-                          loading="lazy"
-                        />
-                      </span>
-                    );
+                    finalParts.push(imageParts);
                   }
-                });
+                } else {
+                  finalParts.push(part);
+                }
+              }
+              
+              // Check if we have any media content
+              const hasMediaContent = finalParts.some(part => 
+                typeof part === 'object' && (part.type === 'markdown-image' || part.type === 'youtube-embed')
+              );
+              
+              const content = finalParts.map((part: string | { type: string; alt?: string; src?: string; url?: string }, i: number) => {
+                if (typeof part === 'string') {
+                  return <span key={`${index}-${i}`}>{part}</span>;
+                } else if (part.type === 'markdown-image') {
+                  return (
+                    <div key={`${index}-${i}`} className="my-4 w-full">
+                      <Image 
+                        src={part.src || ''} 
+                        alt={part.alt || ''} 
+                        width={800}
+                        height={600}
+                        className="w-full" 
+                        loading="lazy"
+                      />
+                    </div>
+                  );
+                } else if (part.type === 'youtube-embed') {
+                  return (
+                    <div key={`${index}-${i}`} className="my-4 w-full">
+                      <YouTubeEmbed url={part.url || ''} />
+                    </div>
+                  );
+                }
+                return null;
+              });
+              
+              // If we have media content, use a div container instead of p
+              if (hasMediaContent) {
+                return <div key={index} className="text-primary mb-6">{content}</div>;
+              } else {
+                return <span key={index}>{content}</span>;
               }
             }
             return child;
           });
           
-          return <p className="text-primary leading-relaxed mb-6">{processedChildren}</p>;
+          return <p className="text-primary mb-6">{processedChildren}</p>;
         }
         
-        return <p className="text-primary leading-relaxed mb-6">{children}</p>;
+        return <p className="text-primary mb-6">{children}</p>;
       },
       blockquote: ({ children }) => (
         <blockquote className="border-l-4 border-black/30 pl-4 italic text-primary my-6">{children}</blockquote>
@@ -158,7 +222,7 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
   }
 
   return (
-    <section className="pt-4 md:pt-8 pb-16 font-serif text-[1.2rem] leading-[1.8] tracking-[0.01rem] px-4 sm:px-6">
+    <section className="pt-4 md:pt-8 pb-16 px-4 sm:px-6">
       <div className="container-custom">
         <div className="max-w-3xl mx-auto">
           <div className="">
@@ -170,13 +234,13 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
           
           {/* Tags */}
           <div className="mt-16 pt-8 border-t border-neutral-800/50">
-            <h3 className="text-md font-medium font-sans mb-4">Tags</h3>
+            <h3 className="mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag, index) => (
                 <Link 
                   key={index} 
                   href={`/?tag=${encodeURIComponent(tag)}`}
-                  className="font-sans text-sm px-3 py-1 bg-olive/50 text-neutral-800 hover:bg-olive hover:text-secondary transition-colors duration-300"
+                  className="text-sm px-3 py-1 bg-olive/50 text-neutral-800 hover:bg-olive hover:text-secondary transition-colors duration-300"
                 >
                   {tag}
                 </Link>
@@ -186,7 +250,7 @@ const BlogPostContent = ({ post }: BlogPostContentProps) => {
           
           {/* Share */}
           <div className="mt-12">
-            <h3 className="text-md font-medium mb-4">Share this article</h3>
+            <h3 className="mb-4">Share this article</h3>
             <div className="flex space-x-4">
               <a 
                 href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}&text=${encodeURIComponent(post.title)}`}

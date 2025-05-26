@@ -17,7 +17,7 @@ const RelatedPosts = ({ posts }: RelatedPostsProps) => {
         <div
           className="max-w-4xl mx-auto"
         >
-          <h2 className="heading-md mb-12 text-center">Related Articles</h2>
+          <h2 className="mb-12 text-center">Related Articles</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts.map((post, index) => (
@@ -63,7 +63,7 @@ const RelatedPostCard = ({ post }: RelatedPostCardProps) => {
               <span className="text-neutral-800 text-xs">{post.readingTime}</span>
             </div>
             
-            <h3 className="text-lg font-medium mb-2 group-hover:text-primary transition-colors duration-300">
+            <h3 className="text-lg mb-2 group-hover:text-primary transition-colors duration-300">
               {post.title}
             </h3>
             

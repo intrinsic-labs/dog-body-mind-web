@@ -1,5 +1,5 @@
 import "./globals.css";
-import { rubik } from "./fonts";
+import { rubik, helvetica } from "./fonts";
 
 export const metadata = {
   title: "Dog Body Mind",
@@ -14,7 +14,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${rubik.variable} antialiased`}>{children}</body>
+      <body 
+        className={`
+          ${rubik.variable} 
+          ${helvetica.variable} 
+          antialiased
+        `}
+      >
+        {children}
+      </body>
     </html>
   );
 }
