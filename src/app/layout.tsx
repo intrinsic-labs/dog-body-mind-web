@@ -1,5 +1,5 @@
 import "./globals.css";
-import { rubik, helvetica } from "./fonts";
+import { rubik, helvetica } from "@/fonts/fonts";
 
 export const metadata = {
   title: "Dog Body Mind",
