@@ -6,6 +6,19 @@
   --blue: #265F80;
   --orange: #F17F19;
   --slate: #2B2B2B;
+  
+  /* Typography scale variables */
+  --base-font-size: 16px;
+  --scale-ratio: 1.250;
+  
+  /* Calculated font sizes using the modular scale */
+  --font-size-small: calc(var(--base-font-size) / var(--scale-ratio));
+  --font-size-base: var(--base-font-size);
+  --font-size-lg: calc(var(--font-size-base) * var(--scale-ratio));
+  --font-size-xl: calc(var(--font-size-lg) * var(--scale-ratio));
+  --font-size-2xl: calc(var(--font-size-xl) * var(--scale-ratio));
+  --font-size-3xl: calc(var(--font-size-2xl) * var(--scale-ratio));
+  --font-size-4xl: calc(var(--font-size-3xl) * var(--scale-ratio));
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -38,12 +51,12 @@
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-helvetica);
-    font-size: 16px;
-    line-height: 20px;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
     letter-spacing: 0;
   }
 
-  /* Heading styles - All use Rubik Medium */
+  /* Heading styles - All use Rubik Medium with modular scale */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-rubik);
     font-weight: 500; /* Medium weight */
@@ -51,34 +64,56 @@
   }
 
   h1 {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: var(--font-size-4xl);
+    line-height: 1.2;
   }
 
   h2 {
-    font-size: 20px;
-    line-height: 24px;
+    font-size: var(--font-size-3xl);
+    line-height: 1.2;
   }
 
   h3 {
-    font-size: 16px;
-    line-height: 22px;
+    font-size: var(--font-size-2xl);
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: var(--font-size-xl);
+    line-height: 1.3;
+  }
+
+  h5 {
+    font-size: var(--font-size-lg);
+    line-height: 1.4;
+  }
+
+  h6 {
+    font-size: var(--font-size-base);
+    line-height: 1.4;
+    font-weight: 600; /* Slightly bolder for distinction */
   }
 
   /* Body text styles */
   p {
     font-family: var(--font-helvetica);
-    font-size: 16px;
-    line-height: 20px;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
   }
 
   /* Blockquote styles - Rubik Regular */
   blockquote {
     font-family: var(--font-rubik);
     font-weight: 400; /* Regular weight */
-    font-size: 16px;
-    line-height: 20px;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
     color: var(--foreground);
+  }
+
+  /* Small text */
+  small {
+    font-size: var(--font-size-small);
+    line-height: 1.4;
   }
 
   /* Additional text elements using Helvetica */
@@ -95,17 +130,7 @@
   /* List styles */
   ul, ol {
     font-family: var(--font-helvetica);
-    font-size: 16px;
-    line-height: 20px;
-  }
-
-  /* Scrollbar hiding utilities for ScrollableImage component */
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Safari and Chrome */
+    font-size: var(--font-size-base);
+    line-height: 1.6;
   }
 }

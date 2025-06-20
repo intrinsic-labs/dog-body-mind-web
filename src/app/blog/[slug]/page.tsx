@@ -1,35 +1,49 @@
 import { Metadata } from 'next';
-import BlogPostHeader from '@/components/blog/BlogPostHeader';
-import BlogPostContent from '@/components/blog/BlogPostContent';
-import RelatedPosts from '@/components/blog/RelatedPosts';
-import { getBlogPost, getRelatedPosts } from '@/lib/blog';
+import { notFound } from 'next/navigation';
+import { getBlogPost, getRelatedBlogPosts } from '@/lib/blog-service';
+import BlogPost from '@/components/blog/BlogPost';
+import BlogList from '@/components/blog/BlogList';
 
-// This would be replaced with actual data fetching
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPost(slug);
   
+  if (!post) {
+    return { title: 'Post Not Found' };
+  }
+  
   return {
     title: `${post.title} | Dog Body Mind`,
-    description: post.excerpt,
+    description: post.meta || post.excerpt,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
-      images: [post.coverImage],
+      description: post.meta || post.excerpt,
+      images: post.coverImageUrl ? [post.coverImageUrl] : [],
     },
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPageNew({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getBlogPost(slug);
-  const relatedPosts = await getRelatedPosts(slug);
+  
+  if (!post) {
+    notFound();
+  }
+  
+  const relatedPosts = await getRelatedBlogPosts(slug, 3);
   
   return (
-    <main className="min-h-screen">
-      <BlogPostHeader post={post} />
-      <BlogPostContent post={post} />
-      <RelatedPosts posts={relatedPosts} />
+    <main>
+      <BlogPost post={post} />
+      
+      {/* Related posts */}
+      {relatedPosts.length > 0 && (
+        <BlogList 
+          posts={relatedPosts} 
+          title="Related Posts" 
+        />
+      )}
     </main>
   );
 } 
