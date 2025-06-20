@@ -37,7 +37,7 @@ export function transformPost(post: BlogPost): DisplayPost {
   return {
     _id: post._id,
     title: post.title,
-    slug: post.slug,
+    slug: post.slug.current,
     excerpt: post.excerpt,
     content: post.content,
     coverImageUrl: urlForImage(post.coverImage) || '',
@@ -76,8 +76,8 @@ export function transformPost(post: BlogPost): DisplayPost {
     howTo: post.howTo,
     
     // Settings
-    featured: post.featured,
-    featuredCategory: post.featuredCategory,
+    featured: post.featured || false,
+    featuredCategory: post.featuredCategory || false,
     language: post.language,
   };
 }

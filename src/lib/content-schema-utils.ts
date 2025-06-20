@@ -68,7 +68,7 @@ export async function generateEmbeddedContentSchema(content: PortableTextBlock[]
           schemas.push(videoSchema);
         }
       } catch (error) {
-        console.warn('Failed to generate schema for YouTube embed:', embed.url);
+        console.warn('Failed to generate schema for YouTube embed:', embed.url, error);
       }
     }
   }
