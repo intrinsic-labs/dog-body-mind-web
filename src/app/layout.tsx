@@ -1,28 +1,8 @@
-import "./globals.css";
-import { rubik, helvetica } from "@/fonts/fonts";
-
-export const metadata = {
-  title: "Dog Body Mind",
-  description: "Dog Body Mind",
-  keywords: ["Dog Body Mind", "Dog Body Mind", "Dog Body Mind"],
-};
-
+// This root layout is minimal - middleware redirects to locale-specific routes
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body 
-        className={`
-          ${rubik.variable} 
-          ${helvetica.variable} 
-          antialiased
-        `}
-      >
-        {children}
-      </body>
-    </html>
-  );
+}) {
+  return children;
 }

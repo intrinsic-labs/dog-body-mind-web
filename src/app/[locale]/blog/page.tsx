@@ -1,10 +1,17 @@
 import { getAllBlogPosts, getFeaturedBlogPosts } from "@/lib/blog-service";
 import BlogList from '@/components/blog/BlogList';
+import { Locale } from "@/lib/locale";
 
-export default async function BlogPageNew() {
-  // Fetch posts using our clean new service
-  const allPosts = await getAllBlogPosts();
-  const featuredPosts = await getFeaturedBlogPosts();
+export default async function BlogPageNew({
+  params
+}: {
+  params: Promise<{ locale: Locale }>
+}) {
+  const { locale } = await params;
+  
+  // Fetch posts using our clean new service with locale
+  const allPosts = await getAllBlogPosts(locale);
+  const featuredPosts = await getFeaturedBlogPosts(locale);
 
   return (
     <main>

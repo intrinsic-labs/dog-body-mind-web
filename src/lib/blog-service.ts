@@ -1,6 +1,6 @@
 import * as queries from './blog-queries';
 import { transformPost, transformPosts } from './blog-transforms';
-import { DisplayPost, Category, BlogPost } from './blog-types';
+import { DisplayPost, Category, BlogPost, Organization } from './blog-types';
 
 // Main service functions that combine queries + transforms
 export async function getAllBlogPosts(language?: string): Promise<DisplayPost[]> {
@@ -39,5 +39,10 @@ export async function getBlogCategories(language?: string): Promise<Category[]> 
   return categories as unknown as Category[];
 }
 
+export async function getOrganization(): Promise<Organization | null> {
+  const organization = await queries.getOrganization();
+  return organization as unknown as Organization || null;
+}
+
 // Re-export types for convenience
-export type { DisplayPost, Category, BlogPost } from './blog-types'; 
+export type { DisplayPost, Category, BlogPost, Organization } from './blog-types'; 

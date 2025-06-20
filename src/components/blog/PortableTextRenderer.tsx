@@ -1,66 +1,26 @@
+'use client';
+
 import { PortableText, PortableTextComponents } from '@portabletext/react';
 import { PortableTextBlock } from '@portabletext/types';
 import Image from 'next/image';
 import { urlFor } from '@/sanity/client';
 import { InlineImage, YouTubeEmbed } from '@/lib/blog-types';
-import { useState, useEffect } from 'react';
+import { getYouTubeId } from '@/lib/youtube-utils';
 
 interface PortableTextRendererProps {
   content: PortableTextBlock[];
 }
 
-interface YouTubeMetadata {
-  title?: string;
-  duration?: string;
-  error?: string;
-}
-
-// Enhanced YouTube embed component that fetches metadata on frontend
+// Simplified YouTube embed component for display only
 function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
-  const [metadata, setMetadata] = useState<YouTubeMetadata | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const getYouTubeId = (url: string): string | null => {
-    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[7].length === 11) ? match[7] : null;
-  };
-
   const videoId = getYouTubeId(value.url);
-
-  // Fetch YouTube metadata on component mount
-  useEffect(() => {
-    if (!videoId || metadata || loading) return;
-
-    const fetchMetadata = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch('/api/youtube', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: value.url }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setMetadata(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch YouTube metadata:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [videoId, value.url, metadata, loading]);
   
   if (!videoId) {
     return <p>Invalid YouTube URL</p>;
   }
 
-  // Use override title if provided, otherwise use fetched title
-  const displayTitle = value.title || metadata?.title;
+  // Use override title if provided
+  const displayTitle = value.title;
 
   return (
     <div className="my-8">
@@ -70,10 +30,6 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       
       {value.description && (
         <p className="mb-4 text-gray-600">{value.description}</p>
-      )}
-      
-      {metadata?.duration && (
-        <p className="mb-2 text-sm text-gray-500">Duration: {metadata.duration}</p>
       )}
       
       <div className="relative w-full aspect-video">
@@ -124,26 +80,6 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
             {value.transcript}
           </div>
         </details>
-      )}
-
-      {/* Schema markup for VideoObject */}
-      {metadata && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'VideoObject',
-              name: displayTitle,
-              description: value.description,
-              thumbnailUrl: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-              uploadDate: new Date().toISOString(), // You could fetch this from YouTube API if needed
-              duration: metadata.duration,
-              embedUrl: `https://www.youtube.com/embed/${videoId}`,
-              ...(value.transcript && { transcript: value.transcript })
-            })
-          }}
-        />
       )}
     </div>
   );
