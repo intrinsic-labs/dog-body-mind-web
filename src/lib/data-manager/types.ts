@@ -1,23 +1,32 @@
-import { Post, Author, Category, Organization } from '../sanity.types'
+import { 
+  PostBySlugQueryResult,
+  AllPostsQueryResult,
+  AuthorBySlugQueryResult,
+  AllAuthorsQueryResult,
+  CategoryBySlugQueryResult,
+  AllCategoriesQueryResult,
+  OrganizationQueryResult
+} from '../sanity.types'
 
 // Resolved data types (what DataManager methods return)
-export interface ResolvedPost {
-  post: Post;
-  author: Author;
-  primaryCategory: Category | null; // First category = primary
-  categories: Category[]; // All categories resolved
-  organization: Organization;
+// These contain query result types with document references resolved
+export interface PostWithReferences {
+  post: PostBySlugQueryResult;
+  author: AuthorBySlugQueryResult;
+  primaryCategory: CategoryBySlugQueryResult | null; // First category = primary
+  categories: CategoryBySlugQueryResult[]; // All categories resolved
+  organization: OrganizationQueryResult;
 }
 
-export interface ResolvedAuthor {
-  author: Author;
+export interface AuthorWithReferences {
+  author: AuthorBySlugQueryResult;
   // Future: could include resolved references if authors reference other entities
   // for something like an Author detail page
 }
 
-export interface ResolvedCategory {
-  category: Category;
-  parent: Category | null; // Parent category if it exists
+export interface CategoryWithParent {
+  category: CategoryBySlugQueryResult;
+  parent: CategoryBySlugQueryResult | null; // Parent category if it exists
 }
 
 // Reference resolution types
@@ -29,10 +38,15 @@ export interface ReferenceRequest {
 export interface ResolvedReference {
   id: string;
   type: 'author' | 'category' | 'organization';
-  data: Author | Category | Organization | null;
+  data: AuthorBySlugQueryResult | CategoryBySlugQueryResult | OrganizationQueryResult | null;
 }
 
-// Cache types
+// Cache types - now stores query result types for consistency
+export interface DataManagerCache {
+  authors: Record<string, AuthorBySlugQueryResult>;
+  categories: Record<string, CategoryBySlugQueryResult>;
+  organization: OrganizationQueryResult | null;
+}
 
 // Note: CacheEntry is not used in the current implementation.
 // For future use when TTL is set up if needed
@@ -41,33 +55,27 @@ export interface CacheEntry<T> {
   timestamp: number;
 }
 
-export interface DataManagerCache {
-  authors: Record<string, Author>;
-  categories: Record<string, Category>;
-  organization: Organization | null;
-}
-
 // DataManager interface contract
 export interface IDataManager {
   // Core initialization
   initialize(): Promise<void>;
   
   // Post operations
-  getPost(slug: string): Promise<ResolvedPost>;
-  getAllPosts(): Promise<Post[]>;
+  getPost(slug: string): Promise<PostWithReferences>;
+  getAllPosts(): Promise<AllPostsQueryResult>;
   
   // Author operations
-  getPostAuthor(authorId: string): Promise<Author>;
-  getAllAuthors(): Promise<Author[]>;
+  getPostAuthor(authorId: string): Promise<AuthorBySlugQueryResult>;
+  getAllAuthors(): Promise<AllAuthorsQueryResult>;
   
   // Category operations  
-  getPostCategory(categoryId: string): Promise<Category>;
-  getCategoryWithParent(categoryId: string): Promise<ResolvedCategory>;
-  getAllCategories(): Promise<Category[]>;
-  getCategoryChildren(parentId: string): Promise<Category[]>;
+  getPostCategory(categoryId: string): Promise<CategoryBySlugQueryResult>;
+  getCategoryWithParent(categoryId: string): Promise<CategoryWithParent>;
+  getAllCategories(): Promise<AllCategoriesQueryResult>;
+  getCategoryChildren(parentId: string): Promise<CategoryBySlugQueryResult[]>;
   
   // Organization operations
-  getOrganization(): Promise<Organization>;
+  getOrganization(): Promise<OrganizationQueryResult>;
   
   // Batch operations
   getMultipleReferences(requests: ReferenceRequest[]): Promise<ResolvedReference[]>;
@@ -86,4 +94,9 @@ export class DataManagerError extends Error {
 }
 
 // Language type
-export type SupportedLanguage = 'en' | 'uk' | 'de' | 'fr' | 'es' | 'it'; 
+export type SupportedLanguage = 'en' | 'uk' | 'de' | 'fr' | 'es' | 'it';
+
+// Helper types for extracting single items from array query results
+export type PostItem = AllPostsQueryResult[0];
+export type AuthorItem = AllAuthorsQueryResult[0];
+export type CategoryItem = AllCategoriesQueryResult[0]; 

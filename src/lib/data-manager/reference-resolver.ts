@@ -1,12 +1,13 @@
 import { client } from '../../sanity/client'
-import { Author, Category } from '../sanity.types'
 import { 
-  authorReferencesQuery, 
-  // allAuthorsQuery 
+  AuthorBySlugQueryResult,
+  CategoryBySlugQueryResult 
+} from '../sanity.types'
+import { 
+  allAuthorsQuery 
 } from '../author-queries'
 import { 
-  categoryReferencesQuery, 
-  // allCategoriesQuery 
+  allCategoriesQuery 
 } from '../category-queries'
 import { 
   ReferenceRequest, 
@@ -39,7 +40,7 @@ export class ReferenceResolver {
     const missingAuthorIds = this.cache.getMissingAuthorIds(authorIds)
     const missingCategoryIds = this.cache.getMissingCategoryIds(categoryIds)
 
-    // Batch fetch missing references
+    // Batch fetch missing references using full queries for complete data
     const fetchPromises: Promise<void>[] = []
 
     if (missingAuthorIds.length > 0) {
@@ -57,7 +58,7 @@ export class ReferenceResolver {
     const resolved: ResolvedReference[] = []
 
     for (const request of requests) {
-      let data: Author | Category | null = null
+      let data: AuthorBySlugQueryResult | CategoryBySlugQueryResult | null = null
 
       switch (request.type) {
         case 'author':
@@ -89,19 +90,27 @@ export class ReferenceResolver {
 
   /**
    * Fetch missing authors and cache them
+   * Uses the full allAuthorsQuery to get complete author data with resolved assets
    */
   private async fetchMissingAuthors(ids: string[]): Promise<void> {
     try {
-      const authors = await client.fetch<Author[]>(
-        authorReferencesQuery, 
-        { ids, language: this.language }
+      // Get all authors and filter to the ones we need
+      // This is more efficient than multiple individual queries
+      const allAuthors = await client.fetch<AuthorBySlugQueryResult[]>(
+        allAuthorsQuery, 
+        { language: this.language }
+      )
+
+      // Filter to only the authors we need
+      const neededAuthors = allAuthors.filter(author => 
+        author && author._id && ids.includes(author._id)
       )
 
       // Cache the fetched authors
-      this.cache.setMultipleAuthors(authors)
+      this.cache.setMultipleAuthors(neededAuthors)
 
       // Verify we got all requested authors
-      const fetchedIds = new Set(authors.map(author => author._id).filter(Boolean))
+      const fetchedIds = new Set(neededAuthors.map(author => author && author._id).filter(Boolean))
       const missingIds = ids.filter(id => !fetchedIds.has(id))
 
       if (missingIds.length > 0) {
@@ -125,19 +134,26 @@ export class ReferenceResolver {
 
   /**
    * Fetch missing categories and cache them
+   * Uses the full allCategoriesQuery to get complete category data with resolved assets
    */
   private async fetchMissingCategories(ids: string[]): Promise<void> {
     try {
-      const categories = await client.fetch<Category[]>(
-        categoryReferencesQuery, 
-        { ids, language: this.language }
+      // Get all categories and filter to the ones we need
+      const allCategories = await client.fetch<CategoryBySlugQueryResult[]>(
+        allCategoriesQuery, 
+        { language: this.language }
+      )
+
+      // Filter to only the categories we need
+      const neededCategories = allCategories.filter(category => 
+        category && category._id && ids.includes(category._id)
       )
 
       // Cache the fetched categories
-      this.cache.setMultipleCategories(categories)
+      this.cache.setMultipleCategories(neededCategories)
 
       // Verify we got all requested categories
-      const fetchedIds = new Set(categories.map(category => category._id).filter(Boolean))
+      const fetchedIds = new Set(neededCategories.map(category => category && category._id).filter(Boolean))
       const missingIds = ids.filter(id => !fetchedIds.has(id))
 
       if (missingIds.length > 0) {
@@ -162,20 +178,20 @@ export class ReferenceResolver {
   /**
    * Helper method to resolve a single author reference
    */
-  async resolveAuthor(authorId: string): Promise<Author> {
+  async resolveAuthor(authorId: string): Promise<AuthorBySlugQueryResult> {
     const resolved = await this.resolveReferences([
       { id: authorId, type: 'author' }
     ])
-    return resolved[0].data as Author
+    return resolved[0].data as AuthorBySlugQueryResult
   }
 
   /**
    * Helper method to resolve a single category reference
    */
-  async resolveCategory(categoryId: string): Promise<Category> {
+  async resolveCategory(categoryId: string): Promise<CategoryBySlugQueryResult> {
     const resolved = await this.resolveReferences([
       { id: categoryId, type: 'category' }
     ])
-    return resolved[0].data as Category
+    return resolved[0].data as CategoryBySlugQueryResult
   }
 } 

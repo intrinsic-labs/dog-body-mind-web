@@ -1,16 +1,23 @@
 import { client } from '../../sanity/client'
-import { Post, Author, Category, Organization } from '../sanity.types'
+import { 
+  PostBySlugQueryResult,
+  AllPostsQueryResult,
+  AuthorBySlugQueryResult,
+  AllAuthorsQueryResult,
+  CategoryBySlugQueryResult,
+  AllCategoriesQueryResult,
+  ChildCategoriesQueryResult,
+  OrganizationQueryResult
+} from '../sanity.types'
 import { 
   allPostsQuery, 
   postBySlugQuery 
 } from '../post-queries'
 import { 
-  allAuthorsQuery, 
-  // authorBySlugQuery 
+  allAuthorsQuery
 } from '../author-queries'
 import { 
-  allCategoriesQuery, 
-  // categoryBySlugQuery,
+  allCategoriesQuery,
   childCategoriesQuery 
 } from '../category-queries'
 import { 
@@ -18,9 +25,8 @@ import {
 } from '../organization-queries'
 import {
   IDataManager,
-  ResolvedPost,
-  // ResolvedAuthor,
-  ResolvedCategory,
+  PostWithReferences,
+  CategoryWithParent,
   ReferenceRequest,
   ResolvedReference,
   DataManagerError,
@@ -45,7 +51,7 @@ export class DataManager implements IDataManager {
   async initialize(): Promise<void> {
     try {
       // Eagerly load organization (always needed for schema.org)
-      const organization = await client.fetch<Organization>(
+      const organization = await client.fetch<OrganizationQueryResult>(
         organizationQuery, 
         { language: this.language }
       )
@@ -61,7 +67,7 @@ export class DataManager implements IDataManager {
       this.cache.setOrganization(organization)
       
       // Eagerly load all categories (commonly needed for navigation)
-      const categories = await client.fetch<Category[]>(
+      const categories = await client.fetch<AllCategoriesQueryResult>(
         allCategoriesQuery, 
         { language: this.language }
       )
@@ -82,14 +88,15 @@ export class DataManager implements IDataManager {
   }
 
   /**
-   * Get a single post with all references resolved
+   * Get a single post with all document references resolved
+   * Assets and language fields are already resolved by the query
    */
-  async getPost(slug: string): Promise<ResolvedPost> {
+  async getPost(slug: string): Promise<PostWithReferences> {
     this.ensureInitialized()
     
     try {
-      // Fetch the post
-      const post = await client.fetch<Post>(
+      // Fetch the post - this already has resolved assets and extracted language fields
+      const post = await client.fetch<PostBySlugQueryResult>(
         postBySlugQuery, 
         { slug, language: this.language }
       )
@@ -102,7 +109,7 @@ export class DataManager implements IDataManager {
         )
       }
 
-      // Resolve references
+      // Resolve document references only (assets are already resolved by query)
       if (!post.author?._ref) {
         throw new DataManagerError(
           `Post missing author reference: ${slug}`,
@@ -114,7 +121,7 @@ export class DataManager implements IDataManager {
       const author = await this.getPostAuthor(post.author._ref)
       
       // Resolve all categories in order (first one is primary)
-      const categories: Category[] = []
+      const categories: CategoryBySlugQueryResult[] = []
       if (post.categories && post.categories.length > 0) {
         const categoryRequests = post.categories.map(cat => ({
           id: cat._ref,
@@ -126,7 +133,7 @@ export class DataManager implements IDataManager {
         for (const postCat of post.categories) {
           const resolved = resolvedCategories.find(r => r.id === postCat._ref)
           if (resolved && resolved.data) {
-            categories.push(resolved.data as Category)
+            categories.push(resolved.data as CategoryBySlugQueryResult)
           }
         }
       }
@@ -156,11 +163,11 @@ export class DataManager implements IDataManager {
   /**
    * Get all posts (for static generation)
    */
-  async getAllPosts(): Promise<Post[]> {
+  async getAllPosts(): Promise<AllPostsQueryResult> {
     this.ensureInitialized()
     
     try {
-      const posts = await client.fetch<Post[]>(
+      const posts = await client.fetch<AllPostsQueryResult>(
         allPostsQuery, 
         { language: this.language }
       )
@@ -177,7 +184,7 @@ export class DataManager implements IDataManager {
   /**
    * Get a post's author, with caching
    */
-  async getPostAuthor(authorId: string): Promise<Author> {
+  async getPostAuthor(authorId: string): Promise<AuthorBySlugQueryResult> {
     this.ensureInitialized()
     
     // Check cache first
@@ -193,11 +200,11 @@ export class DataManager implements IDataManager {
   /**
    * Get all authors
    */
-  async getAllAuthors(): Promise<Author[]> {
+  async getAllAuthors(): Promise<AllAuthorsQueryResult> {
     this.ensureInitialized()
     
     try {
-      const authors = await client.fetch<Author[]>(
+      const authors = await client.fetch<AllAuthorsQueryResult>(
         allAuthorsQuery, 
         { language: this.language }
       )
@@ -218,7 +225,7 @@ export class DataManager implements IDataManager {
   /**
    * Get a post's category, with caching
    */
-  async getPostCategory(categoryId: string): Promise<Category> {
+  async getPostCategory(categoryId: string): Promise<CategoryBySlugQueryResult> {
     this.ensureInitialized()
     
     // Check cache first
@@ -234,15 +241,15 @@ export class DataManager implements IDataManager {
   /**
    * Get a category with its parent resolved
    */
-  async getCategoryWithParent(categoryId: string): Promise<ResolvedCategory> {
+  async getCategoryWithParent(categoryId: string): Promise<CategoryWithParent> {
     this.ensureInitialized()
     
     // Get the category first
     const category = await this.getPostCategory(categoryId)
     
     // Resolve parent if it exists
-    let parent: Category | null = null
-    if (category.parent?._ref) {
+    let parent: CategoryBySlugQueryResult | null = null
+    if (category && category.parent?._ref) {
       parent = await this.getPostCategory(category.parent._ref)
     }
     
@@ -255,11 +262,11 @@ export class DataManager implements IDataManager {
   /**
    * Get all categories
    */
-  async getAllCategories(): Promise<Category[]> {
+  async getAllCategories(): Promise<AllCategoriesQueryResult> {
     this.ensureInitialized()
     
     try {
-      const categories = await client.fetch<Category[]>(
+      const categories = await client.fetch<AllCategoriesQueryResult>(
         allCategoriesQuery, 
         { language: this.language }
       )
@@ -279,18 +286,30 @@ export class DataManager implements IDataManager {
 
   /**
    * Get child categories for hierarchical navigation
+   * Note: Returns lightweight category data, not full category objects
    */
-  async getCategoryChildren(parentId: string): Promise<Category[]> {
+  async getCategoryChildren(parentId: string): Promise<CategoryBySlugQueryResult[]> {
     this.ensureInitialized()
     
     try {
-      const children = await client.fetch<Category[]>(
+      // Get minimal child category data
+      const childrenData = await client.fetch<ChildCategoriesQueryResult>(
         childCategoriesQuery, 
         { parentId, language: this.language }
       )
       
-      // Cache the children
-      this.cache.setMultipleCategories(children)
+      // Convert to CategoryBySlugQueryResult format by filling missing fields
+      const children: CategoryBySlugQueryResult[] = childrenData.map(child => ({
+        ...child,
+        _type: 'category' as const,
+        _createdAt: '',
+        _updatedAt: '', 
+        _rev: '',
+        metaDescription: null,
+        featuredImage: null,
+        parent: null,
+        language: this.language
+      }))
       
       return children
     } catch (error) {
@@ -305,7 +324,7 @@ export class DataManager implements IDataManager {
   /**
    * Get the organization (cached during initialization)
    */
-  async getOrganization(): Promise<Organization> {
+  async getOrganization(): Promise<OrganizationQueryResult> {
     this.ensureInitialized()
     
     const organization = this.cache.getOrganization()

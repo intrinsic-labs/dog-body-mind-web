@@ -1,4 +1,8 @@
-import { Author, Category, Organization } from '../sanity.types'
+import { 
+  AuthorBySlugQueryResult,
+  CategoryBySlugQueryResult, 
+  OrganizationQueryResult 
+} from '../sanity.types'
 import { DataManagerCache } from './types'
 
 export class DataManagerCacheManager {
@@ -9,45 +13,45 @@ export class DataManagerCacheManager {
   }
 
   // Author cache operations
-  getAuthor(id: string): Author | null {
+  getAuthor(id: string): AuthorBySlugQueryResult | null {
     return this.cache.authors[id] || null
   }
 
-  setAuthor(id: string, author: Author): void {
+  setAuthor(id: string, author: AuthorBySlugQueryResult): void {
     this.cache.authors[id] = author
   }
 
-  setMultipleAuthors(authors: Author[]): void {
+  setMultipleAuthors(authors: AuthorBySlugQueryResult[]): void {
     authors.forEach(author => {
-      if (author._id) {
+      if (author && author._id) {
         this.cache.authors[author._id] = author
       }
     })
   }
 
   // Category cache operations
-  getCategory(id: string): Category | null {
+  getCategory(id: string): CategoryBySlugQueryResult | null {
     return this.cache.categories[id] || null
   }
 
-  setCategory(id: string, category: Category): void {
+  setCategory(id: string, category: CategoryBySlugQueryResult): void {
     this.cache.categories[id] = category
   }
 
-  setMultipleCategories(categories: Category[]): void {
+  setMultipleCategories(categories: CategoryBySlugQueryResult[]): void {
     categories.forEach(category => {
-      if (category._id) {
+      if (category && category._id) {
         this.cache.categories[category._id] = category
       }
     })
   }
 
   // Organization cache operations
-  getOrganization(): Organization | null {
+  getOrganization(): OrganizationQueryResult | null {
     return this.cache.organization
   }
 
-  setOrganization(organization: Organization): void {
+  setOrganization(organization: OrganizationQueryResult): void {
     this.cache.organization = organization
   }
 
