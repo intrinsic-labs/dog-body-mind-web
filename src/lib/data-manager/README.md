@@ -21,13 +21,25 @@ await dataManager.initialize()
 
 // Get a single post with all references resolved
 const resolvedPost = await dataManager.getPost('my-blog-post')
-// Returns: { post, author, category, organization }
+// Returns: { post, author, primaryCategory, categories, organization }
 
 // Get all posts (for static generation)
 const allPosts = await dataManager.getAllPosts()
 
 // Get cached organization
 const organization = await dataManager.getOrganization()
+
+// Work with multiple categories
+const { post, author, primaryCategory, categories, organization } = await dataManager.getPost('my-post')
+
+// Use primary category for main classification
+const articleSection = primaryCategory?.title || 'General'
+
+// Use all categories for tags/navigation
+const categoryTags = categories.map(cat => cat.title)
+
+// Get category with parent for breadcrumbs
+const { category, parent } = await dataManager.getCategoryWithParent(primaryCategory._id)
 ```
 
 ## Static Generation Usage
@@ -51,11 +63,11 @@ export default async function BlogPost({ params }) {
   await dataManager.initialize()
   
   // Get complete post data with resolved references
-  const { post, author, category, organization } = await dataManager.getPost(params.slug)
+  const { post, author, primaryCategory, categories, organization } = await dataManager.getPost(params.slug)
   
   // Generate schema.org markup
   const schemas = SchemaGenerator.generatePostSchemas({
-    post, author, category, organization
+    post, author, primaryCategory, categories, organization
   })
   
   return (
@@ -74,10 +86,12 @@ export default async function BlogPost({ params }) {
 ### Core Methods
 
 - `initialize()` - Load commonly needed data (organization, categories)
-- `getPost(slug)` - Get post with all references resolved
+- `getPost(slug)` - Get post with all references resolved (including multiple categories)
 - `getAllPosts()` - Get all posts for a language
 - `getPostAuthor(id)` - Get author (cached)
 - `getPostCategory(id)` - Get category (cached)
+- `getCategoryWithParent(id)` - Get category with parent resolved (for hierarchy)
+- `getCategoryChildren(parentId)` - Get child categories
 - `getOrganization()` - Get organization (cached)
 
 ### Batch Operations
@@ -118,6 +132,27 @@ try {
 - **ReferenceResolver** - Handles batched reference resolution
 - **DataManagerCacheManager** - In-memory caching for instance lifecycle
 - **Types** - TypeScript contracts and interfaces
+
+## Category Features
+
+### Multiple Categories per Post
+Posts can have multiple categories with automatic ordering:
+- **Primary Category**: First category (`primaryCategory`) - used for main classification
+- **All Categories**: Complete array (`categories`) - used for tags, related posts, etc.
+- **Studio Ordering**: Categories maintain exact order from Sanity Studio interface
+
+### Category Hierarchy  
+Full support for parent-child category relationships:
+```typescript
+// Get category with parent resolved
+const { category, parent } = await dataManager.getCategoryWithParent(categoryId)
+
+// Get all children of a category
+const children = await dataManager.getCategoryChildren(parentId)
+
+// Build breadcrumbs
+const breadcrumbs = parent ? [parent.title, category.title] : [category.title]
+```
 
 ## Language Support
 

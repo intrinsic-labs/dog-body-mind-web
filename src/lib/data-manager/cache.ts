@@ -1,5 +1,5 @@
 import { Author, Category, Organization } from '../sanity.types'
-import { DataManagerCache, CacheEntry } from './types'
+import { DataManagerCache } from './types'
 
 export class DataManagerCacheManager {
   private cache: DataManagerCache = {

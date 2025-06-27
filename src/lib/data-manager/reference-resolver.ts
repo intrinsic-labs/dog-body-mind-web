@@ -1,12 +1,12 @@
-import { client } from '../sanity/client'
+import { client } from '../../sanity/client'
 import { Author, Category } from '../sanity.types'
 import { 
   authorReferencesQuery, 
-  allAuthorsQuery 
+  // allAuthorsQuery 
 } from '../author-queries'
 import { 
   categoryReferencesQuery, 
-  allCategoriesQuery 
+  // allCategoriesQuery 
 } from '../category-queries'
 import { 
   ReferenceRequest, 
@@ -40,7 +40,7 @@ export class ReferenceResolver {
     const missingCategoryIds = this.cache.getMissingCategoryIds(categoryIds)
 
     // Batch fetch missing references
-    const fetchPromises: Promise<any>[] = []
+    const fetchPromises: Promise<void>[] = []
 
     if (missingAuthorIds.length > 0) {
       fetchPromises.push(this.fetchMissingAuthors(missingAuthorIds))

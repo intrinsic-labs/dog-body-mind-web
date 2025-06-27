@@ -4,13 +4,15 @@ import { Post, Author, Category, Organization } from '../sanity.types'
 export interface ResolvedPost {
   post: Post;
   author: Author;
-  category: Category | null; // Category is optional on posts
+  primaryCategory: Category | null; // First category = primary
+  categories: Category[]; // All categories resolved
   organization: Organization;
 }
 
 export interface ResolvedAuthor {
   author: Author;
   // Future: could include resolved references if authors reference other entities
+  // for something like an Author detail page
 }
 
 export interface ResolvedCategory {
@@ -31,6 +33,9 @@ export interface ResolvedReference {
 }
 
 // Cache types
+
+// Note: CacheEntry is not used in the current implementation.
+// For future use when TTL is set up if needed
 export interface CacheEntry<T> {
   data: T;
   timestamp: number;
@@ -57,6 +62,7 @@ export interface IDataManager {
   
   // Category operations  
   getPostCategory(categoryId: string): Promise<Category>;
+  getCategoryWithParent(categoryId: string): Promise<ResolvedCategory>;
   getAllCategories(): Promise<Category[]>;
   getCategoryChildren(parentId: string): Promise<Category[]>;
   
@@ -72,7 +78,7 @@ export class DataManagerError extends Error {
   constructor(
     message: string,
     public readonly type: 'MISSING_REFERENCE' | 'QUERY_FAILED' | 'INVALID_LANGUAGE',
-    public readonly details?: any
+    public readonly details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'DataManagerError';

@@ -1,4 +1,4 @@
-import { client } from '../sanity/client'
+import { client } from '../../sanity/client'
 import { Post, Author, Category, Organization } from '../sanity.types'
 import { 
   allPostsQuery, 
@@ -6,11 +6,11 @@ import {
 } from '../post-queries'
 import { 
   allAuthorsQuery, 
-  authorBySlugQuery 
+  // authorBySlugQuery 
 } from '../author-queries'
 import { 
   allCategoriesQuery, 
-  categoryBySlugQuery,
+  // categoryBySlugQuery,
   childCategoriesQuery 
 } from '../category-queries'
 import { 
@@ -19,7 +19,7 @@ import {
 import {
   IDataManager,
   ResolvedPost,
-  ResolvedAuthor,
+  // ResolvedAuthor,
   ResolvedCategory,
   ReferenceRequest,
   ResolvedReference,
@@ -103,16 +103,42 @@ export class DataManager implements IDataManager {
       }
 
       // Resolve references
-      const author = await this.getPostAuthor(post.author?._ref!)
-      const category = post.category?._ref 
-        ? await this.getPostCategory(post.category._ref)
-        : null
+      if (!post.author?._ref) {
+        throw new DataManagerError(
+          `Post missing author reference: ${slug}`,
+          'MISSING_REFERENCE',
+          { slug, language: this.language }
+        )
+      }
+      
+      const author = await this.getPostAuthor(post.author._ref)
+      
+      // Resolve all categories in order (first one is primary)
+      const categories: Category[] = []
+      if (post.categories && post.categories.length > 0) {
+        const categoryRequests = post.categories.map(cat => ({
+          id: cat._ref,
+          type: 'category' as const
+        }))
+        const resolvedCategories = await this.getMultipleReferences(categoryRequests)
+        
+        // Maintain the original order from post.categories
+        for (const postCat of post.categories) {
+          const resolved = resolvedCategories.find(r => r.id === postCat._ref)
+          if (resolved && resolved.data) {
+            categories.push(resolved.data as Category)
+          }
+        }
+      }
+      
+      const primaryCategory = categories.length > 0 ? categories[0] : null
       const organization = await this.getOrganization()
 
       return {
         post,
         author,
-        category,
+        primaryCategory,
+        categories,
         organization
       }
     } catch (error) {
@@ -203,6 +229,27 @@ export class DataManager implements IDataManager {
 
     // Resolve via reference resolver
     return await this.referenceResolver.resolveCategory(categoryId)
+  }
+
+  /**
+   * Get a category with its parent resolved
+   */
+  async getCategoryWithParent(categoryId: string): Promise<ResolvedCategory> {
+    this.ensureInitialized()
+    
+    // Get the category first
+    const category = await this.getPostCategory(categoryId)
+    
+    // Resolve parent if it exists
+    let parent: Category | null = null
+    if (category.parent?._ref) {
+      parent = await this.getPostCategory(category.parent._ref)
+    }
+    
+    return {
+      category,
+      parent
+    }
   }
 
   /**
