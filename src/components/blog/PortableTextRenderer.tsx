@@ -23,20 +23,20 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
   const displayTitle = value.title;
 
   return (
-    <div className="my-8">
+    <div className="my-12">
       {displayTitle && (
-        <h4 className="mb-4 font-semibold">{displayTitle}</h4>
+        <h4 className="mb-6 font-medium text-xl">{displayTitle}</h4>
       )}
       
       {value.description && (
-        <p className="mb-4 text-gray-600">{value.description}</p>
+        <p className="mb-6 text-foreground/70 leading-relaxed">{value.description}</p>
       )}
       
-      <div className="relative w-full aspect-video">
+      <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
           title={displayTitle || 'YouTube video'}
-          className="absolute inset-0 w-full h-full rounded-lg"
+          className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
@@ -44,26 +44,26 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       
       {/* Key moments navigation */}
       {value.keyMoments && value.keyMoments.length > 0 && (
-        <div className="mt-4">
-          <h5 className="font-medium mb-2">Video Chapters:</h5>
-          <ul className="space-y-1">
+        <div className="mt-6">
+          <h5 className="font-medium mb-4 text-lg">Video Chapters:</h5>
+          <ul className="space-y-3 bg-foreground/5 rounded-xl p-4">
             {value.keyMoments.map((moment, index) => {
               const minutes = Math.floor(moment.time / 60);
               const seconds = moment.time % 60;
               const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
               
               return (
-                <li key={index} className="text-sm">
+                <li key={index} className="border-b border-foreground/10 last:border-0 pb-3 last:pb-0">
                   <a 
                     href={`${value.url}&t=${moment.time}s`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue hover:text-blue/80 font-medium block transition-colors"
                   >
                     {timestamp} - {moment.title}
                   </a>
                   {moment.description && (
-                    <p className="text-gray-600 ml-4">{moment.description}</p>
+                    <p className="text-foreground/60 mt-1 text-sm leading-relaxed">{moment.description}</p>
                   )}
                 </li>
               );
@@ -74,9 +74,9 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       
       {/* Transcript for accessibility and SEO */}
       {value.transcript && (
-        <details className="mt-4">
-          <summary className="cursor-pointer font-medium">Video Transcript</summary>
-          <div className="mt-2 p-4 bg-gray-50 rounded-lg text-sm whitespace-pre-wrap">
+        <details className="mt-6">
+          <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-orange transition-colors">Video Transcript</summary>
+          <div className="mt-4 p-6 bg-foreground/5 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
             {value.transcript}
           </div>
         </details>
@@ -103,24 +103,22 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
   const loading = value.loading || 'lazy';
 
   return (
-    <figure className={`my-6 ${sizeClass}`}>
-      <div className={value.enableOverflow ? 'overflow-x-auto' : ''}>
+    <figure className={`my-8 ${sizeClass}`}>
+      <div className={`${value.enableOverflow ? 'overflow-x-auto' : ''} rounded-2xl overflow-hidden`}>
         <Image
           src={imageUrl}
           alt={value.alt}
           width={800}
           height={600}
           loading={loading}
-          className="rounded-lg"
+          className="w-full h-auto object-cover"
           style={{ 
-            width: '100%', 
-            height: 'auto',
             minWidth: value.enableOverflow ? 'max-content' : undefined
           }}
         />
       </div>
       {value.caption && (
-        <figcaption className="mt-2 text-sm text-gray-600 text-center italic">
+        <figcaption className="mt-4 text-sm text-foreground/60 text-center italic leading-relaxed">
           {value.caption}
         </figcaption>
       )}
@@ -136,12 +134,16 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
       youtubeEmbed: ({ value }) => <YouTubeEmbedComponent value={value as YouTubeEmbed} />,
     },
     block: {
-      h1: ({ children }) => <h1>{children}</h1>,
-      h2: ({ children }) => <h2>{children}</h2>,
-      h3: ({ children }) => <h3>{children}</h3>,
-      h4: ({ children }) => <h4>{children}</h4>,
-      normal: ({ children }) => <p>{children}</p>,
-      blockquote: ({ children }) => <blockquote>{children}</blockquote>,
+      h1: ({ children }) => <h1 className="mt-12 mb-6 first:mt-0">{children}</h1>,
+      h2: ({ children }) => <h2 className="mt-10 mb-5 first:mt-0">{children}</h2>,
+      h3: ({ children }) => <h3 className="mt-8 mb-4 first:mt-0">{children}</h3>,
+      h4: ({ children }) => <h4 className="mt-6 mb-3 first:mt-0">{children}</h4>,
+      normal: ({ children }) => <p className="mb-6 leading-relaxed">{children}</p>,
+      blockquote: ({ children }) => (
+        <blockquote className="my-8 pl-6 border-l-4 border-orange bg-orange/5 py-4 rounded-r-xl">
+          {children}
+        </blockquote>
+      ),
     },
     marks: {
       link: ({ children, value }) => {
@@ -149,24 +151,33 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
         const rel = value?.blank ? 'noopener noreferrer' : undefined;
         
         return (
-          <a href={value?.href} target={target} rel={rel}>
+          <a 
+            href={value?.href} 
+            target={target} 
+            rel={rel}
+            className="text-blue hover:text-blue/80 underline decoration-blue/30 hover:decoration-blue/60 transition-colors underline-offset-2"
+          >
             {children}
           </a>
         );
       },
-      strong: ({ children }) => <strong>{children}</strong>,
-      em: ({ children }) => <em>{children}</em>,
-      code: ({ children }) => <code>{children}</code>,
-      underline: ({ children }) => <u>{children}</u>,
-      'strike-through': ({ children }) => <s>{children}</s>,
+      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+      em: ({ children }) => <em className="italic">{children}</em>,
+      code: ({ children }) => (
+        <code className="px-2 py-1 bg-foreground/10 rounded-md text-sm font-mono">
+          {children}
+        </code>
+      ),
+      underline: ({ children }) => <u className="underline decoration-foreground/50">{children}</u>,
+      'strike-through': ({ children }) => <s className="line-through decoration-foreground/50">{children}</s>,
     },
     list: {
-      bullet: ({ children }) => <ul>{children}</ul>,
-      number: ({ children }) => <ol>{children}</ol>,
+      bullet: ({ children }) => <ul className="my-6 space-y-2 ml-6 list-disc">{children}</ul>,
+      number: ({ children }) => <ol className="my-6 space-y-2 ml-6 list-decimal">{children}</ol>,
     },
     listItem: {
-      bullet: ({ children }) => <li>{children}</li>,
-      number: ({ children }) => <li>{children}</li>,
+      bullet: ({ children }) => <li className="leading-relaxed">{children}</li>,
+      number: ({ children }) => <li className="leading-relaxed">{children}</li>,
     },
   };
 
