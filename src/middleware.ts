@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
-import { locales, defaultLocale, isValidLocale } from '@/lib/locale';
+import { locales, defaultLocale } from '@/lib/locale';
 
 function getLocale(request: NextRequest): string {
   // Try to get locale from Accept-Language header
@@ -9,7 +9,7 @@ function getLocale(request: NextRequest): string {
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
   
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  const detectedLocale = match(languages, locales as any, defaultLocale);
+  const detectedLocale = match(languages, locales as readonly string[], defaultLocale);
   
   return detectedLocale;
 }

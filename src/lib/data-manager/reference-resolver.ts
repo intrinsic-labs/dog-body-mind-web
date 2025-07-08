@@ -5,10 +5,10 @@ import {
 } from '../sanity.types'
 import { 
   allAuthorsQuery 
-} from '../author-queries'
+} from '../queries/author-queries'
 import { 
   allCategoriesQuery 
-} from '../category-queries'
+} from '../queries/category-queries'
 import { 
   ReferenceRequest, 
   ResolvedReference, 

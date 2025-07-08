@@ -12,17 +12,18 @@ import {
 import { 
   allPostsQuery, 
   postBySlugQuery 
-} from '../post-queries'
+} from '../queries/post-queries'
 import { 
   allAuthorsQuery
-} from '../author-queries'
+} from '../queries/author-queries'
 import { 
-  allCategoriesQuery,
+  allCategoriesQuery, 
   childCategoriesQuery 
-} from '../category-queries'
+} from '../queries/category-queries'
 import { 
-  organizationQuery 
-} from '../organization-queries'
+  organizationQuery,
+  organizationDebugQuery 
+} from '../queries/organization-queries'
 import {
   IDataManager,
   PostWithReferences,
@@ -49,12 +50,23 @@ export class DataManager implements IDataManager {
    * Initialize the DataManager with commonly needed data
    */
   async initialize(): Promise<void> {
+    console.log(`🔍 DataManager: Initializing for language: ${this.language}`)
     try {
       // Eagerly load organization (always needed for schema.org)
+      console.log('📡 DataManager: Fetching organization...')
+      
       const organization = await client.fetch<OrganizationQueryResult>(
         organizationQuery, 
         { language: this.language }
       )
+    
+      
+      // If organization not found with language filtering, try debug query
+      if (!organization) {
+        console.log('🐛 DataManager: Trying debug query without language filtering...')
+        const debugOrg = await client.fetch(organizationDebugQuery)
+        console.log('🐛 DataManager: Debug organization result:', debugOrg)
+      }
       
       if (!organization) {
         throw new DataManagerError(
@@ -287,6 +299,8 @@ export class DataManager implements IDataManager {
   /**
    * Get child categories for hierarchical navigation
    * Note: Returns lightweight category data, not full category objects
+   * 
+   * What is the point of this? It should return the full category object.
    */
   async getCategoryChildren(parentId: string): Promise<CategoryBySlugQueryResult[]> {
     this.ensureInitialized()

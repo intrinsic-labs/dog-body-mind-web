@@ -8,6 +8,7 @@ export default async function Home({
 }: {
   params: Promise<{ locale: Locale }>
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { locale } = await params;
   
   return (

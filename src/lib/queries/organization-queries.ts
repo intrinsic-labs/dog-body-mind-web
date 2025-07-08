@@ -69,4 +69,20 @@ export const organizationReferenceQuery = defineQuery(`
     url,
     "description": description[_key == $language][0].value
   }
+`)
+
+// Debug query - get organization without language filtering
+export const organizationDebugQuery = defineQuery(`
+  *[_type == "organization"][0] {
+    _id,
+    name,
+    url,
+    description,
+    logo {
+      asset-> {
+        url
+      },
+      alt
+    }
+  }
 `) 

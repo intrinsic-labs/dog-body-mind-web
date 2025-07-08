@@ -94,7 +94,7 @@ export class DataManagerError extends Error {
 }
 
 // Language type
-export type SupportedLanguage = 'en' | 'uk' | 'de' | 'fr' | 'es' | 'it';
+export type SupportedLanguage = 'en' | 'uk' | 'de' | 'fr' | 'es' | 'it'; 
 
 // Helper types for extracting single items from array query results
 export type PostItem = AllPostsQueryResult[0];
