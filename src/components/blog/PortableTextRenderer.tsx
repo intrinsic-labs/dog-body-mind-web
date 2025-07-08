@@ -134,10 +134,26 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
       youtubeEmbed: ({ value }) => <YouTubeEmbedComponent value={value as YouTubeEmbed} />,
     },
     block: {
-      h1: ({ children }) => <h1 className="mt-12 mb-6 first:mt-0">{children}</h1>,
-      h2: ({ children }) => <h2 className="mt-10 mb-5 first:mt-0">{children}</h2>,
-      h3: ({ children }) => <h3 className="mt-8 mb-4 first:mt-0">{children}</h3>,
-      h4: ({ children }) => <h4 className="mt-6 mb-3 first:mt-0">{children}</h4>,
+      h1: ({ children, value }) => {
+        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
+        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
+        return <h1 id={id} className="mt-12 mb-6 first:mt-0">{children}</h1>;
+      },
+      h2: ({ children, value }) => {
+        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
+        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
+        return <h2 id={id} className="mt-10 mb-5 first:mt-0">{children}</h2>;
+      },
+      h3: ({ children, value }) => {
+        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
+        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
+        return <h3 id={id} className="mt-8 mb-4 first:mt-0">{children}</h3>;
+      },
+      h4: ({ children, value }) => {
+        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
+        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
+        return <h4 id={id} className="mt-6 mb-3 first:mt-0">{children}</h4>;
+      },
       normal: ({ children }) => <p className="mb-6 leading-relaxed">{children}</p>,
       blockquote: ({ children }) => (
         <blockquote className="my-8 pl-6 border-l-4 border-orange bg-orange/5 py-4 rounded-r-xl">

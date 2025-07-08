@@ -2,12 +2,71 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { DisplayPost } from '@/lib/blog-types';
 import PortableTextRenderer from './PortableTextRenderer';
+import { PortableTextBlock } from '@portabletext/types';
 
 interface BlogPostProps {
   post: DisplayPost;
 }
 
+// Utility function to extract headings from portable text content
+function extractHeadings(content: PortableTextBlock[]) {
+  const headings: Array<{
+    text: string;
+    level: number;
+    id: string;
+  }> = [];
+
+  content.forEach((block) => {
+    if (block._type === 'block' && block.style && 
+        ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(block.style)) {
+      
+      // Extract text from children
+      const text = block.children
+        ?.map((child) => (child as { text?: string }).text || '')
+        .join('') || '';
+      
+      if (text.trim()) {
+        const level = parseInt(block.style.replace('h', ''), 10);
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .trim();
+        
+        headings.push({ text, level, id });
+      }
+    }
+  });
+
+  return headings;
+}
+
+// Table of Contents component
+function TableOfContents({ headings }: { headings: Array<{ text: string; level: number; id: string }> }) {
+  if (headings.length === 0) return null;
+
+  return (
+    <nav className="mb-12 max-w-2xl w-full border-b border-foreground/10 pb-4">
+      <h3 className="text-lg font-medium mb-4 text-foreground">In This Article We Will Cover:</h3>
+      <ul className="space-y-2">
+          {headings.map((heading, index) => (
+            <li key={index}>
+              <a
+                href={`#${heading.id}`}
+                className="hover:text-orange transition-colors leading-relaxed block py-1"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+    </nav>
+  );
+}
+
 export default function BlogPost({ post }: BlogPostProps) {
+  const headings = extractHeadings(post.content);
+
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center">
       <header className="mb-12 flex flex-col items-center">
@@ -62,6 +121,9 @@ export default function BlogPost({ post }: BlogPostProps) {
         )}
       </header>
       
+      {/* Table of Contents */}
+      <TableOfContents headings={headings} />
+      
       {/* Content */}
       <div className="prose prose-lg max-w-2xl">
         <PortableTextRenderer content={post.content} />
@@ -87,8 +149,8 @@ export default function BlogPost({ post }: BlogPostProps) {
           </div>
         )}
         
-        {/* Author info */}
-        <div className="bg-gradient-to-br from-background to-foreground/5 rounded-2xl p-6 sm:p-8">
+        {/* Author info - add soon */}
+        {/* <div className="bg-gradient-to-br from-background to-foreground/5 rounded-2xl p-6 sm:p-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-orange/20 rounded-full flex items-center justify-center">
               <span className="text-orange font-bold text-xl">
@@ -105,7 +167,7 @@ export default function BlogPost({ post }: BlogPostProps) {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
       </footer>
     </article>
   );
