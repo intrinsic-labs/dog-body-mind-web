@@ -60,8 +60,8 @@ export default async function BlogPage({
 
     return (
       <main>
-        <div className="container mx-auto px-4 py-8">
-          <h1>Blog</h1>
+        <div className="container mx-auto px-4 py-8 flex flex-col items-center">
+          <h1>Dog Body Mind Blog</h1>
           <BlogList posts={displayPosts} />
         </div>
       </main>

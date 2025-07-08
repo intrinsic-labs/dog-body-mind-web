@@ -1,6 +1,4 @@
-import Header from "@/components/Header";
-import HeroSection from "@/components/home/HeroSection";
-import Footer from "@/components/Footer";
+import { redirect } from 'next/navigation';
 import { Locale } from "@/lib/locale";
 
 export default async function Home({
@@ -8,16 +6,8 @@ export default async function Home({
 }: {
   params: Promise<{ locale: Locale }>
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { locale } = await params;
   
-  return (
-    <div className="flex flex-col items-center min-h-screen bg-background">
-      <Header />
-      <main className="flex flex-col items-center w-full">
-        <HeroSection />
-      </main>
-      <Footer />
-    </div>
-  );
+  // Redirect to blog page
+  redirect(`/${locale}/blog`);
 }
