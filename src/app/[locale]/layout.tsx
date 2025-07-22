@@ -3,6 +3,9 @@ import { rubik, helvetica } from "@/fonts/fonts";
 import { Locale, locales, localeToLanguageTag } from "@/lib/locale";
 import { Metadata } from "next";
 
+// Revalidate all pages every hour (3600 seconds)
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }

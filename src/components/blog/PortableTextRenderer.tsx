@@ -163,14 +163,15 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
     },
     marks: {
       link: ({ children, value }) => {
-        const target = value?.blank ? '_blank' : undefined;
-        const rel = value?.blank ? 'noopener noreferrer' : undefined;
+
+        // how do we hyperlink between blog posts and still
+        // respect the current locale of the browser?
         
         return (
           <a 
             href={value?.href} 
-            target={target} 
-            rel={rel}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-blue hover:text-blue/80 underline decoration-blue/30 hover:decoration-blue/60 transition-colors underline-offset-2"
           >
             {children}
