@@ -187,6 +187,8 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
       ),
       underline: ({ children }) => <u className="underline decoration-foreground/50">{children}</u>,
       'strike-through': ({ children }) => <s className="line-through decoration-foreground/50">{children}</s>,
+      super: ({ children }) => <sup>{children}</sup>,
+      sub: ({ children }) => <sub>{children}</sub>,
     },
     list: {
       bullet: ({ children }) => <ul className="my-6 space-y-2 ml-6 list-disc">{children}</ul>,
