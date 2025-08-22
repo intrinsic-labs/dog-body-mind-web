@@ -70,7 +70,7 @@ export const postBySlugQuery = defineQuery(`
     // Content classification
     categories,
     tags,
-    targetAudience,
+    // targetAudience,
     
     // FAQ schema support
     faqs[] {
@@ -180,7 +180,7 @@ export const allPostsQuery = defineQuery(`
     // Content classification
     categories,
     tags,
-    targetAudience,
+    // targetAudience,
     
     // FAQ schema support
     faqs[] {
@@ -290,7 +290,7 @@ export const featuredPostsQuery = defineQuery(`
     // Content classification
     categories,
     tags,
-    targetAudience,
+    // targetAudience,
     
     // FAQ schema support
     faqs[] {

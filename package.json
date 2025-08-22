@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typegen": "cd ../dbm-sanity && npx sanity schema extract --enforce-required-fields && cd ../dbm-frontend && npx sanity typegen generate"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.1",
