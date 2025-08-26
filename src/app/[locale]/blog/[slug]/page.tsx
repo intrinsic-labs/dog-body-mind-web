@@ -99,7 +99,7 @@ export default async function BlogPostPage({
     return (
       <main>
         <div className="container mx-auto px-4 py-8">
-          <BlogPost post={displayPost} />
+          <BlogPost post={displayPost} currentLocale={locale} />
         </div>
       </main>
     );

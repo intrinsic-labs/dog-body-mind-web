@@ -39,7 +39,6 @@ export type BlockContent = Array<{
   listItem?: "bullet" | "number";
   markDefs?: Array<{
     href?: string;
-    linkText: string;
     blank?: boolean;
     _type: "link";
     _key: string;

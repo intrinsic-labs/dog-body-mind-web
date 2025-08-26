@@ -1,15 +1,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { DisplayPost } from '@/lib/blog-types';
+import { Locale } from '@/lib/locale';
 
 interface BlogCardProps {
   post: DisplayPost;
+  currentLocale: Locale;
 }
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({ post, currentLocale }: BlogCardProps) {
+  // Generate locale-aware link that preserves current locale context
+  const postUrl = `/${currentLocale}/blog/${post.slug}`;
+  
   return (
     <article className="group">
-      <Link href={`/blog/${post.slug}`} className="block">
+      <Link href={postUrl} className="block">
         <div className="bg-background border border-foreground/10 rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-orange/20">
           {/* Cover Image */}
           {post.coverImageUrl && (

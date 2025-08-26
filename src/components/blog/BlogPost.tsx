@@ -1,40 +1,31 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { DisplayPost } from '@/lib/blog-types';
-import PortableTextRenderer from './PortableTextRenderer';
 import { PortableTextBlock } from '@portabletext/types';
+import { DisplayPost } from '@/lib/blog-types';
+import { Locale } from '@/lib/locale';
+import PortableTextRenderer from './PortableTextRenderer';
 
 interface BlogPostProps {
   post: DisplayPost;
+  currentLocale: Locale;
 }
 
-// Utility function to extract headings from portable text content
 function extractHeadings(content: PortableTextBlock[]) {
-  const headings: Array<{
-    text: string;
-    level: number;
-    id: string;
-  }> = [];
+  const headings: Array<{ text: string; level: number; id: string }> = [];
 
   content.forEach((block) => {
-    if (block._type === 'block' && block.style && 
-        ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(block.style)) {
-      
-      // Extract text from children
+    if (block._type === 'block' && block.style && ['h1', 'h2', 'h3', 'h4'].includes(block.style)) {
       const text = block.children
         ?.map((child) => (child as { text?: string }).text || '')
         .join('') || '';
       
-      if (text.trim()) {
-        const level = parseInt(block.style.replace('h', ''), 10);
-        const id = text
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .trim();
-        
-        headings.push({ text, level, id });
-      }
+      const level = parseInt(block.style.replace('h', ''));
+      const id = text.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .trim();
+
+      headings.push({ text, level, id });
     }
   });
 
@@ -49,22 +40,22 @@ function TableOfContents({ headings }: { headings: Array<{ text: string; level: 
     <nav className="mb-12 max-w-2xl w-full border-b border-foreground/10 pb-4">
       <h3 className="text-lg font-medium mb-4 text-foreground">In This Article We Will Cover:</h3>
       <ul className="space-y-2">
-          {headings.map((heading, index) => (
-            <li key={index}>
-              <a
-                href={`#${heading.id}`}
-                className="hover:text-orange transition-colors leading-relaxed block py-1"
-              >
-                {heading.text}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {headings.map((heading, index) => (
+          <li key={index}>
+            <a
+              href={`#${heading.id}`}
+              className="hover:text-orange transition-colors leading-relaxed block py-1"
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }
 
-export default function BlogPost({ post }: BlogPostProps) {
+export default function BlogPost({ post, currentLocale }: BlogPostProps) {
   const headings = extractHeadings(post.content);
 
   return (
@@ -77,7 +68,7 @@ export default function BlogPost({ post }: BlogPostProps) {
               {post.categories.map((category: {_id: string, title: string, slug: string}) => (
                 <Link 
                   key={category._id} 
-                  href={`/blog/category/${category.slug}`}
+                  href={`/${currentLocale}/blog/category/${category.slug}`}
                   className="inline-block px-3 py-1 text-sm bg-orange/10 text-orange rounded-full hover:bg-orange/20 transition-colors"
                 >
                   {category.title}
@@ -139,7 +130,7 @@ export default function BlogPost({ post }: BlogPostProps) {
               {post.tags.map((tag: string) => (
                 <Link 
                   key={tag} 
-                  href={`/blog/tag/${encodeURIComponent(tag)}`}
+                  href={`/${currentLocale}/blog/tag/${encodeURIComponent(tag)}`}
                   className="inline-block px-3 py-1 text-sm bg-foreground/5 text-foreground/70 rounded-full hover:bg-foreground/10 transition-colors"
                 >
                   #{tag}
@@ -160,7 +151,7 @@ export default function BlogPost({ post }: BlogPostProps) {
             <div>
               <h4 className="font-medium text-lg">Written by {post.author.name}</h4>
               <Link 
-                href={`/blog/author/${post.author.slug}`}
+                href={`/${currentLocale}/blog/author/${post.author.slug}`}
                 className="text-orange hover:text-orange/80 transition-colors"
               >
                 View all posts by {post.author.name} →

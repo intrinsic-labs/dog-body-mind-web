@@ -4,6 +4,8 @@ import { generateArticleListingMetadata } from '@/lib/metadata/article-metadata'
 import { transformPostForDisplay } from '@/lib/blog-types';
 import BlogList from '@/components/blog/BlogList';
 import { Locale } from '@/lib/locale';
+import { getDomainInfo } from '@/lib/locale';
+import DomainDebugInfo from '@/components/DomainDebugInfo';
 
 export async function generateMetadata({ 
   params 
@@ -44,6 +46,9 @@ export default async function BlogPage({
   const { locale } = await params;
   
   try {
+    // Get domain info for debugging
+    const domainInfo = await getDomainInfo();
+    
     // All data fetching happens at build time
     const dataManager = new DataManager(locale);
     await dataManager.initialize();
@@ -62,8 +67,11 @@ export default async function BlogPage({
       <main>
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
           <h1>Dog Body Mind Blog</h1>
-          <BlogList posts={displayPosts} />
+          <BlogList posts={displayPosts} currentLocale={locale} />
         </div>
+        
+        {/* Debug info - remove in production */}
+        <DomainDebugInfo serverDomainInfo={domainInfo} />
       </main>
     );
   } catch (error) {
@@ -74,6 +82,9 @@ export default async function BlogPage({
           <h1>Blog</h1>
           <p>Sorry, we couldn&apos;t load the blog posts at this time.</p>
         </div>
+        
+        {/* Debug info - remove in production */}
+        <DomainDebugInfo />
       </main>
     );
   }
