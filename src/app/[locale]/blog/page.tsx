@@ -5,7 +5,6 @@ import { transformPostForDisplay } from '@/lib/blog-types';
 import BlogList from '@/components/blog/BlogList';
 import { Locale } from '@/lib/locale';
 import { getDomainInfo } from '@/lib/locale';
-import DomainDebugInfo from '@/components/DomainDebugInfo';
 
 export async function generateMetadata({ 
   params 
@@ -69,9 +68,6 @@ export default async function BlogPage({
           <h1>Dog Body Mind Blog</h1>
           <BlogList posts={displayPosts} currentLocale={locale} />
         </div>
-        
-        {/* Debug info - remove in production */}
-        <DomainDebugInfo serverDomainInfo={domainInfo} />
       </main>
     );
   } catch (error) {

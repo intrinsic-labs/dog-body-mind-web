@@ -19,6 +19,9 @@ export const domainLocaleMap = {
   'dogbodymind.local:3000': 'en',
   'dogbodymind.de.local:3000': 'de',
   'dogbodymind.fr.local:3000': 'fr',
+  'dogbodymind.es.local:3000': 'es',
+  'dogbodymind.it.local:3000': 'it',
+  'dogbodymind.co.uk.local:3000': 'uk'
 } as const;
 
 // Map our locale codes to proper language tags for schema markup
@@ -49,6 +52,16 @@ export const localeToDomain: Record<Locale, string> = {
   fr: 'dogbodymind.fr',
   es: 'dogbodymind.es',
   it: 'dogbodymind.it'
+};
+
+// Dev map
+export const devLocaleToDomain: Record<Locale, string> = {
+  en: 'dogbodymind.local:3000',
+  fr: 'dogbodymind.fr.local:3000',
+  de: 'dogbodymind.de.local:3000',
+  es: 'dogbodymind.es.local:3000',
+  it: 'dogbodymind.it.local:3000',
+  uk: 'dogbodymind.co.uk.local:3000'
 };
 
 export function isValidLocale(locale: string): locale is Locale {
@@ -85,9 +98,13 @@ export function getLocaleFromDomain(hostname: string): Locale {
 /**
  * Get the domain for a given locale
  */
-export function getDomainForLocale(locale: Locale): string {
-  return localeToDomain[locale];
-}
+ export function getDomainForLocale(locale: Locale, dev: boolean = false): string {
+   if (dev) {
+     return devLocaleToDomain[locale];
+   } else {
+     return localeToDomain[locale];
+   }
+ }
 
 /**
  * Check if a hostname matches a specific locale's domain
