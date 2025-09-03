@@ -4,7 +4,7 @@ import { generateArticleListingMetadata } from '@/lib/metadata/article-metadata'
 import { transformPostForDisplay } from '@/lib/blog-types';
 import BlogList from '@/components/blog/BlogList';
 import { Locale } from '@/lib/locale';
-import { getDomainInfo } from '@/lib/locale';
+
 
 export async function generateMetadata({ 
   params 
@@ -45,8 +45,7 @@ export default async function BlogPage({
   const { locale } = await params;
   
   try {
-    // Get domain info for debugging
-    const domainInfo = await getDomainInfo();
+
     
     // All data fetching happens at build time
     const dataManager = new DataManager(locale);
@@ -78,9 +77,6 @@ export default async function BlogPage({
           <h1>Blog</h1>
           <p>Sorry, we couldn&apos;t load the blog posts at this time.</p>
         </div>
-        
-        {/* Debug info - remove in production */}
-        <DomainDebugInfo />
       </main>
     );
   }
