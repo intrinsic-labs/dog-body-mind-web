@@ -322,7 +322,8 @@ export class DataManager implements IDataManager {
         metaDescription: null,
         featuredImage: null,
         parent: null,
-        language: this.language
+        //language: this.language
+        language: null
       }))
       
       return children
