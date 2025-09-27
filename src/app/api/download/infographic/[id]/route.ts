@@ -14,11 +14,11 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Extract parameters
-    const { id } = params;
+    const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
     const language =
       searchParams.get("lang") || searchParams.get("language") || "en";
@@ -60,38 +60,19 @@ export async function GET(
     }
 
     // Fetch infographic data from Sanity
-    console.log(`Fetching infographic with ID: ${id}, Language: ${language}`);
     const infographic = await getInfographicById(id, language);
 
     if (!infographic) {
-      console.error(`Infographic not found for ID: ${id}`);
       return NextResponse.json(
         { error: "Infographic not found" },
         { status: 404 },
       );
     }
 
-    console.log("Raw infographic data:", JSON.stringify(infographic, null, 2));
-
     // Validate infographic data
     if (!validateInfographicData(infographic)) {
-      console.error("❌ Validation failed for infographic data:");
-      console.error("- Title:", infographic.title);
-      console.error("- Alt text:", infographic.altText);
-      console.error("- Image:", infographic.image);
-      console.error("- Image debug:", (infographic as any).imageDebug);
-      console.error("Full data:", JSON.stringify(infographic, null, 2));
-
       return NextResponse.json(
-        {
-          error: "Invalid infographic data",
-          details: {
-            hasTitle: !!infographic.title,
-            hasAltText: !!infographic.altText,
-            hasImage: !!infographic.image,
-            imageUrl: infographic.image?.url || null,
-          },
-        },
+        { error: "Invalid infographic data" },
         { status: 400 },
       );
     }
@@ -114,7 +95,6 @@ export async function GET(
     }
 
     // Generate PDF
-    console.log(`Generating PDF for infographic ${id} in language ${language}`);
     const pdfBuffer = await generateInfographicPDF(infographic, pdfOptions);
 
     // Generate filename
@@ -132,18 +112,11 @@ export async function GET(
     headers.set("Access-Control-Allow-Methods", "GET");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
 
-    // Log successful generation
-    console.log(
-      `Successfully generated PDF for infographic ${id} (${pdfBuffer.length} bytes)`,
-    );
-
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers,
     });
   } catch (error) {
-    console.error("API route error:", error);
-
     // Handle different types of errors
     if (error instanceof Error) {
       if (error.message.includes("not found")) {

@@ -18,8 +18,7 @@ async function generateQRCode(url: string): Promise<string> {
         light: "#ffffff",
       },
     });
-  } catch (error) {
-    console.error("Error generating QR code:", error);
+  } catch {
     return "";
   }
 }
@@ -54,7 +53,6 @@ export async function generateInfographicPDF(
       stream.on("error", reject);
     });
   } catch (error) {
-    console.error("Error generating PDF:", error);
     throw new Error(
       `Failed to generate PDF: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
@@ -93,48 +91,33 @@ export function validateInfographicData(
   infographic: unknown,
 ): infographic is InfographicPDFData {
   if (!infographic || typeof infographic !== "object" || infographic === null) {
-    console.error("❌ Validation failed: infographic is null or not an object");
     return false;
   }
 
   const data = infographic as Record<string, unknown>;
-  console.log("🔍 Validating infographic data:");
-  console.log("- _id:", data._id);
-  console.log("- title:", data.title);
-  console.log("- altText:", data.altText);
-  console.log("- image:", data.image);
-
   const required = ["_id", "title", "altText"];
 
   for (const field of required) {
     if (!data[field]) {
-      console.error(`❌ Missing required field: ${field}`);
       return false;
     }
   }
 
-  // Check image structure - be more flexible about what we accept
+  // Check image structure
   const image = data.image;
   if (!image) {
-    console.error("❌ Missing image field entirely");
-    console.error("Available fields:", Object.keys(data));
     return false;
   }
 
   if (typeof image === "object" && image !== null) {
     const imageObj = image as Record<string, unknown>;
     if (!imageObj.url) {
-      console.error("❌ Image object exists but missing URL");
-      console.error("Image object keys:", Object.keys(imageObj));
-      console.error("Image object:", JSON.stringify(imageObj, null, 2));
       return false;
     }
   } else {
-    console.error("❌ Image is not an object:", typeof image, image);
     return false;
   }
 
-  console.log("✅ Validation passed!");
   return true;
 }
 
@@ -148,13 +131,11 @@ export function validatePDFOptions(
   const opts = options as Record<string, unknown>;
 
   if (!opts.language || typeof opts.language !== "string") {
-    console.error("Missing or invalid language option");
     return false;
   }
 
   const supportedLanguages = ["en", "uk", "de", "fr", "es", "it"];
   if (!supportedLanguages.includes(opts.language)) {
-    console.error(`Unsupported language: ${opts.language}`);
     return false;
   }
 

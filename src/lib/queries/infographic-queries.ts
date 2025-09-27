@@ -59,9 +59,6 @@ export const infographicByIdQuery = defineQuery(`
       }
     },
 
-    // Debug: Include raw image structure to troubleshoot
-    "imageDebug": image[0].asset,
-
     // PDF-specific fields (with fallbacks)
     "downloadFilename": coalesce(
       downloadFilename[language == $language][0].value,
