@@ -13,6 +13,70 @@
  */
 
 // Source: schema.json
+export type Infographic = {
+  _id: string;
+  _type: "infographic";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    value: string;
+    _type: "localizedTitle";
+    _key: string;
+  }>;
+  slug: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    current: Slug;
+    _type: "localizedSlug";
+    _key: string;
+  }>;
+  description?: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    value?: string;
+    _type: "localizedDescription";
+    _key: string;
+  }>;
+  image: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    asset: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    _type: "localizedImage";
+    _key: string;
+  }>;
+  altText: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    value: string;
+    _type: "localizedAltText";
+    _key: string;
+  }>;
+  downloadFilename?: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    value: string;
+    _type: "localizedFilename";
+    _key: string;
+  }>;
+  pdfMetadata?: Array<{
+    language: "en" | "uk" | "de" | "fr" | "es" | "it";
+    title?: string;
+    keywords?: string;
+    author?: string;
+    subject?: string;
+    _type: "localizedPdfMetadata";
+    _key: string;
+  }>;
+};
+
 export type Youtube = {
   _type: "youtube";
   url: string;
@@ -71,6 +135,12 @@ export type BlockContent = Array<{
   size?: "full" | "large" | "medium" | "small";
   _type: "inlineImage";
   _key: string;
+} | {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  _key: string;
+  [internalGroqTypeReferenceTo]?: "infographic";
 } | {
   _key: string;
 } & Youtube>;
@@ -403,25 +473,25 @@ export type SanityImagePalette = {
 
 export type SanityImageDimensions = {
   _type: "sanity.imageDimensions";
-  height?: number;
-  width?: number;
-  aspectRatio?: number;
+  height: number;
+  width: number;
+  aspectRatio: number;
 };
 
 export type SanityImageHotspot = {
   _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type SanityImageCrop = {
   _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
 };
 
 export type SanityFileAsset = {
@@ -500,7 +570,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Youtube | BlockContent | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Infographic | Youtube | BlockContent | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/lib/queries/author-queries.ts
 // Variable: allAuthorsQuery
@@ -519,9 +589,9 @@ export type AllAuthorsQueryResult = Array<{
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -590,9 +660,9 @@ export type AuthorBySlugQueryResult = {
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -673,9 +743,9 @@ export type AllCategoriesQueryResult = Array<{
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -711,9 +781,9 @@ export type CategoryBySlugQueryResult = {
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -747,6 +817,70 @@ export type ChildCategoriesQueryResult = Array<{
   description: string | null;
 }>;
 
+// Source: ./src/lib/queries/infographic-queries.ts
+// Variable: infographicByIdQuery
+// Query: *[_type == "infographic" && _id == $id][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Language-specific content (with fallbacks)    "title": coalesce(      title[language == $language][0].value,      title[language == "en"][0].value,      title[0].value    ),    "description": coalesce(      description[language == $language][0].value,      description[language == "en"][0].value,      description[0].value    ),    "altText": coalesce(      altText[language == $language][0].value,      altText[language == "en"][0].value,      altText[0].value    ),    "slug": coalesce(      slug[language == $language][0].current,      slug[language == "en"][0].current,      slug[0].current    ),    // Language-specific image with proper asset resolution    "image": coalesce(      image[language == $language][0].asset.asset,      image[language == "en"][0].asset.asset,      image[0].asset.asset    ) -> {      _id,      url,      metadata {        dimensions {          width,          height,          aspectRatio        },        lqip,        blurHash,        hasAlpha,        isOpaque      }    },    // PDF-specific fields (with fallbacks)    "downloadFilename": coalesce(      downloadFilename[language == $language][0].value,      downloadFilename[language == "en"][0].value,      downloadFilename[0].value    ),    "pdfMetadata": coalesce(      pdfMetadata[language == $language][0],      pdfMetadata[language == "en"][0],      pdfMetadata[0]    ) {      title,      keywords,      author,      subject    }  }
+export type InfographicByIdQueryResult = {
+  _id: string;
+  _type: "infographic";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string | null;
+  description: string | null;
+  altText: string | null;
+  slug: Slug | null;
+  image: {
+    _id: string;
+    url: string | null;
+    metadata: {
+      dimensions: {
+        width: number;
+        height: number;
+        aspectRatio: number;
+      } | null;
+      lqip: string | null;
+      blurHash: string | null;
+      hasAlpha: boolean | null;
+      isOpaque: boolean | null;
+    } | null;
+  } | null;
+  downloadFilename: string | null;
+  pdfMetadata: {
+    title: string | null;
+    keywords: string | null;
+    author: string | null;
+    subject: string | null;
+  } | null;
+} | null;
+// Variable: infographicsByIdsQuery
+// Query: *[_type == "infographic" && _id in $ids] {    // Core document fields    _id,    _type,    // Language-specific content (with fallbacks)    "title": coalesce(      title[language == $language][0].value,      title[language == "en"][0].value,      title[0].value    ),    "slug": coalesce(      slug[language == $language][0].current,      slug[language == "en"][0].current,      slug[0].current    ),    // Language-specific image for preview    "image": coalesce(      image[language == $language][0].asset.asset,      image[language == "en"][0].asset.asset,      image[0].asset.asset    ) -> {      _id,      url,      metadata {        dimensions {          width,          height,          aspectRatio        },        lqip      }    }  }
+export type InfographicsByIdsQueryResult = Array<{
+  _id: string;
+  _type: "infographic";
+  title: string | null;
+  slug: Slug | null;
+  image: {
+    _id: string;
+    url: string | null;
+    metadata: {
+      dimensions: {
+        width: number;
+        height: number;
+        aspectRatio: number;
+      } | null;
+      lqip: string | null;
+    } | null;
+  } | null;
+}>;
+// Variable: infographicLanguageAvailabilityQuery
+// Query: *[_type == "infographic" && _id == $id][0] {    _id,    "availableLanguages": array::unique([      ...title[].language,      ...image[].language,      ...description[].language    ]),    "hasLanguage": count(title[language == $language]) > 0  }
+export type InfographicLanguageAvailabilityQueryResult = {
+  _id: string;
+  availableLanguages: Array<Array<"de" | "en" | "es" | "fr" | "it" | "uk"> | null>;
+  hasLanguage: boolean;
+} | null;
+
 // Source: ./src/lib/queries/organization-queries.ts
 // Variable: organizationQuery
 // Query: *[_type == "organization"][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic organization info    name,    legalName,    url,    foundingDate,    organizationType,        // Internationalized fields (language-specific extraction)    "description": description[_key == $language][0].value,        // Logo with internationalized alt text    logo {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      "alt": alt[_key == $language][0].value    },        // Contact information (nested object)    contactInfo {      email,      telephone,      address {        streetAddress,        addressLocality,        addressRegion,        postalCode,        addressCountry      }    },        // Social profiles array    socialProfiles  }
@@ -768,9 +902,9 @@ export type OrganizationQueryResult = {
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -841,9 +975,9 @@ export type PostBySlugQueryResult = {
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -912,9 +1046,9 @@ export type PostBySlugQueryResult = {
           url: string | null;
           metadata: {
             dimensions: {
-              width: number | null;
-              height: number | null;
-              aspectRatio: number | null;
+              width: number;
+              height: number;
+              aspectRatio: number;
             } | null;
           } | null;
         } | null;
@@ -950,9 +1084,9 @@ export type AllPostsQueryResult = Array<{
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -1019,9 +1153,9 @@ export type AllPostsQueryResult = Array<{
           url: string | null;
           metadata: {
             dimensions: {
-              width: number | null;
-              height: number | null;
-              aspectRatio: number | null;
+              width: number;
+              height: number;
+              aspectRatio: number;
             } | null;
           } | null;
         } | null;
@@ -1057,9 +1191,9 @@ export type FeaturedPostsQueryResult = Array<{
       url: string | null;
       metadata: {
         dimensions: {
-          width: number | null;
-          height: number | null;
-          aspectRatio: number | null;
+          width: number;
+          height: number;
+          aspectRatio: number;
         } | null;
         lqip: string | null;
         blurHash: string | null;
@@ -1126,9 +1260,9 @@ export type FeaturedPostsQueryResult = Array<{
           url: string | null;
           metadata: {
             dimensions: {
-              width: number | null;
-              height: number | null;
-              aspectRatio: number | null;
+              width: number;
+              height: number;
+              aspectRatio: number;
             } | null;
           } | null;
         } | null;
@@ -1158,6 +1292,9 @@ declare module "@sanity/client" {
     "\n  *[_type == \"category\" && slug[_key == $language][0].value.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value,\n    \"metaDescription\": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n": CategoryBySlugQueryResult;
     "\n  *[_type == \"category\" && _id in $ids] {\n    _id,\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value\n  }\n": CategoryReferencesQueryResult;
     "\n  *[_type == \"category\" && parent._ref == $parentId] | order(title[_key == $language][0].value asc) {\n    _id,\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value\n  }\n": ChildCategoriesQueryResult;
+    "\n  *[_type == \"infographic\" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"description\": coalesce(\n      description[language == $language][0].value,\n      description[language == \"en\"][0].value,\n      description[0].value\n    ),\n    \"altText\": coalesce(\n      altText[language == $language][0].value,\n      altText[language == \"en\"][0].value,\n      altText[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with proper asset resolution\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == \"en\"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    \"downloadFilename\": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == \"en\"][0].value,\n      downloadFilename[0].value\n    ),\n    \"pdfMetadata\": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == \"en\"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n": InfographicByIdQueryResult;
+    "\n  *[_type == \"infographic\" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == \"en\"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n": InfographicsByIdsQueryResult;
+    "\n  *[_type == \"infographic\" && _id == $id][0] {\n    _id,\n    \"availableLanguages\": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    \"hasLanguage\": count(title[language == $language]) > 0\n  }\n": InfographicLanguageAvailabilityQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    \"description\": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n": OrganizationQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    \"description\": description[_key == $language][0].value\n  }\n": OrganizationReferenceQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    description,\n    logo {\n      asset-> {\n        url\n      },\n      alt\n    }\n  }\n": OrganizationDebugQueryResult;
