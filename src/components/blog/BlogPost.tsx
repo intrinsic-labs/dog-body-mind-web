@@ -1,9 +1,9 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { PortableTextBlock } from '@portabletext/types';
-import { DisplayPost } from '@/lib/blog-types';
-import { Locale } from '@/lib/locale';
-import PortableTextRenderer from './PortableTextRenderer';
+import Image from "next/image";
+import Link from "next/link";
+import { PortableTextBlock } from "@portabletext/types";
+import { DisplayPost } from "@/lib/blog-types";
+import { Locale, getCanonicalUrl } from "@/lib/locale";
+import PortableTextRenderer from "./PortableTextRenderer";
 
 interface BlogPostProps {
   post: DisplayPost;
@@ -14,15 +14,21 @@ function extractHeadings(content: PortableTextBlock[]) {
   const headings: Array<{ text: string; level: number; id: string }> = [];
 
   content.forEach((block) => {
-    if (block._type === 'block' && block.style && ['h1', 'h2', 'h3', 'h4'].includes(block.style)) {
-      const text = block.children
-        ?.map((child) => (child as { text?: string }).text || '')
-        .join('') || '';
-      
-      const level = parseInt(block.style.replace('h', ''));
-      const id = text.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
+    if (
+      block._type === "block" &&
+      block.style &&
+      ["h1", "h2", "h3", "h4"].includes(block.style)
+    ) {
+      const text =
+        block.children
+          ?.map((child) => (child as { text?: string }).text || "")
+          .join("") || "";
+
+      const level = parseInt(block.style.replace("h", ""));
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
         .trim();
 
       headings.push({ text, level, id });
@@ -33,12 +39,18 @@ function extractHeadings(content: PortableTextBlock[]) {
 }
 
 // Table of Contents component
-function TableOfContents({ headings }: { headings: Array<{ text: string; level: number; id: string }> }) {
+function TableOfContents({
+  headings,
+}: {
+  headings: Array<{ text: string; level: number; id: string }>;
+}) {
   if (headings.length === 0) return null;
 
   return (
     <nav className="mb-12 max-w-2xl w-full border-b border-foreground/10 pb-4">
-      <h3 className="text-lg font-medium mb-4 text-foreground">In This Article We Will Cover:</h3>
+      <h3 className="text-lg font-medium mb-4 text-foreground">
+        In This Article We Will Cover:
+      </h3>
       <ul className="space-y-2">
         {headings.map((heading, index) => (
           <li key={index}>
@@ -65,22 +77,24 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
         {post.categories.length > 0 && (
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
-              {post.categories.map((category: {_id: string, title: string, slug: string}) => (
-                <Link 
-                  key={category._id} 
-                  href={`/${currentLocale}/blog/category/${category.slug}`}
-                  className="inline-block px-3 py-1 text-sm bg-orange/10 text-orange rounded-full hover:bg-orange/20 transition-colors"
-                >
-                  {category.title}
-                </Link>
-              ))}
+              {post.categories.map(
+                (category: { _id: string; title: string; slug: string }) => (
+                  <Link
+                    key={category._id}
+                    href={`/${currentLocale}/blog/category/${category.slug}`}
+                    className="inline-block px-3 py-1 text-sm bg-orange/10 text-orange rounded-full hover:bg-orange/20 transition-colors"
+                  >
+                    {category.title}
+                  </Link>
+                ),
+              )}
             </div>
           </div>
         )}
-        
+
         {/* Title */}
         <h1 className="mb-6 max-w-2xl text-center">{post.title}</h1>
-        
+
         {/* Meta info */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-foreground/70 mb-8">
           <span className="font-medium">{post.author.name}</span>
@@ -89,12 +103,12 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
           <span className="hidden sm:inline">•</span>
           <span>{post.readingTime}</span>
         </div>
-        
+
         {/* Cover image */}
         {post.coverImageUrl && (
           <div className="mb-8 rounded-2xl overflow-hidden w-full">
-            <Image 
-              src={post.coverImageUrl} 
+            <Image
+              src={post.coverImageUrl}
               alt={post.coverImageAlt}
               width={1200}
               height={600}
@@ -103,7 +117,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
             />
           </div>
         )}
-        
+
         {/* Excerpt */}
         {post.excerpt && (
           <div className="text-lg text-foreground/80 leading-relaxed border-l-4 border-orange pl-6 py-4 bg-orange/5 rounded-r-lg max-w-2xl">
@@ -111,15 +125,19 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
           </div>
         )}
       </header>
-      
+
       {/* Table of Contents */}
       <TableOfContents headings={headings} />
-      
+
       {/* Content */}
       <div className="prose prose-lg max-w-2xl">
-        <PortableTextRenderer content={post.content} />
+        <PortableTextRenderer
+          content={post.content}
+          language={currentLocale}
+          blogPostUrl={getCanonicalUrl(`blog/${post.slug}`, currentLocale)}
+        />
       </div>
-      
+
       {/* Footer */}
       <footer className="mt-16 pt-8 border-t border-foreground/10">
         {/* Tags */}
@@ -128,8 +146,8 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
             <h3 className="text-lg font-medium mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {post.tags.map((tag: string) => (
-                <Link 
-                  key={tag} 
+                <Link
+                  key={tag}
                   href={`/${currentLocale}/blog/tag/${encodeURIComponent(tag)}`}
                   className="inline-block px-3 py-1 text-sm bg-foreground/5 text-foreground/70 rounded-full hover:bg-foreground/10 transition-colors"
                 >
@@ -139,7 +157,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
             </div>
           </div>
         )}
-        
+
         {/* Author info - add soon */}
         {/* <div className="bg-gradient-to-br from-background to-foreground/5 rounded-2xl p-6 sm:p-8">
           <div className="flex items-center gap-4">
@@ -150,7 +168,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
             </div>
             <div>
               <h4 className="font-medium text-lg">Written by {post.author.name}</h4>
-              <Link 
+              <Link
                 href={`/${currentLocale}/blog/author/${post.author.slug}`}
                 className="text-orange hover:text-orange/80 transition-colors"
               >
@@ -162,4 +180,4 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
       </footer>
     </article>
   );
-} 
+}

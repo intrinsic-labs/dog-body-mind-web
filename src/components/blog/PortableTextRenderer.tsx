@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import { PortableText, PortableTextComponents } from '@portabletext/react';
-import { PortableTextBlock } from '@portabletext/types';
-import Image from 'next/image';
-import { urlFor } from '@/sanity/client';
-import { InlineImage, YouTubeEmbed } from '@/lib/blog-types';
-import { getYouTubeId } from '@/lib/youtube-utils';
+import { PortableText, PortableTextComponents } from "@portabletext/react";
+import { PortableTextBlock } from "@portabletext/types";
+import Image from "next/image";
+import { urlFor } from "@/sanity/client";
+import { InlineImage, YouTubeEmbed } from "@/lib/blog-types";
+import { getYouTubeId } from "@/lib/youtube-utils";
+import { Locale } from "@/lib/locale";
+import InfographicReference from "../infographic/InfographicReference";
 
 interface PortableTextRendererProps {
   content: PortableTextBlock[];
+  language: Locale;
+  blogPostUrl?: string;
 }
 
 // Simplified YouTube embed component for display only
 function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
   const videoId = getYouTubeId(value.url);
-  
+
   if (!videoId) {
     return <p>Invalid YouTube URL</p>;
   }
@@ -27,21 +31,23 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       {displayTitle && (
         <h4 className="mb-6 font-medium text-xl">{displayTitle}</h4>
       )}
-      
+
       {value.description && (
-        <p className="mb-6 text-foreground/70 leading-relaxed">{value.description}</p>
+        <p className="mb-6 text-foreground/70 leading-relaxed">
+          {value.description}
+        </p>
       )}
-      
+
       <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
-          title={displayTitle || 'YouTube video'}
+          title={displayTitle || "YouTube video"}
           className="absolute inset-0 w-full h-full"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
       </div>
-      
+
       {/* Key moments navigation */}
       {value.keyMoments && value.keyMoments.length > 0 && (
         <div className="mt-6">
@@ -50,11 +56,14 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
             {value.keyMoments.map((moment, index) => {
               const minutes = Math.floor(moment.time / 60);
               const seconds = moment.time % 60;
-              const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-              
+              const timestamp = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
               return (
-                <li key={index} className="border-b border-foreground/10 last:border-0 pb-3 last:pb-0">
-                  <a 
+                <li
+                  key={index}
+                  className="border-b border-foreground/10 last:border-0 pb-3 last:pb-0"
+                >
+                  <a
                     href={`${value.url}&t=${moment.time}s`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -63,7 +72,9 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
                     {timestamp} - {moment.title}
                   </a>
                   {moment.description && (
-                    <p className="text-foreground/60 mt-1 text-sm leading-relaxed">{moment.description}</p>
+                    <p className="text-foreground/60 mt-1 text-sm leading-relaxed">
+                      {moment.description}
+                    </p>
                   )}
                 </li>
               );
@@ -71,11 +82,13 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
           </ul>
         </div>
       )}
-      
+
       {/* Transcript for accessibility and SEO */}
       {value.transcript && (
         <details className="mt-6">
-          <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-orange transition-colors">Video Transcript</summary>
+          <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-orange transition-colors">
+            Video Transcript
+          </summary>
           <div className="mt-4 p-6 bg-foreground/5 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
             {value.transcript}
           </div>
@@ -88,23 +101,25 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
 // Enhanced inline image component with SEO features
 function InlineImageComponent({ value }: { value: InlineImage }) {
   const imageUrl = urlFor(value.asset).url();
-  
+
   if (!imageUrl) return null;
 
   // Size class mapping
   const sizeClasses = {
-    full: 'w-full',
-    large: 'w-3/4 mx-auto',
-    medium: 'w-1/2 mx-auto',
-    small: 'w-1/4 mx-auto'
+    full: "w-full",
+    large: "w-3/4 mx-auto",
+    medium: "w-1/2 mx-auto",
+    small: "w-1/4 mx-auto",
   };
 
-  const sizeClass = sizeClasses[value.size || 'full'];
-  const loading = value.loading || 'lazy';
+  const sizeClass = sizeClasses[value.size || "full"];
+  const loading = value.loading || "lazy";
 
   return (
     <figure className={`my-8 ${sizeClass}`}>
-      <div className={`${value.enableOverflow ? 'overflow-x-auto' : ''} rounded-2xl overflow-hidden`}>
+      <div
+        className={`${value.enableOverflow ? "overflow-x-auto" : ""} rounded-2xl overflow-hidden`}
+      >
         <Image
           src={imageUrl}
           alt={value.alt}
@@ -112,8 +127,8 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
           height={600}
           loading={loading}
           className="w-full h-auto object-cover"
-          style={{ 
-            minWidth: value.enableOverflow ? 'max-content' : undefined
+          style={{
+            minWidth: value.enableOverflow ? "max-content" : undefined,
           }}
         />
       </div>
@@ -126,35 +141,104 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
   );
 }
 
-export default function PortableTextRenderer({ content }: PortableTextRendererProps) {
+export default function PortableTextRenderer({
+  content,
+  language,
+  blogPostUrl,
+}: PortableTextRendererProps) {
   const components: PortableTextComponents = {
     types: {
-      image: ({ value }) => <InlineImageComponent value={value as InlineImage} />,
-      inlineImage: ({ value }) => <InlineImageComponent value={value as InlineImage} />,
-      youtubeEmbed: ({ value }) => <YouTubeEmbedComponent value={value as YouTubeEmbed} />,
+      image: ({ value }) => (
+        <InlineImageComponent value={value as InlineImage} />
+      ),
+      inlineImage: ({ value }) => (
+        <InlineImageComponent value={value as InlineImage} />
+      ),
+      youtubeEmbed: ({ value }) => (
+        <YouTubeEmbedComponent value={value as YouTubeEmbed} />
+      ),
+      infographicReference: ({ value }) => {
+        // Handle infographic references specifically
+        if (value._ref) {
+          return (
+            <InfographicReference
+              referenceId={value._ref}
+              language={language}
+              blogPostUrl={blogPostUrl}
+            />
+          );
+        }
+        return null;
+      },
     },
     block: {
       h1: ({ children, value }) => {
-        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
-        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
-        return <h1 id={id} className="mt-12 mb-6 first:mt-0">{children}</h1>;
+        const text =
+          value.children
+            ?.map((child) => (child as { text?: string }).text || "")
+            .join("") || "";
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .trim();
+        return (
+          <h1 id={id} className="mt-12 mb-6 first:mt-0">
+            {children}
+          </h1>
+        );
       },
       h2: ({ children, value }) => {
-        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
-        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
-        return <h2 id={id} className="mt-10 mb-5 first:mt-0">{children}</h2>;
+        const text =
+          value.children
+            ?.map((child) => (child as { text?: string }).text || "")
+            .join("") || "";
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .trim();
+        return (
+          <h2 id={id} className="mt-10 mb-5 first:mt-0">
+            {children}
+          </h2>
+        );
       },
       h3: ({ children, value }) => {
-        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
-        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
-        return <h3 id={id} className="mt-8 mb-4 first:mt-0">{children}</h3>;
+        const text =
+          value.children
+            ?.map((child) => (child as { text?: string }).text || "")
+            .join("") || "";
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .trim();
+        return (
+          <h3 id={id} className="mt-8 mb-4 first:mt-0">
+            {children}
+          </h3>
+        );
       },
       h4: ({ children, value }) => {
-        const text = value.children?.map((child) => (child as { text?: string }).text || '').join('') || '';
-        const id = text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
-        return <h4 id={id} className="mt-6 mb-3 first:mt-0">{children}</h4>;
+        const text =
+          value.children
+            ?.map((child) => (child as { text?: string }).text || "")
+            .join("") || "";
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .trim();
+        return (
+          <h4 id={id} className="mt-6 mb-3 first:mt-0">
+            {children}
+          </h4>
+        );
       },
-      normal: ({ children }) => <p className="mb-6 leading-relaxed">{children}</p>,
+      normal: ({ children }) => (
+        <p className="mb-6 leading-relaxed">{children}</p>
+      ),
       blockquote: ({ children }) => (
         <blockquote className="my-8 pl-6 border-l-4 border-orange bg-orange/5 py-4 rounded-r-xl">
           {children}
@@ -163,13 +247,12 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
     },
     marks: {
       link: ({ children, value }) => {
-
         // how do we hyperlink between blog posts and still
         // respect the current locale of the browser?
-        
+
         return (
-          <a 
-            href={value?.href} 
+          <a
+            href={value?.href}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue hover:text-blue/80 underline decoration-blue/30 hover:decoration-blue/60 transition-colors underline-offset-2"
@@ -178,21 +261,31 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
           </a>
         );
       },
-      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+      strong: ({ children }) => (
+        <strong className="font-semibold">{children}</strong>
+      ),
       em: ({ children }) => <em className="italic">{children}</em>,
       code: ({ children }) => (
         <code className="px-2 py-1 bg-foreground/10 rounded-md text-sm font-mono">
           {children}
         </code>
       ),
-      underline: ({ children }) => <u className="underline decoration-foreground/50">{children}</u>,
-      'strike-through': ({ children }) => <s className="line-through decoration-foreground/50">{children}</s>,
+      underline: ({ children }) => (
+        <u className="underline decoration-foreground/50">{children}</u>
+      ),
+      "strike-through": ({ children }) => (
+        <s className="line-through decoration-foreground/50">{children}</s>
+      ),
       super: ({ children }) => <sup>{children}</sup>,
       sub: ({ children }) => <sub>{children}</sub>,
     },
     list: {
-      bullet: ({ children }) => <ul className="my-6 space-y-2 ml-6 list-disc">{children}</ul>,
-      number: ({ children }) => <ol className="my-6 space-y-2 ml-6 list-decimal">{children}</ol>,
+      bullet: ({ children }) => (
+        <ul className="my-6 space-y-2 ml-6 list-disc">{children}</ul>
+      ),
+      number: ({ children }) => (
+        <ol className="my-6 space-y-2 ml-6 list-decimal">{children}</ol>
+      ),
     },
     listItem: {
       bullet: ({ children }) => <li className="leading-relaxed">{children}</li>,
@@ -201,4 +294,4 @@ export default function PortableTextRenderer({ content }: PortableTextRendererPr
   };
 
   return <PortableText value={content} components={components} />;
-} 
+}
