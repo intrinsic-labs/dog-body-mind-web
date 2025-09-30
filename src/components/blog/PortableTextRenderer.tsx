@@ -8,6 +8,7 @@ import { InlineImage, YouTubeEmbed } from "@/lib/blog-types";
 import { getYouTubeId } from "@/lib/youtube-utils";
 import { Locale } from "@/lib/locale";
 import InfographicReference from "../infographic/InfographicReference";
+import { blockquoteStyles } from "../../../shared/blockquote-styles";
 
 interface PortableTextRendererProps {
   content: PortableTextBlock[];
@@ -245,6 +246,55 @@ export default function PortableTextRenderer({
       blockquote: ({ children }) => (
         <blockquote className="my-8 pl-6 border-l-4 border-orange bg-orange/5 py-4 rounded-r-xl">
           {children}
+        </blockquote>
+      ),
+      // Custom blockquote styles with emojis
+      pushpin: ({ children }) => (
+        <blockquote
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          style={{
+            borderColor: blockquoteStyles.pushpin.borderColor,
+            backgroundColor: blockquoteStyles.pushpin.backgroundColor,
+          }}
+        >
+          <span className="text-2xl flex-shrink-0">{blockquoteStyles.pushpin.emoji}</span>
+          <div className="flex-1">{children}</div>
+        </blockquote>
+      ),
+      warning: ({ children }) => (
+        <blockquote
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          style={{
+            borderColor: blockquoteStyles.warning.borderColor,
+            backgroundColor: blockquoteStyles.warning.backgroundColor,
+          }}
+        >
+          <span className="text-2xl flex-shrink-0">{blockquoteStyles.warning.emoji}</span>
+          <div className="flex-1">{children}</div>
+        </blockquote>
+      ),
+      danger: ({ children }) => (
+        <blockquote
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          style={{
+            borderColor: blockquoteStyles.danger.borderColor,
+            backgroundColor: blockquoteStyles.danger.backgroundColor,
+          }}
+        >
+          <span className="text-2xl flex-shrink-0">{blockquoteStyles.danger.emoji}</span>
+          <div className="flex-1">{children}</div>
+        </blockquote>
+      ),
+      announcement: ({ children }) => (
+        <blockquote
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          style={{
+            borderColor: blockquoteStyles.announcement.borderColor,
+            backgroundColor: blockquoteStyles.announcement.backgroundColor,
+          }}
+        >
+          <span className="text-2xl flex-shrink-0">{blockquoteStyles.announcement.emoji}</span>
+          <div className="flex-1">{children}</div>
         </blockquote>
       ),
     },
