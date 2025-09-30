@@ -1,4 +1,4 @@
-import Image from "next/image";
+import TinifyImage from "@/components/TinifyImage";
 import Link from "next/link";
 import { PortableTextBlock } from "@portabletext/types";
 import { DisplayPost } from "@/lib/blog-types";
@@ -107,7 +107,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
         {/* Cover image */}
         {post.coverImageUrl && (
           <div className="mb-8 rounded-2xl overflow-hidden w-full">
-            <Image
+            <TinifyImage
               src={post.coverImageUrl}
               alt={post.coverImageAlt}
               width={1200}

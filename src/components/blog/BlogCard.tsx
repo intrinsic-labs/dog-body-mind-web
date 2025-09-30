@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import TinifyImage from '@/components/TinifyImage';
 import { DisplayPost } from '@/lib/blog-types';
 import { Locale } from '@/lib/locale';
 
@@ -19,8 +19,8 @@ export default function BlogCard({ post, currentLocale }: BlogCardProps) {
           {/* Cover Image */}
           {post.coverImageUrl && (
             <div className="aspect-video overflow-hidden">
-              <Image 
-                src={post.coverImageUrl} 
+              <TinifyImage
+                src={post.coverImageUrl}
                 alt={post.coverImageAlt}
                 width={400}
                 height={225}

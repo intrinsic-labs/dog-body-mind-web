@@ -1,5 +1,5 @@
 import { Locale } from "@/lib/locale";
-import Image from "next/image";
+import TinifyImage from "@/components/TinifyImage";
 // import Link from "next/link";
 
 export default async function Home({
@@ -14,7 +14,7 @@ export default async function Home({
       <div className="text-center space-y-6">
         {/* Logo placeholder - replace with your actual logo */}
         <div className="mb-8">
-          <Image
+          <TinifyImage
             src="/images/logo-alpha.png" // Update this path to your actual logo
             alt="Dog Body Mind Logo"
             width={500}

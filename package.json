@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typegen": "cd ../dbm-sanity && npx sanity schema extract --enforce-required-fields && cd ../dbm-frontend && npx sanity typegen generate"
+    "typegen": "cd ../dbm-sanity && npx sanity schema extract --enforce-required-fields && cd ../dbm-frontend && npx sanity typegen generate",
+    "warm-cache": "tsx scripts/warm-image-cache.ts",
+    "postdeploy": "npm run warm-cache -- https://dogbodymind.com"
   },
   "dependencies": {
+    "@esbuild/darwin-arm64": "^0.25.10",
     "@formatjs/intl-localematcher": "^0.6.1",
     "@portabletext/react": "^3.2.1",
     "@react-pdf/renderer": "^4.3.1",
@@ -34,13 +37,16 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/jsdom": "^27.0.0",
     "@types/negotiator": "^0.6.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "jsdom": "^25.0.1",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

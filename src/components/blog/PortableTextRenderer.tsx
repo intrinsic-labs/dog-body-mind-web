@@ -2,7 +2,7 @@
 
 import { PortableText, PortableTextComponents } from "@portabletext/react";
 import { PortableTextBlock } from "@portabletext/types";
-import Image from "next/image";
+import TinifyImage from "@/components/TinifyImage";
 import { urlFor } from "@/sanity/client";
 import { InlineImage, YouTubeEmbed } from "@/lib/blog-types";
 import { getYouTubeId } from "@/lib/youtube-utils";
@@ -115,21 +115,24 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
   const sizeClass = sizeClasses[value.size || "full"];
   const loading = value.loading || "lazy";
 
+  // Build style object conditionally to avoid undefined values
+  const imageStyle = value.enableOverflow
+    ? { minWidth: "max-content" as const }
+    : undefined;
+
   return (
     <figure className={`my-8 ${sizeClass}`}>
       <div
         className={`${value.enableOverflow ? "overflow-x-auto" : ""} rounded-2xl overflow-hidden`}
       >
-        <Image
+        <TinifyImage
           src={imageUrl}
           alt={value.alt}
           width={800}
           height={600}
           loading={loading}
           className="w-full h-auto object-cover"
-          style={{
-            minWidth: value.enableOverflow ? "max-content" : undefined,
-          }}
+          {...(imageStyle && { style: imageStyle })}
         />
       </div>
       {value.caption && (

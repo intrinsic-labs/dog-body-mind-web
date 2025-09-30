@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import TinifyImage from '@/components/TinifyImage';
 import { FiShare2, FiDownload, FiLink, FiX } from 'react-icons/fi';
 import { InfographicByIdQueryResult } from '@/lib/sanity.types';
 import { Locale } from '@/lib/locale';
@@ -143,7 +143,7 @@ export default function InfographicEmbed({
 
       {/* Main Infographic Image */}
       <div className="w-full rounded-2xl overflow-hidden">
-        <Image
+        <TinifyImage
           src={infographic.image.url || ''}
           alt={infographic.altText || ''}
           width={infographic.image.metadata?.dimensions?.width || 800}

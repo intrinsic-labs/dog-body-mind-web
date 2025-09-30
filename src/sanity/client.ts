@@ -33,7 +33,16 @@ export function urlForImage(source: Image) {
   if (!source?.asset?._ref) {
     return null;
   }
-  
+
   // Hotspot/crop is automatically respected when the source includes this data
-  return builder.image(source).auto('format').fit('max').url();
+  const sanityUrl = builder.image(source).auto('format').fit('max').url();
+
+  // If Tinify CDN is configured, proxy the Sanity URL through Tinify
+  const tinifyCdnUrl = process.env.NEXT_PUBLIC_TINIFY_CDN_URL;
+  if (tinifyCdnUrl) {
+    // Encode the Sanity URL to pass it as a parameter to Tinify
+    return `${tinifyCdnUrl}/${encodeURIComponent(sanityUrl)}`;
+  }
+
+  return sanityUrl;
 } 
