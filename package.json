@@ -12,7 +12,6 @@
     "postdeploy": "npm run warm-cache -- https://dogbodymind.com"
   },
   "dependencies": {
-    "@esbuild/darwin-arm64": "^0.25.10",
     "@formatjs/intl-localematcher": "^0.6.1",
     "@portabletext/react": "^3.2.1",
     "@react-pdf/renderer": "^4.3.1",
