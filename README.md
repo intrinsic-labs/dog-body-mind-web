@@ -1,9 +1,12 @@
 Work in progress website for Dog Body Mind app.
 
-Currently working on:
-- SEO optimization (schema.org markup etc)
-- Proper internationalization for 6 languages
-- Middleware optimization for multidomain routing and subdirectory handling
-- Dynamic sitemap
+Completed:
+- ✅ SEO optimization (schema.org markup)
+- ✅ Internationalization for 6 languages
+- ✅ Middleware for multidomain routing (ccTLD-based)
+- ✅ Dynamic sitemap with hreflang alternates
 
-UI/UX design optimization and implementation have not been tackled yet - it's pretty vanilla at the moment. Getting the plumbing working well first.
+Currently working on:
+- UI/UX design optimization and implementation
+
+Getting the plumbing working well first - SEO and internationalization infrastructure is solid!
