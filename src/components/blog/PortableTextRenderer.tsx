@@ -9,6 +9,7 @@ import { getYouTubeId } from "@/lib/youtube-utils";
 import { Locale } from "@/lib/locale";
 import InfographicReference from "../infographic/InfographicReference";
 import { blockquoteStyles } from "../../../shared/blockquote-styles";
+import { parseMarkdownTable } from "@/lib/markdown-table-parser";
 
 interface PortableTextRendererProps {
   content: PortableTextBlock[];
@@ -145,6 +146,63 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
   );
 }
 
+// Table component for markdown tables
+interface TableValue {
+  markdown: string;
+  caption?: string;
+}
+
+function TableComponent({ value }: { value: TableValue }) {
+  const tableData = parseMarkdownTable(value.markdown);
+
+  if (!tableData) {
+    return <p className="text-foreground/60 italic">Invalid table format</p>;
+  }
+
+  return (
+    <figure className="my-8 overflow-x-auto">
+      <div className="rounded-2xl border border-foreground/10 overflow-hidden">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="bg-orange/10 border-b-2 border-orange/30">
+              {tableData.headers.map((header, index) => (
+                <th
+                  key={index}
+                  className="px-4 py-3 text-left font-semibold border-r border-foreground/10 last:border-r-0"
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {tableData.rows.map((row, rowIndex) => (
+              <tr
+                key={rowIndex}
+                className="border-b border-foreground/10 last:border-b-0 hover:bg-foreground/5 transition-colors"
+              >
+                {row.map((cell, cellIndex) => (
+                  <td
+                    key={cellIndex}
+                    className="px-4 py-3 border-r border-foreground/10 last:border-r-0"
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {value.caption && (
+        <figcaption className="mt-4 text-sm text-foreground/60 text-center italic">
+          {value.caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 export default function PortableTextRenderer({
   content,
   language,
@@ -174,6 +232,7 @@ export default function PortableTextRenderer({
         }
         return null;
       },
+      table: ({ value }) => <TableComponent value={value as TableValue} />,
     },
     block: {
       h1: ({ children, value }) => {
@@ -312,6 +371,22 @@ export default function PortableTextRenderer({
           >
             {children}
           </a>
+        );
+      },
+      citation: ({ value }) => {
+        // In-text citation as superscript link to references section
+        const citationNumber = value?.citationIndex || 1;
+        return (
+          <sup>
+            <a
+              href={`#citation-${citationNumber}`}
+              title={`Jump to reference ${citationNumber}`}
+              aria-label={`Jump to reference ${citationNumber}`}
+              className="text-orange hover:text-orange/80 transition-colors font-normal no-underline"
+            >
+              [{citationNumber}]
+            </a>
+          </sup>
         );
       },
       strong: ({ children }) => (

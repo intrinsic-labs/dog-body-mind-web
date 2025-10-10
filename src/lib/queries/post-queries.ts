@@ -61,12 +61,34 @@ export const postBySlugQuery = defineQuery(`
     articleSection,
     wordCount,
     
+    // Citations & References
+    references[] {
+      _key,
+      citationType,
+      title,
+      authors,
+      publicationYear,
+      publisher,
+      url,
+      doi,
+      isbn,
+      issn,
+      volume,
+      issue,
+      pages,
+      edition,
+      accessDate,
+      seoWeight,
+      keywordRelevance,
+      internalNote
+    },
+
     // E-E-A-T signals
     medicallyReviewed,
     medicalReviewer,
     reviewDate,
     nextReviewDate,
-    
+
     // Content classification
     categories,
     tags,
@@ -171,12 +193,34 @@ export const allPostsQuery = defineQuery(`
     articleSection,
     wordCount,
     
+    // Citations & References
+    references[] {
+      _key,
+      citationType,
+      title,
+      authors,
+      publicationYear,
+      publisher,
+      url,
+      doi,
+      isbn,
+      issn,
+      volume,
+      issue,
+      pages,
+      edition,
+      accessDate,
+      seoWeight,
+      keywordRelevance,
+      internalNote
+    },
+
     // E-E-A-T signals
     medicallyReviewed,
     medicalReviewer,
     reviewDate,
     nextReviewDate,
-    
+
     // Content classification
     categories,
     tags,
@@ -281,12 +325,34 @@ export const featuredPostsQuery = defineQuery(`
     articleSection,
     wordCount,
     
+    // Citations & References
+    references[] {
+      _key,
+      citationType,
+      title,
+      authors,
+      publicationYear,
+      publisher,
+      url,
+      doi,
+      isbn,
+      issn,
+      volume,
+      issue,
+      pages,
+      edition,
+      accessDate,
+      seoWeight,
+      keywordRelevance,
+      internalNote
+    },
+
     // E-E-A-T signals
     medicallyReviewed,
     medicalReviewer,
     reviewDate,
     nextReviewDate,
-    
+
     // Content classification
     categories,
     tags,

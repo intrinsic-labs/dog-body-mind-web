@@ -6,13 +6,17 @@
  */
 
 import type { PostWithReferences, SupportedLanguage } from '../../data-manager/types'
-import type { Graph, Person, Organization, BlogPosting } from 'schema-dts'
+import type { Graph, Person, Organization, BlogPosting, Thing } from 'schema-dts'
 import {
   generateCanonicalUrl,
   generateSchemaId,
   generatePersonId,
   generateOrganizationId
 } from '../url-utils'
+import {
+  generateAllCitationSchemas,
+  type Citation
+} from './citation-schema'
 
 /**
  * Configuration options for article schema generation
@@ -89,6 +93,14 @@ export function generateArticleSchema(
     articleSchema.image = post.coverImage.asset.url
   }
 
+  // Add citations if present
+  if (post.references && post.references.length > 0) {
+    // Link to citation schemas by their IDs
+    articleSchema.citation = post.references.map((_, index) => ({
+      '@id': `#citation-${index + 1}`
+    }))
+  }
+
   // Build Author schema
   const authorUrl = generateCanonicalUrl({
     baseUrl,
@@ -159,13 +171,29 @@ export function generateArticleSchema(
     organizationSchema.logo = organization.logo.asset.url
   }
 
+  // Generate citation schemas if references exist
+  const graphItems: Thing[] = [
+    articleSchema,
+    authorSchema,
+    organizationSchema
+  ]
+
+  // Add citation schemas to the graph
+  if (post.references && post.references.length > 0) {
+    // Cast references to Citation type (they match the structure from Sanity)
+    const citations = post.references as unknown as Citation[]
+    const { citationSchemas, authorSchemas } = generateAllCitationSchemas(citations)
+
+    // Add citation schemas
+    graphItems.push(...citationSchemas)
+
+    // Add citation author schemas
+    graphItems.push(...authorSchemas)
+  }
+
   // Return the complete schema graph
   return {
     '@context': 'https://schema.org',
-    '@graph': [
-      articleSchema,
-      authorSchema,
-      organizationSchema
-    ]
+    '@graph': graphItems
   }
 } 

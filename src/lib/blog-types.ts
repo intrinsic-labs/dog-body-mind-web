@@ -5,6 +5,7 @@
 
 import type { PostWithReferences } from './data-manager/types'
 import type { PortableTextBlock } from '@portabletext/types'
+import type { Citation } from './schema/generators/citation-schema'
 
 export interface DisplayPost {
   _id: string
@@ -28,6 +29,7 @@ export interface DisplayPost {
   publishedAt: string
   formattedDate: string
   readingTime: string
+  references?: Citation[]
 }
 
 export interface InlineImage {
@@ -108,6 +110,7 @@ export function transformPostForDisplay(postWithReferences: PostWithReferences):
       month: 'long',
       day: 'numeric'
     }),
-    readingTime: post.readingTime ? `${post.readingTime} min read` : 'Quick read'
+    readingTime: post.readingTime ? `${post.readingTime} min read` : 'Quick read',
+    references: post.references ? (post.references as unknown as Citation[]) : undefined
   }
 } 

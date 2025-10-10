@@ -4,6 +4,7 @@ import { PortableTextBlock } from "@portabletext/types";
 import { DisplayPost } from "@/lib/blog-types";
 import { Locale, getCanonicalUrl } from "@/lib/locale";
 import PortableTextRenderer from "./PortableTextRenderer";
+import ReferencesSection from "./ReferencesSection";
 
 interface BlogPostProps {
   post: DisplayPost;
@@ -137,6 +138,13 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
           blogPostUrl={getCanonicalUrl(`blog/${post.slug}`, currentLocale)}
         />
       </div>
+
+      {/* References Section */}
+      {post.references && post.references.length > 0 && (
+        <div className="max-w-2xl w-full">
+          <ReferencesSection references={post.references} />
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="mt-16 pt-8 border-t border-foreground/10">
