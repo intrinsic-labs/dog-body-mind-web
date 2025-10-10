@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 import { getLocaleFromDomain, Locale } from '@/lib/locale';
-import { getSitemapPosts } from '@/lib/queries/sitemap-queries';
+import { getSitemapPosts, type SitemapPost } from '@/lib/queries/sitemap-queries';
 import {
   postToSitemapEntry,
   createBlogListingEntry,
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Fetch all published posts for this locale
-    const posts = await getSitemapPosts(locale);
+    const posts: SitemapPost[] = await getSitemapPosts(locale);
 
     console.log(`[SITEMAP] Found ${posts.length} posts for locale ${locale}`);
 
