@@ -29,6 +29,7 @@ export interface DisplayPost {
   publishedAt: string
   formattedDate: string
   readingTime: string
+  featured?: boolean
   references?: Citation[]
 }
 
@@ -111,6 +112,7 @@ export function transformPostForDisplay(postWithReferences: PostWithReferences):
       day: 'numeric'
     }),
     readingTime: post.readingTime ? `${post.readingTime} min read` : 'Quick read',
+    featured: post.featured || false,
     references: post.references ? (post.references as unknown as Citation[]) : undefined
   }
 } 

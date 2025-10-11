@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F5F5F5;
-  --foreground: #3B3B3B;
-  --blue: #265F80;
-  --orange: #F17F19;
-  --slate: #2B2B2B;
-  
+  --background: #f5f5f5;
+  --foreground: #3b3b3b;
+  --blue: #265f80;
+  --orange: #f17f19;
+  --slate: #2b2b2b;
+
   /* Typography scale variables */
   --base-font-size: 18px;
-  --scale-ratio: 1.250;
-  
+  --scale-ratio: 1.25;
+
   /* Calculated font sizes using the modular scale */
   --font-size-small: calc(var(--base-font-size) / var(--scale-ratio));
   --font-size-base: var(--base-font-size);
@@ -19,6 +19,7 @@
   --font-size-2xl: calc(var(--font-size-xl) * var(--scale-ratio));
   --font-size-3xl: calc(var(--font-size-2xl) * var(--scale-ratio));
   --font-size-4xl: calc(var(--font-size-3xl) * var(--scale-ratio));
+  --font-size-5xl: calc(var(--font-size-4xl) * var(--scale-ratio));
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -29,7 +30,6 @@
 } */
 
 @theme inline {
-
   /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -42,7 +42,6 @@
   --font-helvetica: var(--font-helvetica);
   --font-heading: var(--font-rubik);
   --font-rubik: var(--font-rubik);
-
 }
 
 @layer base {
@@ -57,7 +56,12 @@
   }
 
   /* Heading styles - All use Rubik Medium with modular scale */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-rubik);
     font-weight: 500; /* Medium weight */
     color: var(--foreground);
@@ -65,7 +69,8 @@
 
   h1 {
     font-size: var(--font-size-4xl);
-    line-height: 1.2;
+    line-height: 1;
+    letter-spacing: -0.05em;
   }
 
   h2 {
@@ -117,7 +122,12 @@
   }
 
   /* Additional text elements using Helvetica */
-  span, div, a, li, td, th {
+  span,
+  div,
+  a,
+  li,
+  td,
+  th {
     font-family: var(--font-helvetica);
   }
 
@@ -128,7 +138,8 @@
   }
 
   /* List styles */
-  ul, ol {
+  ul,
+  ol {
     font-family: var(--font-helvetica);
     font-size: var(--font-size-base);
     line-height: 1.6;
@@ -288,24 +299,22 @@
 .card {
   background-color: var(--background);
   border: 1px solid rgba(59, 59, 59, 0.1);
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   padding: 1.5rem;
   transition: all 0.3s ease-in-out;
 }
 
 .card:hover {
   border-color: rgba(241, 127, 25, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Card variants */
 .card-elevated {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* No shadow */
 }
 
 .card-elevated:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  /* No shadow or transform */
 }
 
 .card-flat {

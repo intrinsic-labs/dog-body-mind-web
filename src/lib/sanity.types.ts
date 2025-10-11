@@ -179,6 +179,20 @@ export type BlockContent = Array<{
   _key: string;
 } & Table>;
 
+export type BlogPageSettings = {
+  _id: string;
+  _type: "blogPageSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: Array<{
+    _key: string;
+  } & InternationalizedArrayStringValue>;
+  subtitle: Array<{
+    _key: string;
+  } & InternationalizedArrayStringValue>;
+};
+
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -278,7 +292,29 @@ export type InternationalizedArrayReferenceValue = {
     _type: "reference";
     _weak?: boolean;
     [internalGroqTypeReferenceTo]?: "post";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "legalPage";
   };
+};
+
+export type LegalPage = {
+  _id: string;
+  _type: "legalPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  content: BlockContent;
+  excerpt?: string;
+  lastUpdated: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  noIndex?: boolean;
+  language?: string;
 };
 
 export type Post = {
@@ -644,7 +680,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Table | Citation | Infographic | Youtube | BlockContent | SiteSettings | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Table | Citation | Infographic | Youtube | BlockContent | BlogPageSettings | SiteSettings | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | LegalPage | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/lib/queries/author-queries.ts
 // Variable: allAuthorsQuery
@@ -797,6 +833,20 @@ export type AuthorReferencesQueryResult = Array<{
   slug: Slug;
   jobTitle: string | null;
 }>;
+
+// Source: ./src/lib/queries/blog-page-settings-queries.ts
+// Variable: blogPageSettingsQuery
+// Query: *[_type == "blogPageSettings"][0] {    _id,    _type,    title,    subtitle  }
+export type BlogPageSettingsQueryResult = {
+  _id: string;
+  _type: "blogPageSettings";
+  title: Array<{
+    _key: string;
+  } & InternationalizedArrayStringValue>;
+  subtitle: Array<{
+    _key: string;
+  } & InternationalizedArrayStringValue>;
+} | null;
 
 // Source: ./src/lib/queries/category-queries.ts
 // Variable: allCategoriesQuery
@@ -954,6 +1004,33 @@ export type InfographicLanguageAvailabilityQueryResult = {
   availableLanguages: Array<Array<"de" | "en" | "es" | "fr" | "it" | "uk"> | null>;
   hasLanguage: boolean;
 } | null;
+
+// Source: ./src/lib/queries/legal-page-queries.ts
+// Variable: legalPageBySlugQuery
+// Query: *[_type == "legalPage" && slug.current == $slug && (!defined(language) || language == $language)][0] {    _id,    _type,    _createdAt,    _updatedAt,    title,    slug,    content,    excerpt,    lastUpdated,    metaTitle,    metaDescription,    noIndex,    language  }
+export type LegalPageBySlugQueryResult = {
+  _id: string;
+  _type: "legalPage";
+  _createdAt: string;
+  _updatedAt: string;
+  title: string;
+  slug: Slug;
+  content: BlockContent;
+  excerpt: string | null;
+  lastUpdated: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  noIndex: boolean | null;
+  language: string | null;
+} | null;
+// Variable: allLegalPagesQuery
+// Query: *[_type == "legalPage" && defined(slug.current) && (!defined(language) || language == $language)] | order(title asc) {    _id,    title,    slug,    language  }
+export type AllLegalPagesQueryResult = Array<{
+  _id: string;
+  title: string;
+  slug: Slug;
+  language: string | null;
+}>;
 
 // Source: ./src/lib/queries/organization-queries.ts
 // Variable: organizationQuery
@@ -1472,6 +1549,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"author\"] | order(name asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    \"bio\": bio[_key == $language][0].value,\n    \"jobTitle\": jobTitle[_key == $language][0].value,\n    \"specialties\": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n": AllAuthorsQueryResult;
     "\n  *[_type == \"author\" && slug.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    \"bio\": bio[_key == $language][0].value,\n    \"jobTitle\": jobTitle[_key == $language][0].value,\n    \"specialties\": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n": AuthorBySlugQueryResult;
     "\n  *[_type == \"author\" && _id in $ids] {\n    _id,\n    name,\n    slug,\n    \"jobTitle\": jobTitle[_key == $language][0].value\n  }\n": AuthorReferencesQueryResult;
+    "\n  *[_type == \"blogPageSettings\"][0] {\n    _id,\n    _type,\n    title,\n    subtitle\n  }\n": BlogPageSettingsQueryResult;
     "\n  *[_type == \"category\"] | order(title[_key == $language][0].value asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value,\n    \"metaDescription\": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n": AllCategoriesQueryResult;
     "\n  *[_type == \"category\" && slug[_key == $language][0].value.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value,\n    \"metaDescription\": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n": CategoryBySlugQueryResult;
     "\n  *[_type == \"category\" && _id in $ids] {\n    _id,\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value\n  }\n": CategoryReferencesQueryResult;
@@ -1479,6 +1557,8 @@ declare module "@sanity/client" {
     "\n  *[_type == \"infographic\" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"description\": coalesce(\n      description[language == $language][0].value,\n      description[language == \"en\"][0].value,\n      description[0].value\n    ),\n    \"altText\": coalesce(\n      altText[language == $language][0].value,\n      altText[language == \"en\"][0].value,\n      altText[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with flexible asset resolution\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset->,\n      image[language == \"en\"][0].asset.asset->,\n      image[0].asset.asset->\n    ) {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    \"downloadFilename\": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == \"en\"][0].value,\n      downloadFilename[0].value\n    ),\n    \"pdfMetadata\": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == \"en\"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n": InfographicByIdQueryResult;
     "\n  *[_type == \"infographic\" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == \"en\"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n": InfographicsByIdsQueryResult;
     "\n  *[_type == \"infographic\" && _id == $id][0] {\n    _id,\n    \"availableLanguages\": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    \"hasLanguage\": count(title[language == $language]) > 0\n  }\n": InfographicLanguageAvailabilityQueryResult;
+    "\n  *[_type == \"legalPage\" && slug.current == $slug && (!defined(language) || language == $language)][0] {\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    title,\n    slug,\n    content,\n    excerpt,\n    lastUpdated,\n    metaTitle,\n    metaDescription,\n    noIndex,\n    language\n  }\n": LegalPageBySlugQueryResult;
+    "\n  *[_type == \"legalPage\" && defined(slug.current) && (!defined(language) || language == $language)] | order(title asc) {\n    _id,\n    title,\n    slug,\n    language\n  }\n": AllLegalPagesQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    \"description\": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n": OrganizationQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    \"description\": description[_key == $language][0].value\n  }\n": OrganizationReferenceQueryResult;
     "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    description,\n    logo {\n      asset-> {\n        url\n      },\n      alt\n    }\n  }\n": OrganizationDebugQueryResult;

@@ -14,9 +14,10 @@ interface NewsletterContent {
 
 interface NewsletterSignupProps {
   content: NewsletterContent;
+  variant?: 'default' | 'compact';
 }
 
-export default function NewsletterSignup({ content }: NewsletterSignupProps) {
+export default function NewsletterSignup({ content, variant = 'default' }: NewsletterSignupProps) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -44,6 +45,49 @@ export default function NewsletterSignup({ content }: NewsletterSignupProps) {
     }, 1000);
   };
 
+  // Compact variant - inline form
+  if (variant === 'compact') {
+    return (
+      <div className="w-full bg-orange py-6 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-5xl">
+          {status === 'success' ? (
+            <div className="text-center rounded-lg bg-white/20 px-4 py-3 text-white">
+              {content.successMessage || 'Thank you for subscribing!'}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <span className="text-lg font-medium text-white whitespace-nowrap">
+                {content.heading}
+              </span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={content.placeholder}
+                className="w-full sm:w-auto sm:flex-1 sm:max-w-sm rounded-full border-2 border-white/30 bg-white/10 px-6 py-2.5 text-white placeholder:text-white/60 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                disabled={status === 'loading'}
+                required
+              />
+              <button
+                type="submit"
+                className="btn btn-primary btn-sm whitespace-nowrap"
+                disabled={status === 'loading'}
+              >
+                {status === 'loading' ? 'Subscribing...' : content.buttonText}
+              </button>
+            </form>
+          )}
+          {status === 'error' && (
+            <p className="mt-2 text-center text-sm text-white/90">
+              {content.errorMessage || 'Please enter a valid email address.'}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Default variant - full layout with icon
   return (
     <div className="w-full bg-orange py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl">

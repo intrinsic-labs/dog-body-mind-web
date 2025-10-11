@@ -1,4 +1,5 @@
 import { getSiteSettings } from './queries/site-settings-queries';
+import { getBlogPageSettings } from './queries/blog-page-settings-queries';
 import { Locale } from './locale';
 
 // Helper to extract internationalized string value
@@ -74,5 +75,28 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
   } catch (error) {
     console.error('Error fetching social links:', error);
     return [];
+  }
+}
+
+export interface BlogPageContent {
+  title: string;
+  subtitle: string;
+}
+
+export async function getBlogPageContent(locale: Locale): Promise<BlogPageContent | null> {
+  try {
+    const settings = await getBlogPageSettings();
+
+    if (!settings) {
+      return null;
+    }
+
+    return {
+      title: getLocalizedValue(settings.title, locale),
+      subtitle: getLocalizedValue(settings.subtitle, locale),
+    };
+  } catch (error) {
+    console.error('Error fetching blog page content:', error);
+    return null;
   }
 }
