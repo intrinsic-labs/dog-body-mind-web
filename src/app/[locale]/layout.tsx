@@ -2,6 +2,8 @@ import "../globals.css";
 import { rubik, helvetica } from "@/fonts/fonts";
 import { Locale, locales, localeToLanguageTag } from "@/lib/locale";
 import { Metadata } from "next";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 // Revalidate all pages every hour (3600 seconds)
 export const revalidate = 3600;
@@ -16,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
   const { locale } = await params;
-  
+
   return {
     title: "Dog Body Mind",
     description: "Dog Body Mind - Expert pet care guidance and education",
@@ -35,17 +37,21 @@ export default async function LocaleLayout({
   params: Promise<{ locale: Locale }>;
 }>) {
   const { locale } = await params;
-  
+
   return (
     <html lang={localeToLanguageTag[locale]}>
-      <body 
+      <body
         className={`
-          ${rubik.variable} 
-          ${helvetica.variable} 
+          ${rubik.variable}
+          ${helvetica.variable}
           antialiased
         `}
       >
-        {children}
+        <Header locale={locale} />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

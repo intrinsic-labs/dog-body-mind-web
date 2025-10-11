@@ -134,3 +134,186 @@
     line-height: 1.6;
   }
 }
+
+/* ============================================
+   DESIGN SYSTEM - BUTTONS & CARDS
+   ============================================ */
+
+/* Base button styles - shared across all button types */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.625rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: var(--font-helvetica);
+  line-height: 1.5;
+  text-decoration: none;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Primary Button - Solid Blue */
+.btn-primary {
+  background-color: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+
+.btn-primary:hover {
+  background-color: #1d4a60;
+  border-color: #1d4a60;
+}
+
+.btn-primary:active {
+  background-color: #163a4d;
+  border-color: #163a4d;
+  transform: scale(0.98);
+}
+
+/* Primary Outline Button */
+.btn-primary-outline {
+  background-color: transparent;
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+.btn-primary-outline:hover {
+  background-color: var(--blue);
+  color: white;
+}
+
+.btn-primary-outline:active {
+  background-color: #1d4a60;
+  border-color: #1d4a60;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Secondary Button - Solid Orange */
+.btn-secondary {
+  background-color: var(--orange);
+  color: white;
+  border-color: var(--orange);
+}
+
+.btn-secondary:hover {
+  background-color: #d66b0f;
+  border-color: #d66b0f;
+}
+
+.btn-secondary:active {
+  background-color: #b8590d;
+  border-color: #b8590d;
+  transform: scale(0.98);
+}
+
+/* Secondary Outline Button */
+.btn-secondary-outline {
+  background-color: transparent;
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+.btn-secondary-outline:hover {
+  background-color: var(--orange);
+  color: white;
+}
+
+.btn-secondary-outline:active {
+  background-color: #d66b0f;
+  border-color: #d66b0f;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Tertiary Button - Solid Mid Gray */
+.btn-tertiary {
+  background-color: #6b7280;
+  color: white;
+  border-color: #6b7280;
+}
+
+.btn-tertiary:hover {
+  background-color: #4b5563;
+  border-color: #4b5563;
+}
+
+.btn-tertiary:active {
+  background-color: #374151;
+  border-color: #374151;
+  transform: scale(0.98);
+}
+
+/* Tertiary Outline Button */
+.btn-tertiary-outline {
+  background-color: transparent;
+  color: #6b7280;
+  border-color: #6b7280;
+}
+
+.btn-tertiary-outline:hover {
+  background-color: #6b7280;
+  color: white;
+}
+
+.btn-tertiary-outline:active {
+  background-color: #4b5563;
+  border-color: #4b5563;
+  color: white;
+  transform: scale(0.98);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* Base card style */
+.card {
+  background-color: var(--background);
+  border: 1px solid rgba(59, 59, 59, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  border-color: rgba(241, 127, 25, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Card variants */
+.card-elevated {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card-elevated:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.card-flat {
+  border: none;
+  background-color: white;
+}
+
+/* Card with accent border */
+.card-accent {
+  border-left: 4px solid var(--orange);
+}

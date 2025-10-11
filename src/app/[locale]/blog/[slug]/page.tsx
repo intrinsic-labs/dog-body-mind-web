@@ -5,7 +5,10 @@ import { generateArticleSchema } from '@/lib/schema/generators/article-schema';
 import { generateArticleMetadata } from '@/lib/metadata/article-metadata';
 import { transformPostForDisplay } from '@/lib/blog-types';
 import BlogPost from '@/components/blog/BlogPost';
+import NewsletterSignup from '@/components/NewsletterSignup';
+import SocialLinks from '@/components/SocialLinks';
 import { Locale } from '@/lib/locale';
+import { getNewsletterContent, getSocialLinks } from '@/lib/site-settings-utils';
 
 export async function generateStaticParams() {
   // In development, don't pre-generate all params to avoid performance issues
@@ -80,27 +83,50 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPostPage({ 
-  params 
-}: { 
-  params: Promise<{ locale: Locale; slug: string }> 
+export default async function BlogPostPage({
+  params
+}: {
+  params: Promise<{ locale: Locale; slug: string }>
 }) {
   const { locale, slug } = await params;
-  
+
   try {
     // All data fetching happens at build time
     const dataManager = new DataManager(locale);
     await dataManager.initialize();
     const postWithReferences = await dataManager.getPost(slug);
-    
+
     // Transform for component consumption
     const displayPost = transformPostForDisplay(postWithReferences);
-    
+
+    // Fetch newsletter content and social links
+    const newsletterContent = await getNewsletterContent(locale);
+    const socialLinks = await getSocialLinks();
+
     return (
       <main>
         <div className="container mx-auto px-4 py-8">
           <BlogPost post={displayPost} currentLocale={locale} />
         </div>
+
+        {/* Social Share */}
+        {socialLinks.length > 0 && (
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex flex-col items-center gap-4 py-8">
+              <h3 className="text-lg font-medium text-foreground/80">
+                Follow us for more pet care tips
+              </h3>
+              <SocialLinks links={socialLinks} size="lg" />
+            </div>
+          </div>
+        )}
+
+        {/* Newsletter Signup */}
+        {newsletterContent && (
+          <div className="mt-8">
+            <NewsletterSignup content={newsletterContent} />
+          </div>
+        )}
       </main>
     );
   } catch (error) {

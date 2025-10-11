@@ -3,7 +3,9 @@ import { DataManager } from '@/lib/data-manager';
 import { generateArticleListingMetadata } from '@/lib/metadata/article-metadata';
 import { transformPostForDisplay } from '@/lib/blog-types';
 import BlogList from '@/components/blog/BlogList';
+import NewsletterSignup from '@/components/NewsletterSignup';
 import { Locale } from '@/lib/locale';
+import { getNewsletterContent } from '@/lib/site-settings-utils';
 
 
 export async function generateMetadata({ 
@@ -37,21 +39,19 @@ export async function generateMetadata({
   }
 }
 
-export default async function BlogPage({ 
+export default async function BlogPage({
   params
 }: {
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params;
-  
-  try {
 
-    
+  try {
     // All data fetching happens at build time
     const dataManager = new DataManager(locale);
     await dataManager.initialize();
     const posts = await dataManager.getAllPosts();
-    
+
     // Transform posts for component consumption
     const displayPosts = await Promise.all(
       posts.map(async (post) => {
@@ -61,12 +61,22 @@ export default async function BlogPage({
       })
     );
 
+    // Fetch newsletter content
+    const newsletterContent = await getNewsletterContent(locale);
+
     return (
       <main>
         <div className="container mx-auto px-4 py-8 flex flex-col items-center">
           <h1>Dog Body Mind Blog</h1>
           <BlogList posts={displayPosts} currentLocale={locale} />
         </div>
+
+        {/* Newsletter Signup */}
+        {newsletterContent && (
+          <div className="mt-12">
+            <NewsletterSignup content={newsletterContent} />
+          </div>
+        )}
       </main>
     );
   } catch (error) {

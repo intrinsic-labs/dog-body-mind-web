@@ -179,6 +179,43 @@ export type BlockContent = Array<{
   _key: string;
 } & Table>;
 
+export type SiteSettings = {
+  _id: string;
+  _type: "siteSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  newsletter?: {
+    heading: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    subheading: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    placeholder: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    buttonText: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    successMessage?: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    errorMessage?: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+  };
+  socialLinks?: Array<{
+    platform: "facebook" | "instagram" | "x" | "linkedin" | "youtube" | "tiktok" | "pinterest" | "threads" | "custom";
+    url: string;
+    label?: string;
+    _type: "socialLink";
+    _key: string;
+  }>;
+  siteName?: string;
+  maintenanceMode?: boolean;
+};
+
 export type Organization = {
   _id: string;
   _type: "organization";
@@ -607,7 +644,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Table | Citation | Infographic | Youtube | BlockContent | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Table | Citation | Infographic | Youtube | BlockContent | SiteSettings | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/lib/queries/author-queries.ts
 // Variable: allAuthorsQuery
@@ -1378,6 +1415,41 @@ export type FeaturedPostsQueryResult = Array<{
   language: string | null;
 }>;
 
+// Source: ./src/lib/queries/site-settings-queries.ts
+// Variable: siteSettingsQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0] {    _id,    _type,    newsletter {      heading,      subheading,      placeholder,      buttonText,      successMessage,      errorMessage    },    socialLinks[] {      platform,      url,      label    },    siteName,    maintenanceMode  }
+export type SiteSettingsQueryResult = {
+  _id: string;
+  _type: "siteSettings";
+  newsletter: {
+    heading: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    subheading: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    placeholder: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    buttonText: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue>;
+    successMessage: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue> | null;
+    errorMessage: Array<{
+      _key: string;
+    } & InternationalizedArrayStringValue> | null;
+  } | null;
+  socialLinks: Array<{
+    platform: "custom" | "facebook" | "instagram" | "linkedin" | "pinterest" | "threads" | "tiktok" | "x" | "youtube";
+    url: string;
+    label: string | null;
+  }> | null;
+  siteName: string | null;
+  maintenanceMode: boolean | null;
+} | null;
+
 // Source: ./src/lib/queries/sitemap-queries.ts
 // Variable: sitemapPostsQuery
 // Query: *[    _type == "post"    && defined(slug.current)    && defined(publishedAt)    && publishedAt <= now()    && (!defined(noIndex) || noIndex == false)    && (!defined(language) || language == $language)  ] | order(publishedAt desc) {    _id,    _updatedAt,    slug,    publishedAt,    lastModified,    language  }
@@ -1413,6 +1485,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"post\" && slug.current == $slug && (!defined(language) || language == $language)][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": PostBySlugQueryResult;
     "\n  *[_type == \"post\" && defined(slug.current) && (!defined(language) || language == $language)] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": AllPostsQueryResult;
     "\n  *[_type == \"post\" && defined(slug.current) && featured == true && (!defined(language) || language == $language)] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": FeaturedPostsQueryResult;
+    "\n  *[_type == \"siteSettings\" && _id == \"siteSettings\"][0] {\n    _id,\n    _type,\n    newsletter {\n      heading,\n      subheading,\n      placeholder,\n      buttonText,\n      successMessage,\n      errorMessage\n    },\n    socialLinks[] {\n      platform,\n      url,\n      label\n    },\n    siteName,\n    maintenanceMode\n  }\n": SiteSettingsQueryResult;
     "\n  *[\n    _type == \"post\"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ] | order(publishedAt desc) {\n    _id,\n    _updatedAt,\n    slug,\n    publishedAt,\n    lastModified,\n    language\n  }\n": SitemapPostsQueryResult;
     "\n  count(*[\n    _type == \"post\"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ])\n": SitemapPostCountQueryResult;
   }
