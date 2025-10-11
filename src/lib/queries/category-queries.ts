@@ -1,4 +1,9 @@
 import { defineQuery } from 'next-sanity'
+import { client } from '@/sanity/client'
+import { Locale } from '../locale'
+
+// Default query options for caching
+const DEFAULT_OPTIONS = { next: { revalidate: 3600 } } // Cache for 1 hour
 
 // Get all categories with language-specific field extraction
 export const allCategoriesQuery = defineQuery(`
@@ -115,4 +120,9 @@ export const childCategoriesQuery = defineQuery(`
     "slug": slug[_key == $language][0].value,
     "description": description[_key == $language][0].value
   }
-`) 
+`)
+
+// Helper function to fetch all categories
+export async function getAllCategories(locale: Locale) {
+  return client.fetch(allCategoriesQuery, { language: locale }, DEFAULT_OPTIONS)
+} 

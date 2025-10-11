@@ -17,6 +17,11 @@ export const siteSettingsQuery = defineQuery(`
       successMessage,
       errorMessage
     },
+    blogCta {
+      heading,
+      subheading,
+      buttonText
+    },
     socialLinks[] {
       platform,
       url,

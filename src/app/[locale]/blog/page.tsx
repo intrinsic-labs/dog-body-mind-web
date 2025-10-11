@@ -2,13 +2,14 @@ import { Metadata } from "next";
 import { DataManager } from "@/lib/data-manager";
 import { generateArticleListingMetadata } from "@/lib/metadata/article-metadata";
 import { transformPostForDisplay } from "@/lib/blog-types";
-import BlogList from "@/components/blog/BlogList";
+import FilterableBlogList from "@/components/blog/FilterableBlogList";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { Locale } from "@/lib/locale";
 import {
   getNewsletterContent,
   getBlogPageContent,
 } from "@/lib/site-settings-utils";
+import { getAllCategories } from "@/lib/queries/category-queries";
 
 export async function generateMetadata({
   params,
@@ -65,9 +66,19 @@ export default async function BlogPage({
       }),
     );
 
-    // Fetch newsletter content and blog page content
+    // Fetch newsletter content, blog page content, and categories
     const newsletterContent = await getNewsletterContent(locale);
     const blogPageContent = await getBlogPageContent(locale);
+    const allCategories = await getAllCategories(locale);
+
+    // Filter and transform categories to match expected type
+    const categories = allCategories
+      .filter(cat => cat.title && cat.slug?.current)
+      .map(cat => ({
+        _id: cat._id,
+        title: cat.title!,
+        slug: cat.slug!.current
+      }));
 
     return (
       <main>
@@ -89,8 +100,9 @@ export default async function BlogPage({
             </div>
           )}
 
-          <BlogList
+          <FilterableBlogList
             posts={displayPosts}
+            categories={categories}
             currentLocale={locale}
             newsletterContent={newsletterContent}
           />

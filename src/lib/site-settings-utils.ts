@@ -1,5 +1,6 @@
 import { getSiteSettings } from './queries/site-settings-queries';
 import { getBlogPageSettings } from './queries/blog-page-settings-queries';
+import { getHomePageSettings } from './queries/home-page-settings-queries';
 import { Locale } from './locale';
 
 // Helper to extract internationalized string value
@@ -69,7 +70,7 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     }
 
     // Filter out any invalid entries and return
-    return settings.socialLinks.filter(link =>
+    return settings.socialLinks.filter((link: SocialLink) =>
       link && link.platform && link.url
     );
   } catch (error) {
@@ -97,6 +98,58 @@ export async function getBlogPageContent(locale: Locale): Promise<BlogPageConten
     };
   } catch (error) {
     console.error('Error fetching blog page content:', error);
+    return null;
+  }
+}
+
+export interface BlogCtaContent {
+  heading: string;
+  subheading: string;
+  buttonText: string;
+}
+
+export async function getBlogCtaContent(locale: Locale): Promise<BlogCtaContent | null> {
+  try {
+    const settings = await getSiteSettings();
+
+    if (!settings?.blogCta) {
+      return null;
+    }
+
+    const { blogCta } = settings;
+
+    return {
+      heading: getLocalizedValue(blogCta.heading, locale),
+      subheading: getLocalizedValue(blogCta.subheading, locale),
+      buttonText: getLocalizedValue(blogCta.buttonText, locale),
+    };
+  } catch (error) {
+    console.error('Error fetching blog CTA content:', error);
+    return null;
+  }
+}
+
+export interface HomePageContent {
+  title: string;
+  subtitle: string;
+  youtubeUrl: string;
+}
+
+export async function getHomePageContent(locale: Locale): Promise<HomePageContent | null> {
+  try {
+    const settings = await getHomePageSettings();
+
+    if (!settings) {
+      return null;
+    }
+
+    return {
+      title: getLocalizedValue(settings.title, locale),
+      subtitle: getLocalizedValue(settings.subtitle, locale),
+      youtubeUrl: settings.youtubeUrl,
+    };
+  } catch (error) {
+    console.error('Error fetching home page content:', error);
     return null;
   }
 }

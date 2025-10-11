@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import TinifyImage from './TinifyImage';
-import { Locale } from '@/lib/locale';
+import Link from "next/link";
+import TinifyImage from "./TinifyImage";
+import { Locale } from "@/lib/locale";
 
 interface HeaderProps {
   locale: Locale;
@@ -29,7 +29,7 @@ const Header = ({ locale }: HeaderProps) => {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
             href={`/${locale}/blog`}
-            className="btn btn-secondary-outline btn-sm sm:btn"
+            className="btn btn-primary-outline btn-sm sm:btn"
           >
             Blog
           </Link>
@@ -39,4 +39,4 @@ const Header = ({ locale }: HeaderProps) => {
   );
 };
 
-export default Header; 
+export default Header;
