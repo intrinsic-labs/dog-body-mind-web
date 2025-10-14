@@ -20,24 +20,26 @@ export default function InfographicEmbed({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showButton, setShowButton] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdown and hide button when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsShareOpen(false);
+        setShowButton(false);
       }
     }
 
-    if (isShareOpen) {
+    if (isShareOpen || showButton) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isShareOpen]);
+  }, [isShareOpen, showButton]);
 
   const handleDownload = async () => {
     if (downloading) return;
@@ -96,13 +98,17 @@ export default function InfographicEmbed({
     return null;
   }
 
+  const handleImageTap = () => {
+    setShowButton(true);
+  };
+
   return (
     <figure className="my-8 relative group">
       {/* Share Button - positioned absolutely in top right */}
       <div className="absolute top-4 right-4 z-10" ref={dropdownRef}>
         <button
           onClick={() => setIsShareOpen(!isShareOpen)}
-          className="bg-white/90 backdrop-blur-sm hover:bg-white border border-foreground/20 hover:border-foreground/30 rounded-lg p-2 shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+          className={`bg-white/90 backdrop-blur-sm hover:bg-white border border-foreground/20 hover:border-foreground/30 rounded-lg p-2 shadow-lg transition-all duration-200 ${showButton ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
           aria-label="Share infographic"
         >
           {isShareOpen ? (
@@ -142,7 +148,10 @@ export default function InfographicEmbed({
       </div>
 
       {/* Main Infographic Image */}
-      <div className="w-full rounded-2xl overflow-hidden">
+      <div
+        className="w-full rounded-2xl overflow-hidden cursor-pointer"
+        onClick={handleImageTap}
+      >
         <TinifyImage
           src={infographic.image.url || ''}
           alt={infographic.altText || ''}
