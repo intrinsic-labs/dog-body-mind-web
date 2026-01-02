@@ -34,7 +34,7 @@ function detectUserPreferredLocale(request: NextRequest): Locale {
   return detectedLocale as Locale;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get("host") || "";
 
