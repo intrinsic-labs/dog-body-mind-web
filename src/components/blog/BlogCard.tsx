@@ -38,7 +38,7 @@ export default function BlogCard({ post, currentLocale, variant = 'default' }: B
                   {post.categories.slice(0, 2).map((category) => (
                     <span
                       key={category._id}
-                      className="inline-block px-3 py-1 text-xs font-medium bg-orange/10 text-orange rounded-full mr-2"
+                      className="inline-block px-3 py-1 text-xs font-medium bg-blue/10 text-blue rounded-full mr-2"
                     >
                       {category.title}
                     </span>
@@ -47,7 +47,7 @@ export default function BlogCard({ post, currentLocale, variant = 'default' }: B
               )}
 
               {/* Title */}
-              <h2 className="text-2xl sm:text-3xl mb-4 group-hover:text-orange transition-colors line-clamp-2">
+              <h2 className="text-2xl sm:text-3xl mb-4 group-hover:text-blue transition-colors line-clamp-2">
                 {post.title}
               </h2>
 
@@ -93,13 +93,13 @@ export default function BlogCard({ post, currentLocale, variant = 'default' }: B
             <div className="p-4 flex-1 flex flex-col">
               {/* Category - just first one */}
               {post.categories[0] && (
-                <span className="inline-block px-2 py-1 text-xs font-medium bg-orange/10 text-orange rounded-full mb-3 self-start">
+                <span className="inline-block px-2 py-1 text-xs font-medium bg-blue/10 text-blue rounded-full mb-3 self-start">
                   {post.categories[0].title}
                 </span>
               )}
 
               {/* Title */}
-              <h3 className="text-lg mb-2 group-hover:text-orange transition-colors line-clamp-2 flex-1">
+              <h3 className="text-lg mb-2 group-hover:text-blue transition-colors line-clamp-2 flex-1">
                 {post.title}
               </h3>
 
@@ -141,7 +141,7 @@ export default function BlogCard({ post, currentLocale, variant = 'default' }: B
                 {post.categories.slice(0, 2).map((category) => (
                   <span
                     key={category._id}
-                    className="inline-block px-2 py-1 text-xs font-medium bg-orange/10 text-orange rounded-full mr-2"
+                    className="inline-block px-2 py-1 text-xs font-medium bg-blue/10 text-blue rounded-full mr-2"
                   >
                     {category.title}
                   </span>
@@ -150,7 +150,7 @@ export default function BlogCard({ post, currentLocale, variant = 'default' }: B
             )}
 
             {/* Title */}
-            <h3 className="text-xl mb-3 group-hover:text-orange transition-colors line-clamp-2">
+            <h3 className="text-xl mb-3 group-hover:text-blue transition-colors line-clamp-2">
               {post.title}
             </h3>
 

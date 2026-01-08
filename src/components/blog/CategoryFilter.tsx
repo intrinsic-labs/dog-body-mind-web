@@ -27,7 +27,7 @@ export default function CategoryFilter({
             flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-medium transition-all
             ${
               selectedCategory === null
-                ? "bg-orange text-white"
+                ? "bg-blue text-white"
                 : "bg-foreground/5 text-foreground hover:bg-foreground/10"
             }
           `}
@@ -44,7 +44,7 @@ export default function CategoryFilter({
               flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-medium transition-all
               ${
                 selectedCategory === category._id
-                  ? "bg-orange text-white"
+                  ? "bg-blue text-white"
                   : "bg-foreground/5 text-foreground hover:bg-foreground/10"
               }
             `}

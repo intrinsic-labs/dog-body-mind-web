@@ -48,7 +48,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
   // Compact variant - inline form
   if (variant === 'compact') {
     return (
-      <div className="w-full bg-orange py-6 px-4 sm:px-6 lg:px-8">
+      <div className="w-full bg-blue py-6 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-5xl">
           {status === 'success' ? (
             <div className="text-center rounded-lg bg-white/20 px-4 py-3 text-white">
@@ -70,7 +70,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
               />
               <button
                 type="submit"
-                className="btn btn-primary btn-sm whitespace-nowrap"
+                className="btn btn-secondary btn-sm whitespace-nowrap"
                 disabled={status === 'loading'}
               >
                 {status === 'loading' ? 'Subscribing...' : content.buttonText}
@@ -89,7 +89,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
 
   // Default variant - full layout with icon
   return (
-    <div className="w-full bg-orange py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <div className="w-full bg-blue py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
           {/* Email Icon */}
@@ -126,7 +126,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
                 />
                 <button
                   type="submit"
-                  className="btn btn-primary whitespace-nowrap"
+                  className="btn btn-secondary whitespace-nowrap"
                   disabled={status === 'loading'}
                 >
                   {status === 'loading' ? 'Subscribing...' : content.buttonText}

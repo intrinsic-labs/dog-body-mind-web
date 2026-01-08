@@ -57,7 +57,7 @@ function TableOfContents({
           <li key={index}>
             <a
               href={`#${heading.id}`}
-              className="hover:text-orange transition-colors leading-relaxed block py-1"
+              className="hover:text-blue transition-colors leading-relaxed block py-1"
             >
               {heading.text}
             </a>
@@ -83,7 +83,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
                   <Link
                     key={category._id}
                     href={`/${currentLocale}/blog/category/${category.slug}`}
-                    className="inline-block px-3 py-1 text-sm bg-orange/10 text-orange rounded-full hover:bg-orange/20 transition-colors"
+                    className="inline-block px-3 py-1 text-sm bg-blue/10 text-blue rounded-full hover:bg-blue/20 transition-colors"
                   >
                     {category.title}
                   </Link>
@@ -121,7 +121,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
 
         {/* Excerpt */}
         {post.excerpt && (
-          <div className="text-lg text-foreground/80 leading-relaxed border-l-4 border-orange pl-6 py-4 bg-orange/5 rounded-r-lg max-w-2xl">
+          <div className="text-lg text-foreground/80 leading-relaxed border-l-4 border-blue pl-6 py-4 bg-blue/5 rounded-r-lg max-w-2xl">
             <p>{post.excerpt}</p>
           </div>
         )}

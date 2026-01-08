@@ -12,5 +12,5 @@ import { tinifyLoader } from '@/lib/tinify-loader';
 
 export default function TinifyImage(props: ImageProps) {
   // eslint-disable-next-line jsx-a11y/alt-text
-  return <Image {...props} loader={tinifyLoader} />;
+  return <Image {...props} loader={tinifyLoader} unoptimized={true} />;
 }

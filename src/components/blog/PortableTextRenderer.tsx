@@ -88,7 +88,7 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       {/* Transcript for accessibility and SEO */}
       {value.transcript && (
         <details className="mt-6">
-          <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-orange transition-colors">
+          <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-blue transition-colors">
             Video Transcript
           </summary>
           <div className="mt-4 p-6 bg-foreground/5 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
@@ -164,7 +164,7 @@ function TableComponent({ value }: { value: TableValue }) {
       <div className="rounded-2xl border border-foreground/10 overflow-hidden">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-orange/10 border-b-2 border-orange/30">
+            <tr className="bg-blue/10 border-b-2 border-blue/30">
               {tableData.headers.map((header, index) => (
                 <th
                   key={index}
@@ -303,7 +303,7 @@ export default function PortableTextRenderer({
         <p className="mb-6 leading-relaxed">{children}</p>
       ),
       blockquote: ({ children }) => (
-        <blockquote className="my-8 pl-6 border-l-4 border-orange bg-orange/5 py-4 rounded-r-xl">
+        <blockquote className="my-8 pl-6 border-l-4 border-blue bg-blue/5 py-4 rounded-r-xl">
           {children}
         </blockquote>
       ),
@@ -382,7 +382,7 @@ export default function PortableTextRenderer({
               href={`#citation-${citationNumber}`}
               title={`Jump to reference ${citationNumber}`}
               aria-label={`Jump to reference ${citationNumber}`}
-              className="text-orange hover:text-orange/80 transition-colors font-normal no-underline"
+              className="text-blue hover:text-blue/80 transition-colors font-normal no-underline"
             >
               [{citationNumber}]
             </a>

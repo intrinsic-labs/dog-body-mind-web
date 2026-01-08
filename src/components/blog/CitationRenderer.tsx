@@ -199,7 +199,7 @@ export default function CitationRenderer({ citation, index }: CitationRendererPr
                 href={link}
                 rel="noopener noreferrer"
                 target="_blank"
-                className="text-orange hover:text-orange/80 underline transition-colors break-all"
+                className="text-blue hover:text-blue/80 underline transition-colors break-all"
                 aria-label={`View source: ${citation.title}`}
               >
                 {linkText}

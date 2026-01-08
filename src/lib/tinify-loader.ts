@@ -16,7 +16,7 @@ const TINIFY_CDN_URL = process.env.NEXT_PUBLIC_TINIFY_CDN_URL;
 export function tinifyLoader({ src, width, quality }: ImageLoaderProps): string {
   // If no Tinify CDN URL is configured, return original src
   if (!TINIFY_CDN_URL) {
-    console.warn('NEXT_PUBLIC_TINIFY_CDN_URL not configured, using original image URL');
+    // console.warn('NEXT_PUBLIC_TINIFY_CDN_URL not configured, using original image URL');
     return src;
   }
 
