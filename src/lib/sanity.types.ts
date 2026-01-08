@@ -12,7 +12,7 @@
  * ---------------------------------------------------------------------------------
  */
 
-// Source: schema.json
+// Source: ../cms/schema.json
 export type Table = {
   _type: "table";
   markdown: string;
@@ -21,7 +21,12 @@ export type Table = {
 
 export type Citation = {
   _type: "citation";
-  citationType: "scholarlyArticle" | "book" | "webPage" | "governmentDocument" | "dataset";
+  citationType:
+    | "scholarlyArticle"
+    | "book"
+    | "webPage"
+    | "governmentDocument"
+    | "dataset";
   title: string;
   authors: Array<string>;
   publicationYear: number;
@@ -105,6 +110,28 @@ export type Infographic = {
   }>;
 };
 
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
 export type Youtube = {
   _type: "youtube";
   url: string;
@@ -120,64 +147,84 @@ export type Youtube = {
   }>;
 };
 
-export type BlockContent = Array<{
-  children?: Array<{
-    marks?: Array<string>;
-    text?: string;
-    _type: "span";
-    _key: string;
-  }>;
-  style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote" | "pushpin" | "warning" | "danger" | "announcement";
-  listItem?: "bullet" | "number";
-  markDefs?: Array<{
-    href?: string;
-    blank?: boolean;
-    _type: "link";
-    _key: string;
-  } | {
-    reference?: {
+export type BlockContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?:
+        | "normal"
+        | "h1"
+        | "h2"
+        | "h3"
+        | "h4"
+        | "blockquote"
+        | "pushpin"
+        | "warning"
+        | "danger"
+        | "announcement";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<
+        | {
+            href?: string;
+            blank?: boolean;
+            _type: "link";
+            _key: string;
+          }
+        | {
+            reference?: {
+              _ref: string;
+              _type: "reference";
+              _weak?: boolean;
+              [internalGroqTypeReferenceTo]?: "post";
+            };
+            _type: "internalLink";
+            _key: string;
+          }
+        | {
+            citationIndex: number;
+            _type: "citation";
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt: string;
+      caption?: string;
+      loading?: "lazy" | "eager";
+      size?: "full" | "large" | "medium" | "small";
+      _type: "inlineImage";
+      _key: string;
+    }
+  | {
       _ref: string;
       _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "post";
-    };
-    _type: "internalLink";
-    _key: string;
-  } | {
-    citationIndex: number;
-    _type: "citation";
-    _key: string;
-  }>;
-  level?: number;
-  _type: "block";
-  _key: string;
-} | {
-  asset?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-  };
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt: string;
-  caption?: string;
-  loading?: "lazy" | "eager";
-  size?: "full" | "large" | "medium" | "small";
-  _type: "inlineImage";
-  _key: string;
-} | {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  _key: string;
-  [internalGroqTypeReferenceTo]?: "infographic";
-} | {
-  _key: string;
-} & Youtube | {
-  _key: string;
-} & Table>;
+      _key: string;
+      [internalGroqTypeReferenceTo]?: "infographic";
+    }
+  | ({
+      _key: string;
+    } & Youtube)
+  | ({
+      _key: string;
+    } & Table)
+>;
 
 export type BlogPageSettings = {
   _id: string;
@@ -185,12 +232,25 @@ export type BlogPageSettings = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title: Array<{
+  title: InternationalizedArrayString;
+  subtitle: InternationalizedArrayString;
+};
+
+export type InternationalizedArrayString = Array<
+  {
     _key: string;
-  } & InternationalizedArrayStringValue>;
-  subtitle: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
+  } & InternationalizedArrayStringValue
+>;
+
+export type HomePageSettings = {
+  _id: string;
+  _type: "homePageSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: InternationalizedArrayString;
+  subtitle: InternationalizedArrayString;
+  youtubeUrl: string;
 };
 
 export type SiteSettings = {
@@ -200,27 +260,29 @@ export type SiteSettings = {
   _updatedAt: string;
   _rev: string;
   newsletter?: {
-    heading: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    subheading: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    placeholder: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    buttonText: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    successMessage?: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    errorMessage?: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
+    heading: InternationalizedArrayString;
+    subheading: InternationalizedArrayString;
+    placeholder: InternationalizedArrayString;
+    buttonText: InternationalizedArrayString;
+    successMessage?: InternationalizedArrayString;
+    errorMessage?: InternationalizedArrayString;
+  };
+  blogCta?: {
+    heading: InternationalizedArrayString;
+    subheading: InternationalizedArrayString;
+    buttonText: InternationalizedArrayString;
   };
   socialLinks?: Array<{
-    platform: "facebook" | "instagram" | "x" | "linkedin" | "youtube" | "tiktok" | "pinterest" | "threads" | "custom";
+    platform:
+      | "facebook"
+      | "instagram"
+      | "x"
+      | "linkedin"
+      | "youtube"
+      | "tiktok"
+      | "pinterest"
+      | "threads"
+      | "custom";
     url: string;
     label?: string;
     _type: "socialLink";
@@ -238,9 +300,7 @@ export type Organization = {
   _rev: string;
   name: string;
   legalName?: string;
-  description: Array<{
-    _key: string;
-  } & InternationalizedArrayTextValue>;
+  description: InternationalizedArrayText;
   logo: {
     asset?: {
       _ref: string;
@@ -251,9 +311,7 @@ export type Organization = {
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    alt: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
+    alt: InternationalizedArrayString;
     _type: "image";
   };
   url: string;
@@ -270,8 +328,19 @@ export type Organization = {
   };
   socialProfiles?: Array<string>;
   foundingDate?: string;
-  organizationType?: "EducationalOrganization" | "Corporation" | "NGO" | "LocalBusiness" | "ProfessionalService";
+  organizationType?:
+    | "EducationalOrganization"
+    | "Corporation"
+    | "NGO"
+    | "LocalBusiness"
+    | "ProfessionalService";
 };
+
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
 
 export type TranslationMetadata = {
   _id: string;
@@ -279,25 +348,31 @@ export type TranslationMetadata = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  translations?: Array<{
-    _key: string;
-  } & InternationalizedArrayReferenceValue>;
+  translations?: InternationalizedArrayReference;
   schemaTypes?: Array<string>;
 };
 
+export type InternationalizedArrayReference = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayReferenceValue
+>;
+
 export type InternationalizedArrayReferenceValue = {
   _type: "internationalizedArrayReferenceValue";
-  value?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "post";
-  } | {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "legalPage";
-  };
+  value?:
+    | {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "post";
+      }
+    | {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "legalPage";
+      };
 };
 
 export type LegalPage = {
@@ -327,9 +402,11 @@ export type Post = {
   slug: Slug;
   excerpt: string;
   content: BlockContent;
-  references?: Array<{
-    _key: string;
-  } & Citation>;
+  references?: Array<
+    {
+      _key: string;
+    } & Citation
+  >;
   coverImage: {
     asset?: {
       _ref: string;
@@ -356,7 +433,12 @@ export type Post = {
   meta?: string;
   focusKeyword?: string;
   secondaryKeywords?: Array<string>;
-  articleType?: "Article" | "NewsArticle" | "BlogPosting" | "TechnicalArticle" | "MedicalScholarlyArticle";
+  articleType?:
+    | "Article"
+    | "NewsArticle"
+    | "BlogPosting"
+    | "TechnicalArticle"
+    | "MedicalScholarlyArticle";
   articleSection: {
     _ref: string;
     _type: "reference";
@@ -424,18 +506,10 @@ export type Category = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
-  slug: Array<{
-    _key: string;
-  } & InternationalizedArraySlugValue>;
-  description?: Array<{
-    _key: string;
-  } & InternationalizedArrayTextValue>;
-  metaDescription?: Array<{
-    _key: string;
-  } & InternationalizedArrayTextValue>;
+  title: InternationalizedArrayString;
+  slug: InternationalizedArraySlug;
+  description?: InternationalizedArrayText;
+  metaDescription?: InternationalizedArrayText;
   featuredImage?: {
     asset?: {
       _ref: string;
@@ -446,9 +520,7 @@ export type Category = {
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    alt: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
+    alt: InternationalizedArrayString;
     _type: "image";
   };
   parent?: {
@@ -458,6 +530,12 @@ export type Category = {
     [internalGroqTypeReferenceTo]?: "category";
   };
 };
+
+export type InternationalizedArraySlug = Array<
+  {
+    _key: string;
+  } & InternationalizedArraySlugValue
+>;
 
 export type Author = {
   _id: string;
@@ -480,12 +558,8 @@ export type Author = {
     alt: string;
     _type: "image";
   };
-  bio?: Array<{
-    _key: string;
-  } & InternationalizedArrayTextValue>;
-  jobTitle?: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
+  bio?: InternationalizedArrayText;
+  jobTitle?: InternationalizedArrayString;
   credentials?: Array<{
     name: string;
     issuingOrganization: string;
@@ -513,9 +587,7 @@ export type Author = {
     _type: "experience";
     _key: string;
   }>;
-  specialties?: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
+  specialties?: InternationalizedArrayString;
   yearsExperience?: number;
   email?: string;
   socialLinks?: {
@@ -531,10 +603,6 @@ export type Author = {
   memberOf?: Array<string>;
 };
 
-export type InternationalizedArrayReference = Array<{
-  _key: string;
-} & InternationalizedArrayReferenceValue>;
-
 export type InternationalizedArraySlugValue = {
   _type: "internationalizedArraySlugValue";
   value?: Slug;
@@ -549,18 +617,6 @@ export type InternationalizedArrayStringValue = {
   _type: "internationalizedArrayStringValue";
   value?: string;
 };
-
-export type InternationalizedArraySlug = Array<{
-  _key: string;
-} & InternationalizedArraySlugValue>;
-
-export type InternationalizedArrayText = Array<{
-  _key: string;
-} & InternationalizedArrayTextValue>;
-
-export type InternationalizedArrayString = Array<{
-  _key: string;
-} & InternationalizedArrayStringValue>;
 
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
@@ -588,20 +644,15 @@ export type SanityImageDimensions = {
   aspectRatio: number;
 };
 
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
+export type SanityImageMetadata = {
+  _type: "sanity.imageMetadata";
+  location?: Geopoint;
+  dimensions?: SanityImageDimensions;
+  palette?: SanityImagePalette;
+  lqip?: string;
+  blurHash?: string;
+  hasAlpha?: boolean;
+  isOpaque?: boolean;
 };
 
 export type SanityFileAsset = {
@@ -624,6 +675,13 @@ export type SanityFileAsset = {
   path?: string;
   url?: string;
   source?: SanityAssetSourceData;
+};
+
+export type SanityAssetSourceData = {
+  _type: "sanity.assetSourceData";
+  name?: string;
+  id?: string;
+  url?: string;
 };
 
 export type SanityImageAsset = {
@@ -649,17 +707,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData;
 };
 
-export type SanityImageMetadata = {
-  _type: "sanity.imageMetadata";
-  location?: Geopoint;
-  dimensions?: SanityImageDimensions;
-  palette?: SanityImagePalette;
-  lqip?: string;
-  blurHash?: string;
-  hasAlpha?: boolean;
-  isOpaque?: boolean;
-};
-
 export type Geopoint = {
   _type: "geopoint";
   lat?: number;
@@ -667,22 +714,44 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
-};
+export type AllSanitySchemaTypes =
+  | Table
+  | Citation
+  | Infographic
+  | SanityImageCrop
+  | SanityImageHotspot
+  | Slug
+  | Youtube
+  | BlockContent
+  | BlogPageSettings
+  | InternationalizedArrayString
+  | HomePageSettings
+  | SiteSettings
+  | Organization
+  | InternationalizedArrayText
+  | TranslationMetadata
+  | InternationalizedArrayReference
+  | InternationalizedArrayReferenceValue
+  | LegalPage
+  | Post
+  | Category
+  | InternationalizedArraySlug
+  | Author
+  | InternationalizedArraySlugValue
+  | InternationalizedArrayTextValue
+  | InternationalizedArrayStringValue
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
 
-export type SanityAssetSourceData = {
-  _type: "sanity.assetSourceData";
-  name?: string;
-  id?: string;
-  url?: string;
-};
-
-export type AllSanitySchemaTypes = Table | Citation | Infographic | Youtube | BlockContent | BlogPageSettings | SiteSettings | Organization | TranslationMetadata | InternationalizedArrayReferenceValue | LegalPage | Post | Category | Author | InternationalizedArrayReference | InternationalizedArraySlugValue | InternationalizedArrayTextValue | InternationalizedArrayStringValue | InternationalizedArraySlug | InternationalizedArrayText | InternationalizedArrayString | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
-// Source: ./src/lib/queries/author-queries.ts
+
+// Source: src/lib/queries/author-queries.ts
 // Variable: allAuthorsQuery
 // Query: *[_type == "author"] | order(name asc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic info fields    name,    slug,    avatar {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      alt    },        // Internationalized fields (language-specific extraction)    "bio": bio[_key == $language][0].value,    "jobTitle": jobTitle[_key == $language][0].value,    "specialties": specialties[_key == $language][0].value,        // Credentials & E-E-A-T fields    credentials[] {      name,      issuingOrganization,      url,      dateIssued,      expires,      _key    },    education[] {      institution,      degree,      field,      graduationYear,      url,      _key    },    experience[] {      position,      organization,      startDate,      endDate,      description,      _key    },    yearsExperience,        // Social & contact fields    email,    socialLinks {      linkedin,      twitter,      instagram,      facebook,      youtube,      website    },        // Schema-specific fields    sameAs,    worksFor,    memberOf  }
 export type AllAuthorsQueryResult = Array<{
@@ -754,6 +823,8 @@ export type AllAuthorsQueryResult = Array<{
   worksFor: string | null;
   memberOf: Array<string> | null;
 }>;
+
+// Source: src/lib/queries/author-queries.ts
 // Variable: authorBySlugQuery
 // Query: *[_type == "author" && slug.current == $slug][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic info fields    name,    slug,    avatar {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      alt    },        // Internationalized fields (language-specific extraction)    "bio": bio[_key == $language][0].value,    "jobTitle": jobTitle[_key == $language][0].value,    "specialties": specialties[_key == $language][0].value,        // Credentials & E-E-A-T fields    credentials[] {      name,      issuingOrganization,      url,      dateIssued,      expires,      _key    },    education[] {      institution,      degree,      field,      graduationYear,      url,      _key    },    experience[] {      position,      organization,      startDate,      endDate,      description,      _key    },    yearsExperience,        // Social & contact fields    email,    socialLinks {      linkedin,      twitter,      instagram,      facebook,      youtube,      website    },        // Schema-specific fields    sameAs,    worksFor,    memberOf  }
 export type AuthorBySlugQueryResult = {
@@ -825,6 +896,8 @@ export type AuthorBySlugQueryResult = {
   worksFor: string | null;
   memberOf: Array<string> | null;
 } | null;
+
+// Source: src/lib/queries/author-queries.ts
 // Variable: authorReferencesQuery
 // Query: *[_type == "author" && _id in $ids] {    _id,    name,    slug,    "jobTitle": jobTitle[_key == $language][0].value  }
 export type AuthorReferencesQueryResult = Array<{
@@ -834,21 +907,17 @@ export type AuthorReferencesQueryResult = Array<{
   jobTitle: string | null;
 }>;
 
-// Source: ./src/lib/queries/blog-page-settings-queries.ts
+// Source: src/lib/queries/blog-page-settings-queries.ts
 // Variable: blogPageSettingsQuery
 // Query: *[_type == "blogPageSettings"][0] {    _id,    _type,    title,    subtitle  }
 export type BlogPageSettingsQueryResult = {
   _id: string;
   _type: "blogPageSettings";
-  title: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
-  subtitle: Array<{
-    _key: string;
-  } & InternationalizedArrayStringValue>;
+  title: InternationalizedArrayString;
+  subtitle: InternationalizedArrayString;
 } | null;
 
-// Source: ./src/lib/queries/category-queries.ts
+// Source: src/lib/queries/category-queries.ts
 // Variable: allCategoriesQuery
 // Query: *[_type == "category"] | order(title[_key == $language][0].value asc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Internationalized fields (language-specific extraction)    "title": title[_key == $language][0].value,    "slug": slug[_key == $language][0].value,    "description": description[_key == $language][0].value,    "metaDescription": metaDescription[_key == $language][0].value,        // Featured image with internationalized alt text    featuredImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      "alt": alt[_key == $language][0].value    },        // Parent category reference (kept as reference for separate resolution)    parent {      _ref,      _type    },        // Language field (managed by internationalization plugin)    language  }
 export type AllCategoriesQueryResult = Array<{
@@ -887,6 +956,8 @@ export type AllCategoriesQueryResult = Array<{
   } | null;
   language: null;
 }>;
+
+// Source: src/lib/queries/category-queries.ts
 // Variable: categoryBySlugQuery
 // Query: *[_type == "category" && slug[_key == $language][0].value.current == $slug][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Internationalized fields (language-specific extraction)    "title": title[_key == $language][0].value,    "slug": slug[_key == $language][0].value,    "description": description[_key == $language][0].value,    "metaDescription": metaDescription[_key == $language][0].value,        // Featured image with internationalized alt text    featuredImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      "alt": alt[_key == $language][0].value    },        // Parent category reference (kept as reference for separate resolution)    parent {      _ref,      _type    },        // Language field (managed by internationalization plugin)    language  }
 export type CategoryBySlugQueryResult = {
@@ -925,6 +996,8 @@ export type CategoryBySlugQueryResult = {
   } | null;
   language: null;
 } | null;
+
+// Source: src/lib/queries/category-queries.ts
 // Variable: categoryReferencesQuery
 // Query: *[_type == "category" && _id in $ids] {    _id,    "title": title[_key == $language][0].value,    "slug": slug[_key == $language][0].value  }
 export type CategoryReferencesQueryResult = Array<{
@@ -932,6 +1005,8 @@ export type CategoryReferencesQueryResult = Array<{
   title: string | null;
   slug: Slug | null;
 }>;
+
+// Source: src/lib/queries/category-queries.ts
 // Variable: childCategoriesQuery
 // Query: *[_type == "category" && parent._ref == $parentId] | order(title[_key == $language][0].value asc) {    _id,    "title": title[_key == $language][0].value,    "slug": slug[_key == $language][0].value,    "description": description[_key == $language][0].value  }
 export type ChildCategoriesQueryResult = Array<{
@@ -941,7 +1016,18 @@ export type ChildCategoriesQueryResult = Array<{
   description: string | null;
 }>;
 
-// Source: ./src/lib/queries/infographic-queries.ts
+// Source: src/lib/queries/home-page-settings-queries.ts
+// Variable: homePageSettingsQuery
+// Query: *[_type == "homePageSettings"][0] {    _id,    _type,    title,    subtitle,    youtubeUrl  }
+export type HomePageSettingsQueryResult = {
+  _id: string;
+  _type: "homePageSettings";
+  title: InternationalizedArrayString;
+  subtitle: InternationalizedArrayString;
+  youtubeUrl: string;
+} | null;
+
+// Source: src/lib/queries/infographic-queries.ts
 // Variable: infographicByIdQuery
 // Query: *[_type == "infographic" && _id == $id][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Language-specific content (with fallbacks)    "title": coalesce(      title[language == $language][0].value,      title[language == "en"][0].value,      title[0].value    ),    "description": coalesce(      description[language == $language][0].value,      description[language == "en"][0].value,      description[0].value    ),    "altText": coalesce(      altText[language == $language][0].value,      altText[language == "en"][0].value,      altText[0].value    ),    "slug": coalesce(      slug[language == $language][0].current,      slug[language == "en"][0].current,      slug[0].current    ),    // Language-specific image with flexible asset resolution    "image": coalesce(      image[language == $language][0].asset.asset->,      image[language == "en"][0].asset.asset->,      image[0].asset.asset->    ) {      _id,      url,      metadata {        dimensions {          width,          height,          aspectRatio        },        lqip,        blurHash,        hasAlpha,        isOpaque      }    },    // PDF-specific fields (with fallbacks)    "downloadFilename": coalesce(      downloadFilename[language == $language][0].value,      downloadFilename[language == "en"][0].value,      downloadFilename[0].value    ),    "pdfMetadata": coalesce(      pdfMetadata[language == $language][0],      pdfMetadata[language == "en"][0],      pdfMetadata[0]    ) {      title,      keywords,      author,      subject    }  }
 export type InfographicByIdQueryResult = {
@@ -977,6 +1063,8 @@ export type InfographicByIdQueryResult = {
     subject: string | null;
   } | null;
 } | null;
+
+// Source: src/lib/queries/infographic-queries.ts
 // Variable: infographicsByIdsQuery
 // Query: *[_type == "infographic" && _id in $ids] {    // Core document fields    _id,    _type,    // Language-specific content (with fallbacks)    "title": coalesce(      title[language == $language][0].value,      title[language == "en"][0].value,      title[0].value    ),    "slug": coalesce(      slug[language == $language][0].current,      slug[language == "en"][0].current,      slug[0].current    ),    // Language-specific image for preview    "image": coalesce(      image[language == $language][0].asset.asset,      image[language == "en"][0].asset.asset,      image[0].asset.asset    ) -> {      _id,      url,      metadata {        dimensions {          width,          height,          aspectRatio        },        lqip      }    }  }
 export type InfographicsByIdsQueryResult = Array<{
@@ -997,17 +1085,19 @@ export type InfographicsByIdsQueryResult = Array<{
     } | null;
   } | null;
 }>;
+
+// Source: src/lib/queries/infographic-queries.ts
 // Variable: infographicLanguageAvailabilityQuery
 // Query: *[_type == "infographic" && _id == $id][0] {    _id,    "availableLanguages": array::unique([      ...title[].language,      ...image[].language,      ...description[].language    ]),    "hasLanguage": count(title[language == $language]) > 0  }
 export type InfographicLanguageAvailabilityQueryResult = {
   _id: string;
-  availableLanguages: Array<Array<"de" | "en" | "es" | "fr" | "it" | "uk"> | null>;
+  availableLanguages: Array<"de" | "en" | "es" | "fr" | "it" | "uk">;
   hasLanguage: boolean;
 } | null;
 
-// Source: ./src/lib/queries/legal-page-queries.ts
+// Source: src/lib/queries/legal-page-queries.ts
 // Variable: legalPageBySlugQuery
-// Query: *[_type == "legalPage" && slug.current == $slug && (!defined(language) || language == $language)][0] {    _id,    _type,    _createdAt,    _updatedAt,    title,    slug,    content,    excerpt,    lastUpdated,    metaTitle,    metaDescription,    noIndex,    language  }
+// Query: *[_type == "legalPage" && slug.current == $slug && language == $language][0] {    _id,    _type,    _createdAt,    _updatedAt,    title,    slug,    content,    excerpt,    lastUpdated,    metaTitle,    metaDescription,    noIndex,    language  }
 export type LegalPageBySlugQueryResult = {
   _id: string;
   _type: "legalPage";
@@ -1023,8 +1113,10 @@ export type LegalPageBySlugQueryResult = {
   noIndex: boolean | null;
   language: string | null;
 } | null;
+
+// Source: src/lib/queries/legal-page-queries.ts
 // Variable: allLegalPagesQuery
-// Query: *[_type == "legalPage" && defined(slug.current) && (!defined(language) || language == $language)] | order(title asc) {    _id,    title,    slug,    language  }
+// Query: *[_type == "legalPage" && defined(slug.current) && language == $language] | order(title asc) {    _id,    title,    slug,    language  }
 export type AllLegalPagesQueryResult = Array<{
   _id: string;
   title: string;
@@ -1032,7 +1124,7 @@ export type AllLegalPagesQueryResult = Array<{
   language: string | null;
 }>;
 
-// Source: ./src/lib/queries/organization-queries.ts
+// Source: src/lib/queries/organization-queries.ts
 // Variable: organizationQuery
 // Query: *[_type == "organization"][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic organization info    name,    legalName,    url,    foundingDate,    organizationType,        // Internationalized fields (language-specific extraction)    "description": description[_key == $language][0].value,        // Logo with internationalized alt text    logo {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      "alt": alt[_key == $language][0].value    },        // Contact information (nested object)    contactInfo {      email,      telephone,      address {        streetAddress,        addressLocality,        addressRegion,        postalCode,        addressCountry      }    },        // Social profiles array    socialProfiles  }
 export type OrganizationQueryResult = {
@@ -1045,7 +1137,13 @@ export type OrganizationQueryResult = {
   legalName: string | null;
   url: string;
   foundingDate: string | null;
-  organizationType: "Corporation" | "EducationalOrganization" | "LocalBusiness" | "NGO" | "ProfessionalService" | null;
+  organizationType:
+    | "Corporation"
+    | "EducationalOrganization"
+    | "LocalBusiness"
+    | "NGO"
+    | "ProfessionalService"
+    | null;
   description: string | null;
   logo: {
     asset: {
@@ -1080,6 +1178,8 @@ export type OrganizationQueryResult = {
   } | null;
   socialProfiles: Array<string> | null;
 } | null;
+
+// Source: src/lib/queries/organization-queries.ts
 // Variable: organizationReferenceQuery
 // Query: *[_type == "organization"][0] {    _id,    name,    url,    "description": description[_key == $language][0].value  }
 export type OrganizationReferenceQueryResult = {
@@ -1088,28 +1188,26 @@ export type OrganizationReferenceQueryResult = {
   url: string;
   description: string | null;
 } | null;
+
+// Source: src/lib/queries/organization-queries.ts
 // Variable: organizationDebugQuery
 // Query: *[_type == "organization"][0] {    _id,    name,    url,    description,    logo {      asset-> {        url      },      alt    }  }
 export type OrganizationDebugQueryResult = {
   _id: string;
   name: string;
   url: string;
-  description: Array<{
-    _key: string;
-  } & InternationalizedArrayTextValue>;
+  description: InternationalizedArrayText;
   logo: {
     asset: {
       url: string | null;
     } | null;
-    alt: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
+    alt: InternationalizedArrayString;
   };
 } | null;
 
-// Source: ./src/lib/queries/post-queries.ts
+// Source: src/lib/queries/post-queries.ts
 // Variable: postBySlugQuery
-// Query: *[_type == "post" && slug.current == $slug && (!defined(language) || language == $language)][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic content fields    title,    slug,    excerpt,    content,        // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,        // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,        // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,        // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,        // FAQ schema support    faqs[] {      question,      answer    },        // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },        // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,        // International    language  }
+// Query: *[_type == "post" && slug.current == $slug && language == $language][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Basic content fields    title,    slug,    excerpt,    content,    // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash,          hasAlpha,          isOpaque        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,    // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,    // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,    // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,    // FAQ schema support    faqs[] {      question,      answer    },    // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },    // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,    // International    language  }
 export type PostBySlugQueryResult = {
   _id: string;
   _type: "post";
@@ -1155,7 +1253,13 @@ export type PostBySlugQueryResult = {
   meta: string | null;
   focusKeyword: string | null;
   secondaryKeywords: Array<string> | null;
-  articleType: "Article" | "BlogPosting" | "MedicalScholarlyArticle" | "NewsArticle" | "TechnicalArticle" | null;
+  articleType:
+    | "Article"
+    | "BlogPosting"
+    | "MedicalScholarlyArticle"
+    | "NewsArticle"
+    | "TechnicalArticle"
+    | null;
   articleSection: {
     _ref: string;
     _type: "reference";
@@ -1165,7 +1269,12 @@ export type PostBySlugQueryResult = {
   wordCount: number | null;
   references: Array<{
     _key: string;
-    citationType: "book" | "dataset" | "governmentDocument" | "scholarlyArticle" | "webPage";
+    citationType:
+      | "book"
+      | "dataset"
+      | "governmentDocument"
+      | "scholarlyArticle"
+      | "webPage";
     title: string;
     authors: Array<string>;
     publicationYear: number;
@@ -1237,8 +1346,10 @@ export type PostBySlugQueryResult = {
   canonicalUrl: string | null;
   language: string | null;
 } | null;
+
+// Source: src/lib/queries/post-queries.ts
 // Variable: allPostsQuery
-// Query: *[_type == "post" && defined(slug.current) && (!defined(language) || language == $language)] | order(publishedAt desc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic content fields    title,    slug,    excerpt,    content,        // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,        // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,        // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,        // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,        // FAQ schema support    faqs[] {      question,      answer    },        // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },        // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,        // International    language  }
+// Query: *[_type == "post" && defined(slug.current) && language == $language] | order(publishedAt desc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Basic content fields    title,    slug,    excerpt,    content,    // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,    // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,    // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,    // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,    // FAQ schema support    faqs[] {      question,      answer    },    // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },    // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,    // International    language  }
 export type AllPostsQueryResult = Array<{
   _id: string;
   _type: "post";
@@ -1282,7 +1393,13 @@ export type AllPostsQueryResult = Array<{
   meta: string | null;
   focusKeyword: string | null;
   secondaryKeywords: Array<string> | null;
-  articleType: "Article" | "BlogPosting" | "MedicalScholarlyArticle" | "NewsArticle" | "TechnicalArticle" | null;
+  articleType:
+    | "Article"
+    | "BlogPosting"
+    | "MedicalScholarlyArticle"
+    | "NewsArticle"
+    | "TechnicalArticle"
+    | null;
   articleSection: {
     _ref: string;
     _type: "reference";
@@ -1292,7 +1409,12 @@ export type AllPostsQueryResult = Array<{
   wordCount: number | null;
   references: Array<{
     _key: string;
-    citationType: "book" | "dataset" | "governmentDocument" | "scholarlyArticle" | "webPage";
+    citationType:
+      | "book"
+      | "dataset"
+      | "governmentDocument"
+      | "scholarlyArticle"
+      | "webPage";
     title: string;
     authors: Array<string>;
     publicationYear: number;
@@ -1364,8 +1486,10 @@ export type AllPostsQueryResult = Array<{
   canonicalUrl: string | null;
   language: string | null;
 }>;
+
+// Source: src/lib/queries/post-queries.ts
 // Variable: featuredPostsQuery
-// Query: *[_type == "post" && defined(slug.current) && featured == true && (!defined(language) || language == $language)] | order(publishedAt desc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,        // Basic content fields    title,    slug,    excerpt,    content,        // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,        // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,        // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,        // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,        // FAQ schema support    faqs[] {      question,      answer    },        // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },        // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,        // International    language  }
+// Query: *[_type == "post" && defined(slug.current) && featured == true && language == $language] | order(publishedAt desc) {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Basic content fields    title,    slug,    excerpt,    content,    // Media fields    coverImage {      asset-> {        _id,        url,        metadata {          dimensions {            width,            height,            aspectRatio          },          lqip,          blurHash        }      },      hotspot,      crop,      alt,      caption    },    coverImageAlt,    // Author & publication (references only)    author,    publishedAt,    lastModified,    readingTime,    // SEO & Schema fields    metaTitle,    meta,    focusKeyword,    secondaryKeywords,    articleType,    articleSection,    wordCount,    // Citations & References    references[] {      _key,      citationType,      title,      authors,      publicationYear,      publisher,      url,      doi,      isbn,      issn,      volume,      issue,      pages,      edition,      accessDate,      seoWeight,      keywordRelevance,      internalNote    },    // E-E-A-T signals    medicallyReviewed,    medicalReviewer,    reviewDate,    nextReviewDate,    // Content classification    categories,    tags,    // targetAudience,    // FAQ schema support    faqs[] {      question,      answer    },    // How-To schema support    howTo {      totalTime,      supply,      tool,      steps[] {        name,        text,        image {          asset-> {            _id,            url,            metadata {              dimensions {                width,                height,                aspectRatio              }            }          },          hotspot,          crop,          alt,          caption        },        url      }    },    // Advanced features    featured,    featuredCategory,    noIndex,    canonicalUrl,    // International    language  }
 export type FeaturedPostsQueryResult = Array<{
   _id: string;
   _type: "post";
@@ -1409,7 +1533,13 @@ export type FeaturedPostsQueryResult = Array<{
   meta: string | null;
   focusKeyword: string | null;
   secondaryKeywords: Array<string> | null;
-  articleType: "Article" | "BlogPosting" | "MedicalScholarlyArticle" | "NewsArticle" | "TechnicalArticle" | null;
+  articleType:
+    | "Article"
+    | "BlogPosting"
+    | "MedicalScholarlyArticle"
+    | "NewsArticle"
+    | "TechnicalArticle"
+    | null;
   articleSection: {
     _ref: string;
     _type: "reference";
@@ -1419,7 +1549,12 @@ export type FeaturedPostsQueryResult = Array<{
   wordCount: number | null;
   references: Array<{
     _key: string;
-    citationType: "book" | "dataset" | "governmentDocument" | "scholarlyArticle" | "webPage";
+    citationType:
+      | "book"
+      | "dataset"
+      | "governmentDocument"
+      | "scholarlyArticle"
+      | "webPage";
     title: string;
     authors: Array<string>;
     publicationYear: number;
@@ -1492,34 +1627,36 @@ export type FeaturedPostsQueryResult = Array<{
   language: string | null;
 }>;
 
-// Source: ./src/lib/queries/site-settings-queries.ts
+// Source: src/lib/queries/site-settings-queries.ts
 // Variable: siteSettingsQuery
-// Query: *[_type == "siteSettings" && _id == "siteSettings"][0] {    _id,    _type,    newsletter {      heading,      subheading,      placeholder,      buttonText,      successMessage,      errorMessage    },    socialLinks[] {      platform,      url,      label    },    siteName,    maintenanceMode  }
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0] {    _id,    _type,    newsletter {      heading,      subheading,      placeholder,      buttonText,      successMessage,      errorMessage    },    blogCta {      heading,      subheading,      buttonText    },    socialLinks[] {      platform,      url,      label    },    siteName,    maintenanceMode  }
 export type SiteSettingsQueryResult = {
   _id: string;
   _type: "siteSettings";
   newsletter: {
-    heading: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    subheading: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    placeholder: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    buttonText: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue>;
-    successMessage: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue> | null;
-    errorMessage: Array<{
-      _key: string;
-    } & InternationalizedArrayStringValue> | null;
+    heading: InternationalizedArrayString;
+    subheading: InternationalizedArrayString;
+    placeholder: InternationalizedArrayString;
+    buttonText: InternationalizedArrayString;
+    successMessage: InternationalizedArrayString | null;
+    errorMessage: InternationalizedArrayString | null;
+  } | null;
+  blogCta: {
+    heading: InternationalizedArrayString;
+    subheading: InternationalizedArrayString;
+    buttonText: InternationalizedArrayString;
   } | null;
   socialLinks: Array<{
-    platform: "custom" | "facebook" | "instagram" | "linkedin" | "pinterest" | "threads" | "tiktok" | "x" | "youtube";
+    platform:
+      | "custom"
+      | "facebook"
+      | "instagram"
+      | "linkedin"
+      | "pinterest"
+      | "threads"
+      | "tiktok"
+      | "x"
+      | "youtube";
     url: string;
     label: string | null;
   }> | null;
@@ -1527,7 +1664,7 @@ export type SiteSettingsQueryResult = {
   maintenanceMode: boolean | null;
 } | null;
 
-// Source: ./src/lib/queries/sitemap-queries.ts
+// Source: src/lib/queries/sitemap-queries.ts
 // Variable: sitemapPostsQuery
 // Query: *[    _type == "post"    && defined(slug.current)    && defined(publishedAt)    && publishedAt <= now()    && (!defined(noIndex) || noIndex == false)    && (!defined(language) || language == $language)  ] | order(publishedAt desc) {    _id,    _updatedAt,    slug,    publishedAt,    lastModified,    language  }
 export type SitemapPostsQueryResult = Array<{
@@ -1538,6 +1675,8 @@ export type SitemapPostsQueryResult = Array<{
   lastModified: string | null;
   language: string | null;
 }>;
+
+// Source: src/lib/queries/sitemap-queries.ts
 // Variable: sitemapPostCountQuery
 // Query: count(*[    _type == "post"    && defined(slug.current)    && defined(publishedAt)    && publishedAt <= now()    && (!defined(noIndex) || noIndex == false)    && (!defined(language) || language == $language)  ])
 export type SitemapPostCountQueryResult = number;
@@ -1546,27 +1685,28 @@ export type SitemapPostCountQueryResult = number;
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "\n  *[_type == \"author\"] | order(name asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    \"bio\": bio[_key == $language][0].value,\n    \"jobTitle\": jobTitle[_key == $language][0].value,\n    \"specialties\": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n": AllAuthorsQueryResult;
-    "\n  *[_type == \"author\" && slug.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    \"bio\": bio[_key == $language][0].value,\n    \"jobTitle\": jobTitle[_key == $language][0].value,\n    \"specialties\": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n": AuthorBySlugQueryResult;
-    "\n  *[_type == \"author\" && _id in $ids] {\n    _id,\n    name,\n    slug,\n    \"jobTitle\": jobTitle[_key == $language][0].value\n  }\n": AuthorReferencesQueryResult;
-    "\n  *[_type == \"blogPageSettings\"][0] {\n    _id,\n    _type,\n    title,\n    subtitle\n  }\n": BlogPageSettingsQueryResult;
-    "\n  *[_type == \"category\"] | order(title[_key == $language][0].value asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value,\n    \"metaDescription\": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n": AllCategoriesQueryResult;
-    "\n  *[_type == \"category\" && slug[_key == $language][0].value.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value,\n    \"metaDescription\": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n": CategoryBySlugQueryResult;
-    "\n  *[_type == \"category\" && _id in $ids] {\n    _id,\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value\n  }\n": CategoryReferencesQueryResult;
-    "\n  *[_type == \"category\" && parent._ref == $parentId] | order(title[_key == $language][0].value asc) {\n    _id,\n    \"title\": title[_key == $language][0].value,\n    \"slug\": slug[_key == $language][0].value,\n    \"description\": description[_key == $language][0].value\n  }\n": ChildCategoriesQueryResult;
-    "\n  *[_type == \"infographic\" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"description\": coalesce(\n      description[language == $language][0].value,\n      description[language == \"en\"][0].value,\n      description[0].value\n    ),\n    \"altText\": coalesce(\n      altText[language == $language][0].value,\n      altText[language == \"en\"][0].value,\n      altText[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with flexible asset resolution\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset->,\n      image[language == \"en\"][0].asset.asset->,\n      image[0].asset.asset->\n    ) {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    \"downloadFilename\": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == \"en\"][0].value,\n      downloadFilename[0].value\n    ),\n    \"pdfMetadata\": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == \"en\"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n": InfographicByIdQueryResult;
-    "\n  *[_type == \"infographic\" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    \"title\": coalesce(\n      title[language == $language][0].value,\n      title[language == \"en\"][0].value,\n      title[0].value\n    ),\n    \"slug\": coalesce(\n      slug[language == $language][0].current,\n      slug[language == \"en\"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    \"image\": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == \"en\"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n": InfographicsByIdsQueryResult;
-    "\n  *[_type == \"infographic\" && _id == $id][0] {\n    _id,\n    \"availableLanguages\": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    \"hasLanguage\": count(title[language == $language]) > 0\n  }\n": InfographicLanguageAvailabilityQueryResult;
-    "\n  *[_type == \"legalPage\" && slug.current == $slug && (!defined(language) || language == $language)][0] {\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    title,\n    slug,\n    content,\n    excerpt,\n    lastUpdated,\n    metaTitle,\n    metaDescription,\n    noIndex,\n    language\n  }\n": LegalPageBySlugQueryResult;
-    "\n  *[_type == \"legalPage\" && defined(slug.current) && (!defined(language) || language == $language)] | order(title asc) {\n    _id,\n    title,\n    slug,\n    language\n  }\n": AllLegalPagesQueryResult;
-    "\n  *[_type == \"organization\"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    \"description\": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      \"alt\": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n": OrganizationQueryResult;
-    "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    \"description\": description[_key == $language][0].value\n  }\n": OrganizationReferenceQueryResult;
-    "\n  *[_type == \"organization\"][0] {\n    _id,\n    name,\n    url,\n    description,\n    logo {\n      asset-> {\n        url\n      },\n      alt\n    }\n  }\n": OrganizationDebugQueryResult;
-    "\n  *[_type == \"post\" && slug.current == $slug && (!defined(language) || language == $language)][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": PostBySlugQueryResult;
-    "\n  *[_type == \"post\" && defined(slug.current) && (!defined(language) || language == $language)] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": AllPostsQueryResult;
-    "\n  *[_type == \"post\" && defined(slug.current) && featured == true && (!defined(language) || language == $language)] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n    \n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n    \n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n    \n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n    \n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n    \n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n    \n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n    \n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n    \n    // International\n    language\n  }\n": FeaturedPostsQueryResult;
-    "\n  *[_type == \"siteSettings\" && _id == \"siteSettings\"][0] {\n    _id,\n    _type,\n    newsletter {\n      heading,\n      subheading,\n      placeholder,\n      buttonText,\n      successMessage,\n      errorMessage\n    },\n    socialLinks[] {\n      platform,\n      url,\n      label\n    },\n    siteName,\n    maintenanceMode\n  }\n": SiteSettingsQueryResult;
-    "\n  *[\n    _type == \"post\"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ] | order(publishedAt desc) {\n    _id,\n    _updatedAt,\n    slug,\n    publishedAt,\n    lastModified,\n    language\n  }\n": SitemapPostsQueryResult;
-    "\n  count(*[\n    _type == \"post\"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ])\n": SitemapPostCountQueryResult;
+    '\n  *[_type == "author"] | order(name asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    "bio": bio[_key == $language][0].value,\n    "jobTitle": jobTitle[_key == $language][0].value,\n    "specialties": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n': AllAuthorsQueryResult;
+    '\n  *[_type == "author" && slug.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic info fields\n    name,\n    slug,\n    avatar {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt\n    },\n    \n    // Internationalized fields (language-specific extraction)\n    "bio": bio[_key == $language][0].value,\n    "jobTitle": jobTitle[_key == $language][0].value,\n    "specialties": specialties[_key == $language][0].value,\n    \n    // Credentials & E-E-A-T fields\n    credentials[] {\n      name,\n      issuingOrganization,\n      url,\n      dateIssued,\n      expires,\n      _key\n    },\n    education[] {\n      institution,\n      degree,\n      field,\n      graduationYear,\n      url,\n      _key\n    },\n    experience[] {\n      position,\n      organization,\n      startDate,\n      endDate,\n      description,\n      _key\n    },\n    yearsExperience,\n    \n    // Social & contact fields\n    email,\n    socialLinks {\n      linkedin,\n      twitter,\n      instagram,\n      facebook,\n      youtube,\n      website\n    },\n    \n    // Schema-specific fields\n    sameAs,\n    worksFor,\n    memberOf\n  }\n': AuthorBySlugQueryResult;
+    '\n  *[_type == "author" && _id in $ids] {\n    _id,\n    name,\n    slug,\n    "jobTitle": jobTitle[_key == $language][0].value\n  }\n': AuthorReferencesQueryResult;
+    '\n  *[_type == "blogPageSettings"][0] {\n    _id,\n    _type,\n    title,\n    subtitle\n  }\n': BlogPageSettingsQueryResult;
+    '\n  *[_type == "category"] | order(title[_key == $language][0].value asc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value,\n    "description": description[_key == $language][0].value,\n    "metaDescription": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n': AllCategoriesQueryResult;
+    '\n  *[_type == "category" && slug[_key == $language][0].value.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Internationalized fields (language-specific extraction)\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value,\n    "description": description[_key == $language][0].value,\n    "metaDescription": metaDescription[_key == $language][0].value,\n    \n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n    \n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n    \n    // Language field (managed by internationalization plugin)\n    language\n  }\n': CategoryBySlugQueryResult;
+    '\n  *[_type == "category" && _id in $ids] {\n    _id,\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value\n  }\n': CategoryReferencesQueryResult;
+    '\n  *[_type == "category" && parent._ref == $parentId] | order(title[_key == $language][0].value asc) {\n    _id,\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value,\n    "description": description[_key == $language][0].value\n  }\n': ChildCategoriesQueryResult;
+    '\n  *[_type == "homePageSettings"][0] {\n    _id,\n    _type,\n    title,\n    subtitle,\n    youtubeUrl\n  }\n': HomePageSettingsQueryResult;
+    '\n  *[_type == "infographic" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "description": coalesce(\n      description[language == $language][0].value,\n      description[language == "en"][0].value,\n      description[0].value\n    ),\n    "altText": coalesce(\n      altText[language == $language][0].value,\n      altText[language == "en"][0].value,\n      altText[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with flexible asset resolution\n    "image": coalesce(\n      image[language == $language][0].asset.asset->,\n      image[language == "en"][0].asset.asset->,\n      image[0].asset.asset->\n    ) {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    "downloadFilename": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == "en"][0].value,\n      downloadFilename[0].value\n    ),\n    "pdfMetadata": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == "en"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n': InfographicByIdQueryResult;
+    '\n  *[_type == "infographic" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    "image": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == "en"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n': InfographicsByIdsQueryResult;
+    '\n  *[_type == "infographic" && _id == $id][0] {\n    _id,\n    "availableLanguages": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    "hasLanguage": count(title[language == $language]) > 0\n  }\n': InfographicLanguageAvailabilityQueryResult;
+    '\n  *[_type == "legalPage" && slug.current == $slug && language == $language][0] {\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    title,\n    slug,\n    content,\n    excerpt,\n    lastUpdated,\n    metaTitle,\n    metaDescription,\n    noIndex,\n    language\n  }\n': LegalPageBySlugQueryResult;
+    '\n  *[_type == "legalPage" && defined(slug.current) && language == $language] | order(title asc) {\n    _id,\n    title,\n    slug,\n    language\n  }\n': AllLegalPagesQueryResult;
+    '\n  *[_type == "organization"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    "description": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n': OrganizationQueryResult;
+    '\n  *[_type == "organization"][0] {\n    _id,\n    name,\n    url,\n    "description": description[_key == $language][0].value\n  }\n': OrganizationReferenceQueryResult;
+    '\n  *[_type == "organization"][0] {\n    _id,\n    name,\n    url,\n    description,\n    logo {\n      asset-> {\n        url\n      },\n      alt\n    }\n  }\n': OrganizationDebugQueryResult;
+    '\n  *[_type == "post" && slug.current == $slug && language == $language][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n\n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n\n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n\n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n\n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n\n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n\n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n\n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n\n    // International\n    language\n  }\n': PostBySlugQueryResult;
+    '\n  *[_type == "post" && defined(slug.current) && language == $language] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n\n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n\n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n\n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n\n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n\n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n\n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n\n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n\n    // International\n    language\n  }\n': AllPostsQueryResult;
+    '\n  *[_type == "post" && defined(slug.current) && featured == true && language == $language] | order(publishedAt desc) {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Basic content fields\n    title,\n    slug,\n    excerpt,\n    content,\n\n    // Media fields\n    coverImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash\n        }\n      },\n      hotspot,\n      crop,\n      alt,\n      caption\n    },\n    coverImageAlt,\n\n    // Author & publication (references only)\n    author,\n    publishedAt,\n    lastModified,\n    readingTime,\n\n    // SEO & Schema fields\n    metaTitle,\n    meta,\n    focusKeyword,\n    secondaryKeywords,\n    articleType,\n    articleSection,\n    wordCount,\n\n    // Citations & References\n    references[] {\n      _key,\n      citationType,\n      title,\n      authors,\n      publicationYear,\n      publisher,\n      url,\n      doi,\n      isbn,\n      issn,\n      volume,\n      issue,\n      pages,\n      edition,\n      accessDate,\n      seoWeight,\n      keywordRelevance,\n      internalNote\n    },\n\n    // E-E-A-T signals\n    medicallyReviewed,\n    medicalReviewer,\n    reviewDate,\n    nextReviewDate,\n\n    // Content classification\n    categories,\n    tags,\n    // targetAudience,\n\n    // FAQ schema support\n    faqs[] {\n      question,\n      answer\n    },\n\n    // How-To schema support\n    howTo {\n      totalTime,\n      supply,\n      tool,\n      steps[] {\n        name,\n        text,\n        image {\n          asset-> {\n            _id,\n            url,\n            metadata {\n              dimensions {\n                width,\n                height,\n                aspectRatio\n              }\n            }\n          },\n          hotspot,\n          crop,\n          alt,\n          caption\n        },\n        url\n      }\n    },\n\n    // Advanced features\n    featured,\n    featuredCategory,\n    noIndex,\n    canonicalUrl,\n\n    // International\n    language\n  }\n': FeaturedPostsQueryResult;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0] {\n    _id,\n    _type,\n    newsletter {\n      heading,\n      subheading,\n      placeholder,\n      buttonText,\n      successMessage,\n      errorMessage\n    },\n    blogCta {\n      heading,\n      subheading,\n      buttonText\n    },\n    socialLinks[] {\n      platform,\n      url,\n      label\n    },\n    siteName,\n    maintenanceMode\n  }\n': SiteSettingsQueryResult;
+    '\n  *[\n    _type == "post"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ] | order(publishedAt desc) {\n    _id,\n    _updatedAt,\n    slug,\n    publishedAt,\n    lastModified,\n    language\n  }\n': SitemapPostsQueryResult;
+    '\n  count(*[\n    _type == "post"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && publishedAt <= now()\n    && (!defined(noIndex) || noIndex == false)\n    && (!defined(language) || language == $language)\n  ])\n': SitemapPostCountQueryResult;
   }
 }

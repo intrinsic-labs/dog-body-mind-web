@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typegen": "cd ../dbm-sanity && npx sanity schema extract --enforce-required-fields && cd ../dbm-frontend && npx sanity typegen generate",
+    "typegen": "cd ../cms && npx sanity schema extract --enforce-required-fields && cd ../frontend && npx sanity typegen generate",
     "warm-cache": "tsx scripts/warm-image-cache.ts",
     "postdeploy": "npm run warm-cache -- https://dogbodymind.com"
   },

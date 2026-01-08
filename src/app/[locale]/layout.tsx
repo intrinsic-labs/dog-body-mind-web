@@ -4,6 +4,8 @@ import { Locale, locales, localeToLanguageTag } from "@/lib/locale";
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { isValidLocale } from "@/lib/locale";
+import { notFound } from "next/navigation";
 
 // Revalidate all pages every hour (3600 seconds)
 export const revalidate = 3600;
@@ -13,19 +15,22 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({
-  params
+  params,
 }: {
-  params: Promise<{ locale: Locale }>
+  // we may want to stop using params: Promise everywhere,
+  // it's kind of unconventional
+  params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  const locale = isValidLocale(rawLocale) ? rawLocale : notFound();
 
   return {
     title: "Dog Body Mind",
     description: "Dog Body Mind - Expert pet care guidance and education",
     keywords: ["Dog Body Mind", "pet care", "dog health", "veterinary advice"],
     other: {
-      'og:locale': localeToLanguageTag[locale]
-    }
+      "og:locale": localeToLanguageTag[locale],
+    },
   };
 }
 
@@ -34,9 +39,10 @@ export default async function LocaleLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ locale: Locale }>;
+  params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  const locale = isValidLocale(rawLocale) ? rawLocale : notFound();
 
   return (
     <html lang={localeToLanguageTag[locale]}>
@@ -48,11 +54,9 @@ export default async function LocaleLayout({
         `}
       >
         <Header locale={locale} />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <main className="min-h-screen">{children}</main>
         <Footer locale={locale} />
       </body>
     </html>
   );
-} 
+}

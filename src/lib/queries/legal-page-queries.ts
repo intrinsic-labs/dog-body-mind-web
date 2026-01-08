@@ -6,7 +6,7 @@ const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour
 
 // Get single legal page by slug
 export const legalPageBySlugQuery = defineQuery(`
-  *[_type == "legalPage" && slug.current == $slug && (!defined(language) || language == $language)][0] {
+  *[_type == "legalPage" && slug.current == $slug && language == $language][0] {
     _id,
     _type,
     _createdAt,
@@ -25,7 +25,7 @@ export const legalPageBySlugQuery = defineQuery(`
 
 // Get all legal pages for a language (for generating static params)
 export const allLegalPagesQuery = defineQuery(`
-  *[_type == "legalPage" && defined(slug.current) && (!defined(language) || language == $language)] | order(title asc) {
+  *[_type == "legalPage" && defined(slug.current) && language == $language] | order(title asc) {
     _id,
     title,
     slug,

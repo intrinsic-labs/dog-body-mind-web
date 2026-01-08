@@ -73,7 +73,8 @@ export function isValidLocale(locale: string): locale is Locale {
  */
 export function getLocaleFromDomain(hostname: string): Locale {
   // Handle both with and without protocol, and normalize
-  const normalizedHost = hostname.toLowerCase().replace(/^https?:\/\//, '');
+  let normalizedHost = hostname.toLowerCase().replace(/^https?:\/\//, '');
+  normalizedHost = normalizedHost.replace(/^www\./, "")
   
   // Check exact match first
   if (normalizedHost in domainLocaleMap) {
@@ -86,11 +87,11 @@ export function getLocaleFromDomain(hostname: string): Locale {
   }
   
   // Fallback: try to match partial domain (useful for preview domains)
-  for (const [domain, locale] of Object.entries(domainLocaleMap)) {
-    if (normalizedHost.includes(domain.split('.')[0])) {
-      return locale as Locale;
-    }
-  }
+  // for (const [domain, locale] of Object.entries(domainLocaleMap)) {
+  //   if (normalizedHost.includes(domain.split('.')[0])) {
+  //     return locale as Locale;
+  //   }
+  // }
   
   return defaultLocale;
 }

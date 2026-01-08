@@ -1,4 +1,4 @@
-import { defineQuery } from 'groq';
+import { defineQuery } from "groq";
 import { client } from "@/sanity/client";
 
 // Default query options for caching
@@ -8,20 +8,20 @@ const DEFAULT_OPTIONS = { next: { revalidate: 30 } };
 
 // Get single post by slug with ALL fields (for schema generation)
 export const postBySlugQuery = defineQuery(`
-  *[_type == "post" && slug.current == $slug && (!defined(language) || language == $language)][0] {
+  *[_type == "post" && slug.current == $slug && language == $language][0] {
     // Core document fields
     _id,
     _type,
     _createdAt,
     _updatedAt,
     _rev,
-    
+
     // Basic content fields
     title,
     slug,
     excerpt,
     content,
-    
+
     // Media fields
     coverImage {
       asset-> {
@@ -45,13 +45,13 @@ export const postBySlugQuery = defineQuery(`
       caption
     },
     coverImageAlt,
-    
+
     // Author & publication (references only)
     author,
     publishedAt,
     lastModified,
     readingTime,
-    
+
     // SEO & Schema fields
     metaTitle,
     meta,
@@ -60,7 +60,7 @@ export const postBySlugQuery = defineQuery(`
     articleType,
     articleSection,
     wordCount,
-    
+
     // Citations & References
     references[] {
       _key,
@@ -93,13 +93,13 @@ export const postBySlugQuery = defineQuery(`
     categories,
     tags,
     // targetAudience,
-    
+
     // FAQ schema support
     faqs[] {
       question,
       answer
     },
-    
+
     // How-To schema support
     howTo {
       totalTime,
@@ -128,13 +128,13 @@ export const postBySlugQuery = defineQuery(`
         url
       }
     },
-    
+
     // Advanced features
     featured,
     featuredCategory,
     noIndex,
     canonicalUrl,
-    
+
     // International
     language
   }
@@ -142,20 +142,20 @@ export const postBySlugQuery = defineQuery(`
 
 // Get all posts with ALL fields (for listings that need schema generation)
 export const allPostsQuery = defineQuery(`
-  *[_type == "post" && defined(slug.current) && (!defined(language) || language == $language)] | order(publishedAt desc) {
+  *[_type == "post" && defined(slug.current) && language == $language] | order(publishedAt desc) {
     // Core document fields
     _id,
     _type,
     _createdAt,
     _updatedAt,
     _rev,
-    
+
     // Basic content fields
     title,
     slug,
     excerpt,
     content,
-    
+
     // Media fields
     coverImage {
       asset-> {
@@ -177,13 +177,13 @@ export const allPostsQuery = defineQuery(`
       caption
     },
     coverImageAlt,
-    
+
     // Author & publication (references only)
     author,
     publishedAt,
     lastModified,
     readingTime,
-    
+
     // SEO & Schema fields
     metaTitle,
     meta,
@@ -192,7 +192,7 @@ export const allPostsQuery = defineQuery(`
     articleType,
     articleSection,
     wordCount,
-    
+
     // Citations & References
     references[] {
       _key,
@@ -225,13 +225,13 @@ export const allPostsQuery = defineQuery(`
     categories,
     tags,
     // targetAudience,
-    
+
     // FAQ schema support
     faqs[] {
       question,
       answer
     },
-    
+
     // How-To schema support
     howTo {
       totalTime,
@@ -260,13 +260,13 @@ export const allPostsQuery = defineQuery(`
         url
       }
     },
-    
+
     // Advanced features
     featured,
     featuredCategory,
     noIndex,
     canonicalUrl,
-    
+
     // International
     language
   }
@@ -274,20 +274,20 @@ export const allPostsQuery = defineQuery(`
 
 // Get featured posts with ALL fields
 export const featuredPostsQuery = defineQuery(`
-  *[_type == "post" && defined(slug.current) && featured == true && (!defined(language) || language == $language)] | order(publishedAt desc) {
+  *[_type == "post" && defined(slug.current) && featured == true && language == $language] | order(publishedAt desc) {
     // Core document fields
     _id,
     _type,
     _createdAt,
     _updatedAt,
     _rev,
-    
+
     // Basic content fields
     title,
     slug,
     excerpt,
     content,
-    
+
     // Media fields
     coverImage {
       asset-> {
@@ -309,13 +309,13 @@ export const featuredPostsQuery = defineQuery(`
       caption
     },
     coverImageAlt,
-    
+
     // Author & publication (references only)
     author,
     publishedAt,
     lastModified,
     readingTime,
-    
+
     // SEO & Schema fields
     metaTitle,
     meta,
@@ -324,7 +324,7 @@ export const featuredPostsQuery = defineQuery(`
     articleType,
     articleSection,
     wordCount,
-    
+
     // Citations & References
     references[] {
       _key,
@@ -357,13 +357,13 @@ export const featuredPostsQuery = defineQuery(`
     categories,
     tags,
     // targetAudience,
-    
+
     // FAQ schema support
     faqs[] {
       question,
       answer
     },
-    
+
     // How-To schema support
     howTo {
       totalTime,
@@ -392,13 +392,13 @@ export const featuredPostsQuery = defineQuery(`
         url
       }
     },
-    
+
     // Advanced features
     featured,
     featuredCategory,
     noIndex,
     canonicalUrl,
-    
+
     // International
     language
   }
@@ -416,4 +416,4 @@ export async function getAllPosts(language?: string) {
 
 export async function getFeaturedPosts(language?: string) {
   return client.fetch(featuredPostsQuery, { language }, DEFAULT_OPTIONS);
-} 
+}
