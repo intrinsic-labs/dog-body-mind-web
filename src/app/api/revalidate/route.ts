@@ -73,7 +73,11 @@ function asString(v: unknown): string | null {
   return typeof v === "string" && v.trim() ? v.trim() : null;
 }
 
-function pathForDoc(docType: string | null, slug: string | null, locale: string) {
+function pathForDoc(
+  docType: string | null,
+  slug: string | null,
+  locale: string,
+) {
   // Adjust these mappings to match your routes.
   // This project appears to have localized routes under `/{locale}/...`
   const base = `/${locale}`;
@@ -152,32 +156,49 @@ export async function POST(request: NextRequest) {
   // Optional manual controls via querystring:
   //  - ?path=/en/blog/something (repeatable)
   //  - ?tag=sanity:type:post (repeatable)
-  const extraPaths = request.nextUrl.searchParams.getAll("path").filter(Boolean);
+  const extraPaths = request.nextUrl.searchParams
+    .getAll("path")
+    .filter(Boolean);
   const extraTags = request.nextUrl.searchParams.getAll("tag").filter(Boolean);
 
   // ---- Perform revalidation ----
-  const revalidated: { tags: string[]; paths: string[] } = { tags: [], paths: [] };
+  const revalidated: { tags: string[]; paths: string[] } = {
+    tags: [],
+    paths: [],
+  };
 
   // 1) Tags (preferred)
-  const tags = Array.from(new Set([...tagsForDoc(docType, docId), ...extraTags]));
+  const tags = Array.from(
+    new Set([...tagsForDoc(docType, docId), ...extraTags]),
+  );
   for (const tag of tags) {
     try {
-      revalidateTag(tag);
+      revalidateTag(tag, "layout");
       revalidated.tags.push(tag);
     } catch (err) {
-      console.error("[revalidate] revalidateTag failed", { requestId, tag, err });
+      console.error("[revalidate] revalidateTag failed", {
+        requestId,
+        tag,
+        err,
+      });
     }
   }
 
   // 2) Paths (best-effort mapping for common routes)
   const mappedPath = pathForDoc(docType, slug, locale);
-  const paths = Array.from(new Set([...(mappedPath ? [mappedPath] : []), ...extraPaths]));
+  const paths = Array.from(
+    new Set([...(mappedPath ? [mappedPath] : []), ...extraPaths]),
+  );
   for (const p of paths) {
     try {
       revalidatePath(p);
       revalidated.paths.push(p);
     } catch (err) {
-      console.error("[revalidate] revalidatePath failed", { requestId, path: p, err });
+      console.error("[revalidate] revalidatePath failed", {
+        requestId,
+        path: p,
+        err,
+      });
     }
   }
 
@@ -188,7 +209,10 @@ export async function POST(request: NextRequest) {
       revalidatePath(`/${locale}`);
       revalidated.paths.push(`/${locale}`);
     } catch (err) {
-      console.error("[revalidate] fallback revalidatePath failed", { requestId, err });
+      console.error("[revalidate] fallback revalidatePath failed", {
+        requestId,
+        err,
+      });
     }
   }
 
@@ -205,8 +229,7 @@ export async function POST(request: NextRequest) {
       locale,
     },
     revalidated,
-    note:
-      "Tag invalidation only becomes effective once your Sanity fetch() calls add next.tags. Path invalidation is best-effort based on doc type/slug mappings in this file.",
+    note: "Tag invalidation only becomes effective once your Sanity fetch() calls add next.tags. Path invalidation is best-effort based on doc type/slug mappings in this file.",
   });
 }
 
@@ -220,7 +243,10 @@ export async function GET(request: NextRequest) {
 
   if (!expectedSecret) {
     return json(
-      { ok: false, error: "Missing server configuration: SANITY_REVALIDATE_SECRET" },
+      {
+        ok: false,
+        error: "Missing server configuration: SANITY_REVALIDATE_SECRET",
+      },
       { status: 500 },
     );
   }
@@ -232,10 +258,13 @@ export async function GET(request: NextRequest) {
   const tags = sp.getAll("tag").filter(Boolean);
   const locale = asString(sp.get("locale")) || "en";
 
-  const revalidated: { tags: string[]; paths: string[] } = { tags: [], paths: [] };
+  const revalidated: { tags: string[]; paths: string[] } = {
+    tags: [],
+    paths: [],
+  };
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTag(tag, "layout");
     revalidated.tags.push(tag);
   }
 
@@ -252,8 +281,7 @@ export async function GET(request: NextRequest) {
   return json({
     ok: true,
     revalidated,
-    hint:
-      "Pass ?tag=... and/or ?path=... (repeatable). For Sanity webhook, use POST with JSON body including _type/_id/slug/language.",
+    hint: "Pass ?tag=... and/or ?path=... (repeatable). For Sanity webhook, use POST with JSON body including _type/_id/slug/language.",
   });
 }
 
