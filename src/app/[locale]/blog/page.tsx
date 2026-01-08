@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { DataManager } from "@/lib/data-manager";
 import { generateArticleListingMetadata } from "@/lib/metadata/article-metadata";
 import { transformPostForDisplay } from "@/lib/blog-types";
@@ -73,11 +74,11 @@ export default async function BlogPage({
 
     // Filter and transform categories to match expected type
     const categories = allCategories
-      .filter(cat => cat.title && cat.slug?.current)
-      .map(cat => ({
+      .filter((cat) => cat.title && cat.slug?.current)
+      .map((cat) => ({
         _id: cat._id,
         title: cat.title!,
-        slug: cat.slug!.current
+        slug: cat.slug!.current,
       }));
 
     return (
@@ -100,12 +101,22 @@ export default async function BlogPage({
             </div>
           )}
 
-          <FilterableBlogList
-            posts={displayPosts}
-            categories={categories}
-            currentLocale={locale}
-            newsletterContent={newsletterContent}
-          />
+          <Suspense
+            fallback={
+              <section>
+                <div className="text-center py-16">
+                  <p className="text-foreground/60 text-lg">Loading…</p>
+                </div>
+              </section>
+            }
+          >
+            <FilterableBlogList
+              posts={displayPosts}
+              categories={categories}
+              currentLocale={locale}
+              newsletterContent={newsletterContent}
+            />
+          </Suspense>
         </div>
       </main>
     );
