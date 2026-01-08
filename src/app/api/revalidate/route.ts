@@ -167,10 +167,11 @@ export async function POST(request: NextRequest) {
   };
 
   // 1) Tags (preferred). NOTE: This is a no-op until your Sanity fetch() calls add matching `next: { tags: [...] }`.
+  // Use profile="max" (recommended) to avoid requiring a custom cacheLife profile in next.config.
   const tags = Array.from(new Set(tagsForDoc(docType, docId)));
   for (const tag of tags) {
     try {
-      revalidateTag(tag, "layout");
+      revalidateTag(tag, "max");
       revalidated.tags.push(tag);
     } catch (err) {
       console.error("[revalidate] revalidateTag failed", {
@@ -185,6 +186,7 @@ export async function POST(request: NextRequest) {
   const mappedPath = pathForDoc(docType, slug, locale);
   if (mappedPath) {
     try {
+      // mappedPath is a concrete URL (no dynamic segments), so omit the 2nd argument.
       revalidatePath(mappedPath);
       revalidated.paths.push(mappedPath);
     } catch (err) {
