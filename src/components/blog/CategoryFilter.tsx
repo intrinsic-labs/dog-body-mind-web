@@ -1,5 +1,7 @@
 "use client";
 
+import Select from "@/components/ui/Select";
+
 interface Category {
   _id: string;
   title: string;
@@ -10,49 +12,35 @@ interface CategoryFilterProps {
   categories: Category[];
   selectedCategory: string | null;
   onCategoryChange: (categoryId: string | null) => void;
+  id?: string;
+  label?: string;
 }
 
 export default function CategoryFilter({
   categories,
   selectedCategory,
   onCategoryChange,
+  id = "blog-category",
+  label = "Category",
 }: CategoryFilterProps) {
-  return (
-    <div className="mb-8 -mt-8 md:mb-8">
-      <div className="flex md:flex-wrap gap-2 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-4 sm:px-6 lg:px-8 md:px-0 -mx-4 sm:-mx-6 lg:-mx-8 md:mx-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {/* All Categories Chip */}
-        <button
-          onClick={() => onCategoryChange(null)}
-          className={`
-            flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-medium transition-all
-            ${
-              selectedCategory === null
-                ? "bg-blue text-white"
-                : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-            }
-          `}
-        >
-          All
-        </button>
+  const options = [
+    { value: "", label: "All categories" },
+    ...categories.map((c) => ({
+      value: c._id,
+      label: c.title,
+    })),
+  ];
 
-        {/* Category Chips */}
-        {categories.map((category) => (
-          <button
-            key={category._id}
-            onClick={() => onCategoryChange(category._id)}
-            className={`
-              flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-medium transition-all
-              ${
-                selectedCategory === category._id
-                  ? "bg-blue text-white"
-                  : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-              }
-            `}
-          >
-            {category.title}
-          </button>
-        ))}
-      </div>
-    </div>
+  return (
+    <Select
+      id={id}
+      label={label}
+      value={selectedCategory ?? ""}
+      onChange={(value) => onCategoryChange(value || null)}
+      options={options}
+      placeholder="All categories"
+      srOnlyLabel
+      className="w-full"
+    />
   );
 }

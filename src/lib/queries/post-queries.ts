@@ -404,6 +404,71 @@ export const featuredPostsQuery = defineQuery(`
   }
 `);
 
+// ===== LISTING-READY SEARCH QUERY =====
+//
+// Searches title, excerpt, and Portable Text body content.
+// Returns only the fields needed to render blog listing cards, with author/categories dereferenced
+// to avoid N+1 reference resolution.
+//
+// IMPORTANT: Sanity requires that any referenced GROQ params are provided.
+// So we avoid `defined($categoryId)` and instead use `coalesce($categoryId, "")`.
+export const searchPostsQuery = defineQuery(`
+  *[
+    _type == "post"
+    && defined(slug.current)
+    && language == $language
+    && (
+      title match $pattern
+      || excerpt match $pattern
+      || pt::text(content) match $pattern
+    )
+    && (
+      coalesce($categoryId, "") == ""
+      || $categoryId in categories[]._ref
+    )
+  ]
+  | score(
+      title match $pattern,
+      excerpt match $pattern,
+      pt::text(content) match $pattern
+    )
+  | order(_score desc, publishedAt desc)
+  [0...$limit] {
+    _id,
+    title,
+    slug,
+    excerpt,
+
+    coverImage {
+      asset-> {
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    coverImageAlt,
+
+    author->{
+      _id,
+      name,
+      slug
+    },
+
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+
+    tags,
+    publishedAt,
+    readingTime,
+    featured,
+    featuredCategory
+  }
+`);
+
 // ===== QUERY EXECUTION FUNCTIONS =====
 
 export async function getPostBySlug(slug: string, language?: string) {
@@ -416,4 +481,30 @@ export async function getAllPosts(language?: string) {
 
 export async function getFeaturedPosts(language?: string) {
   return client.fetch(featuredPostsQuery, { language }, DEFAULT_OPTIONS);
+}
+
+export async function searchPosts(params: {
+  q: string;
+  language: string;
+  categoryId?: string;
+  limit?: number;
+}) {
+  const { q, language, categoryId, limit = 50 } = params;
+
+  const trimmed = q.trim();
+  const safe = trimmed.slice(0, 200);
+
+  // GROQ match uses wildcards, so wrap in *...*
+  const pattern = `*${safe}*`;
+
+  // IMPORTANT: always provide categoryId, even when unset, because the GROQ query references it.
+  // We use "" (empty string) as the "no category filter" sentinel.
+  const categoryIdParam = categoryId ? categoryId : "";
+
+  // Search should generally not be cached at the edge like SSG data
+  return client.fetch(
+    searchPostsQuery,
+    { language, pattern, categoryId: categoryIdParam, limit },
+    { cache: "no-store" },
+  );
 }
