@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import crypto from "crypto";
+import { isValidSignature, SIGNATURE_HEADER_NAME } from "@sanity/webhook";
 
 type SanityWebhookBody = {
   _type?: string;
@@ -12,38 +13,9 @@ type SanityWebhookBody = {
 };
 
 function getSecret(): string | null {
-  // Prefer a server-only env var, but allow either to reduce config friction.
-  return (
-    process.env.SANITY_REVALIDATE_SECRET ||
-    process.env.NEXT_PUBLIC_SANITY_REVALIDATE_SECRET ||
-    null
-  );
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  const aBuf = Buffer.from(a);
-  const bBuf = Buffer.from(b);
-  if (aBuf.length !== bBuf.length) return false;
-  return crypto.timingSafeEqual(aBuf, bBuf);
-}
-
-function extractProvidedSecret(request: NextRequest): string | null {
-  // Allow either:
-  //  - `?secret=...`
-  //  - `Authorization: Bearer ...`
-  //  - `X-Revalidate-Secret: ...`
-  const sp = request.nextUrl.searchParams;
-  const fromQuery = sp.get("secret");
-  if (fromQuery) return fromQuery;
-
-  const auth = request.headers.get("authorization") || "";
-  const m = auth.match(/^Bearer\s+(.+)$/i);
-  if (m?.[1]) return m[1];
-
-  const fromHeader = request.headers.get("x-revalidate-secret");
-  if (fromHeader) return fromHeader;
-
-  return null;
+  // Server-only secret used for verifying Sanity webhook signatures.
+  // NOTE: Do not expose this publicly.
+  return process.env.SANITY_REVALIDATE_SECRET || null;
 }
 
 function json(
@@ -61,11 +33,14 @@ function json(
 
 function normalizeSlug(slug: unknown): string | null {
   if (!slug) return null;
+
   if (typeof slug === "string") return slug.replace(/^\/+/, "");
-  if (typeof slug === "object") {
-    const s = (slug as any).current;
-    if (typeof s === "string") return s.replace(/^\/+/, "");
+
+  if (typeof slug === "object" && slug !== null) {
+    const maybe = (slug as { current?: unknown }).current;
+    if (typeof maybe === "string") return maybe.replace(/^\/+/, "");
   }
+
   return null;
 }
 
@@ -112,10 +87,7 @@ export async function POST(request: NextRequest) {
   const startedAt = Date.now();
   const requestId = crypto.randomBytes(6).toString("hex");
 
-  // ---- Auth / verification (shared secret) ----
   const expectedSecret = getSecret();
-  const providedSecret = extractProvidedSecret(request);
-
   if (!expectedSecret) {
     // Misconfiguration: you must set SANITY_REVALIDATE_SECRET in your deployment environment.
     return json(
@@ -128,49 +100,74 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!providedSecret || !constantTimeEqual(providedSecret, expectedSecret)) {
+  // Read raw body first so we can verify signatures (Sanity "Secret" field).
+  // NOTE: Don't call request.json() before this, or you'll consume the stream.
+  let rawBody = "";
+  try {
+    rawBody = await request.text();
+  } catch {
+    rawBody = "";
+  }
+
+  // ---- Auth / verification (Sanity webhook Secret field) ----
+  const signature = request.headers.get(SIGNATURE_HEADER_NAME);
+
+  if (!signature) {
     return json(
-      { ok: false, error: "Unauthorized", requestId },
+      {
+        ok: false,
+        error: "Unauthorized",
+        requestId,
+        detail: `Missing signature header: ${SIGNATURE_HEADER_NAME}`,
+      },
       { status: 401 },
     );
   }
 
-  // ---- Parse webhook body ----
-  let body: SanityWebhookBody | null = null;
-  try {
-    body = (await request.json()) as SanityWebhookBody;
-  } catch {
-    body = null;
+  const signatureOk = await isValidSignature(
+    rawBody,
+    signature,
+    expectedSecret,
+  );
+
+  if (!signatureOk) {
+    return json(
+      {
+        ok: false,
+        error: "Unauthorized",
+        requestId,
+        detail: "Invalid signature",
+      },
+      { status: 401 },
+    );
   }
 
-  // Determine locale: allow query param override, body.language, else default to en
-  const locale =
-    asString(request.nextUrl.searchParams.get("locale")) ||
-    asString(body?.language) ||
-    "en";
+  // ---- Parse webhook body (must be valid JSON) ----
+  let body: SanityWebhookBody;
+  try {
+    body = JSON.parse(rawBody) as SanityWebhookBody;
+  } catch {
+    return json(
+      { ok: false, error: "Bad Request", requestId, detail: "Invalid JSON" },
+      { status: 400 },
+    );
+  }
 
-  const docType = asString(body?._type);
-  const docId = asString(body?._id);
-  const slug = normalizeSlug(body?.slug);
+  // Determine locale strictly from payload (no query-string overrides)
+  const locale = asString(body.language) || "en";
 
-  // Optional manual controls via querystring:
-  //  - ?path=/en/blog/something (repeatable)
-  //  - ?tag=sanity:type:post (repeatable)
-  const extraPaths = request.nextUrl.searchParams
-    .getAll("path")
-    .filter(Boolean);
-  const extraTags = request.nextUrl.searchParams.getAll("tag").filter(Boolean);
+  const docType = asString(body._type);
+  const docId = asString(body._id);
+  const slug = normalizeSlug(body.slug);
 
-  // ---- Perform revalidation ----
+  // ---- Perform revalidation (derived from payload only) ----
   const revalidated: { tags: string[]; paths: string[] } = {
     tags: [],
     paths: [],
   };
 
-  // 1) Tags (preferred)
-  const tags = Array.from(
-    new Set([...tagsForDoc(docType, docId), ...extraTags]),
-  );
+  // 1) Tags (preferred). NOTE: This is a no-op until your Sanity fetch() calls add matching `next: { tags: [...] }`.
+  const tags = Array.from(new Set(tagsForDoc(docType, docId)));
   for (const tag of tags) {
     try {
       revalidateTag(tag, "layout");
@@ -186,25 +183,21 @@ export async function POST(request: NextRequest) {
 
   // 2) Paths (best-effort mapping for common routes)
   const mappedPath = pathForDoc(docType, slug, locale);
-  const paths = Array.from(
-    new Set([...(mappedPath ? [mappedPath] : []), ...extraPaths]),
-  );
-  for (const p of paths) {
+  if (mappedPath) {
     try {
-      revalidatePath(p);
-      revalidated.paths.push(p);
+      revalidatePath(mappedPath);
+      revalidated.paths.push(mappedPath);
     } catch (err) {
       console.error("[revalidate] revalidatePath failed", {
         requestId,
-        path: p,
+        path: mappedPath,
         err,
       });
     }
   }
 
-  // 3) As a safe fallback for "unknown doc types", revalidate the locale root.
-  // This is intentionally conservative; you can remove if too aggressive.
-  if (!mappedPath && paths.length === 0) {
+  // 3) Conservative fallback: if we couldn't map a path, revalidate the locale root.
+  if (!mappedPath) {
     try {
       revalidatePath(`/${locale}`);
       revalidated.paths.push(`/${locale}`);
@@ -233,56 +226,17 @@ export async function POST(request: NextRequest) {
   });
 }
 
-// Allow quick manual testing in a browser (e.g. /api/revalidate?secret=...&path=/en)
-export async function GET(request: NextRequest) {
-  const sp = request.nextUrl.searchParams;
-
-  // Reuse the same auth mechanism for GET.
-  const expectedSecret = getSecret();
-  const providedSecret = extractProvidedSecret(request);
-
-  if (!expectedSecret) {
-    return json(
-      {
-        ok: false,
-        error: "Missing server configuration: SANITY_REVALIDATE_SECRET",
-      },
-      { status: 500 },
-    );
-  }
-  if (!providedSecret || !constantTimeEqual(providedSecret, expectedSecret)) {
-    return json({ ok: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const paths = sp.getAll("path").filter(Boolean);
-  const tags = sp.getAll("tag").filter(Boolean);
-  const locale = asString(sp.get("locale")) || "en";
-
-  const revalidated: { tags: string[]; paths: string[] } = {
-    tags: [],
-    paths: [],
-  };
-
-  for (const tag of tags) {
-    revalidateTag(tag, "layout");
-    revalidated.tags.push(tag);
-  }
-
-  for (const p of paths) {
-    revalidatePath(p);
-    revalidated.paths.push(p);
-  }
-
-  if (paths.length === 0 && tags.length === 0) {
-    revalidatePath(`/${locale}`);
-    revalidated.paths.push(`/${locale}`);
-  }
-
-  return json({
-    ok: true,
-    revalidated,
-    hint: "Pass ?tag=... and/or ?path=... (repeatable). For Sanity webhook, use POST with JSON body including _type/_id/slug/language.",
-  });
+// Manual testing endpoint.
+// This route is intended to be called by Sanity webhooks (signed POSTs).
+export async function GET() {
+  return json(
+    {
+      ok: false,
+      error: "Method not allowed",
+      detail: "Use POST from Sanity webhook (signature-verified).",
+    },
+    { status: 405, headers: { Allow: "POST" } },
+  );
 }
 
 // Webhooks must run on the server runtime.

@@ -28,27 +28,20 @@ Do **not** expose this value publicly.
 
 ### 2) Create a webhook in Sanity
 
-In Sanity Studio, create a webhook that calls:
+In Sanity (Project settings → API → Webhooks), create a webhook that calls:
 
-- `POST https://<your-site-domain>/api/revalidate?secret=<SANITY_REVALIDATE_SECRET>`
+- `POST https://<your-site-domain>/api/revalidate`
+
+Set the **Secret** field in the webhook UI to the same value as `SANITY_REVALIDATE_SECRET`.
+
+> The Secret is **not** appended to the URL. Sanity uses it to sign the request and includes a signature header. Our endpoint verifies that signature.
 
 Payload: include at least `_type` and `_id` (Sanity can include these automatically). If you include `slug` and/or `language`, the endpoint can also do best-effort path revalidation.
 
-### 3) Optional: send the secret via header instead of query string
+### 3) Manual testing
 
-Instead of `?secret=...`, you can send either:
-
-- `Authorization: Bearer <SANITY_REVALIDATE_SECRET>`
-- `X-Revalidate-Secret: <SANITY_REVALIDATE_SECRET>`
-
-### 4) Manual testing
-
-You can test from the browser (GET) using:
-
-- `/api/revalidate?secret=...&path=/en`
-- `/api/revalidate?secret=...&tag=sanity:type:post`
-
-You can repeat `path` and `tag` query params multiple times.
+This endpoint is intended to be called by Sanity webhooks and uses signature verification.
+Use Sanity’s webhook attempts log to validate that delivery is succeeding.
 
 ### Notes
 
