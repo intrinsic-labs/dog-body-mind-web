@@ -1,9 +1,14 @@
-import { defineQuery } from 'next-sanity'
-import { client } from '@/sanity/client'
-import { Locale } from '../locale'
+import { defineQuery } from "next-sanity";
+import { client } from "@/sanity/client";
+import { Locale } from "../locale";
+import {
+  sanityCollectionTags,
+  sanityTagsForDoc,
+  withLocaleTags,
+} from "@/lib/sanity/cache-tags";
 
 // Default query options for caching
-const DEFAULT_OPTIONS = { next: { revalidate: 3600 } } // Cache for 1 hour
+const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour
 
 // Get all categories with language-specific field extraction
 export const allCategoriesQuery = defineQuery(`
@@ -14,13 +19,13 @@ export const allCategoriesQuery = defineQuery(`
     _createdAt,
     _updatedAt,
     _rev,
-    
+
     // Internationalized fields (language-specific extraction)
     "title": title[_key == $language][0].value,
     "slug": slug[_key == $language][0].value,
     "description": description[_key == $language][0].value,
     "metaDescription": metaDescription[_key == $language][0].value,
-    
+
     // Featured image with internationalized alt text
     featuredImage {
       asset-> {
@@ -42,17 +47,17 @@ export const allCategoriesQuery = defineQuery(`
       crop,
       "alt": alt[_key == $language][0].value
     },
-    
+
     // Parent category reference (kept as reference for separate resolution)
     parent {
       _ref,
       _type
     },
-    
+
     // Language field (managed by internationalization plugin)
     language
   }
-`)
+`);
 
 // Get single category by slug with language-specific field extraction
 export const categoryBySlugQuery = defineQuery(`
@@ -63,13 +68,13 @@ export const categoryBySlugQuery = defineQuery(`
     _createdAt,
     _updatedAt,
     _rev,
-    
+
     // Internationalized fields (language-specific extraction)
     "title": title[_key == $language][0].value,
     "slug": slug[_key == $language][0].value,
     "description": description[_key == $language][0].value,
     "metaDescription": metaDescription[_key == $language][0].value,
-    
+
     // Featured image with internationalized alt text
     featuredImage {
       asset-> {
@@ -91,17 +96,17 @@ export const categoryBySlugQuery = defineQuery(`
       crop,
       "alt": alt[_key == $language][0].value
     },
-    
+
     // Parent category reference (kept as reference for separate resolution)
     parent {
       _ref,
       _type
     },
-    
+
     // Language field (managed by internationalization plugin)
     language
   }
-`)
+`);
 
 // Get category references only (for reference resolution)
 export const categoryReferencesQuery = defineQuery(`
@@ -110,7 +115,7 @@ export const categoryReferencesQuery = defineQuery(`
     "title": title[_key == $language][0].value,
     "slug": slug[_key == $language][0].value
   }
-`)
+`);
 
 // Get child categories for hierarchical navigation
 export const childCategoriesQuery = defineQuery(`
@@ -120,9 +125,29 @@ export const childCategoriesQuery = defineQuery(`
     "slug": slug[_key == $language][0].value,
     "description": description[_key == $language][0].value
   }
-`)
+`);
 
 // Helper function to fetch all categories
 export async function getAllCategories(locale: Locale) {
-  return client.fetch(allCategoriesQuery, { language: locale }, DEFAULT_OPTIONS)
-} 
+  const tags = withLocaleTags(
+    Array.from(
+      new Set([
+        ...sanityCollectionTags("categories"),
+        ...sanityTagsForDoc({ _type: "category" }),
+      ]),
+    ),
+    locale,
+  );
+
+  return client.fetch(
+    allCategoriesQuery,
+    { language: locale },
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
+}

@@ -1,5 +1,6 @@
-import { defineQuery } from 'groq';
+import { defineQuery } from "groq";
 import { client } from "@/sanity/client";
+import { sanityTagsForDoc } from "@/lib/sanity/cache-tags";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour
@@ -33,5 +34,17 @@ export const siteSettingsQuery = defineQuery(`
 `);
 
 export async function getSiteSettings() {
-  return client.fetch(siteSettingsQuery, {}, DEFAULT_OPTIONS);
+  const tags = sanityTagsForDoc({ _type: "siteSettings", _id: "siteSettings" });
+
+  return client.fetch(
+    siteSettingsQuery,
+    {},
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
 }

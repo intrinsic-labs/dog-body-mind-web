@@ -1,5 +1,10 @@
 import { defineQuery } from "groq";
 import { client } from "@/sanity/client";
+import {
+  sanityCollectionTags,
+  sanityTagsForDoc,
+  withLocaleTags,
+} from "@/lib/sanity/cache-tags";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 30 } };
@@ -472,15 +477,78 @@ export const searchPostsQuery = defineQuery(`
 // ===== QUERY EXECUTION FUNCTIONS =====
 
 export async function getPostBySlug(slug: string, language?: string) {
-  return client.fetch(postBySlugQuery, { slug, language }, DEFAULT_OPTIONS);
+  // This query returns `_id` and `_type`, but we don't know `_id` until after fetch.
+  // Tag by type + collection + locale so edits to posts can be revalidated reliably.
+  const tags = withLocaleTags(
+    Array.from(
+      new Set([
+        ...sanityCollectionTags("posts"),
+        ...sanityTagsForDoc({ _type: "post" }),
+      ]),
+    ),
+    language ?? null,
+  );
+
+  return client.fetch(
+    postBySlugQuery,
+    { slug, language },
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
 }
 
 export async function getAllPosts(language?: string) {
-  return client.fetch(allPostsQuery, { language }, DEFAULT_OPTIONS);
+  const tags = withLocaleTags(
+    Array.from(
+      new Set([
+        ...sanityCollectionTags("posts"),
+        ...sanityTagsForDoc({ _type: "post" }),
+      ]),
+    ),
+    language ?? null,
+  );
+
+  return client.fetch(
+    allPostsQuery,
+    { language },
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
 }
 
 export async function getFeaturedPosts(language?: string) {
-  return client.fetch(featuredPostsQuery, { language }, DEFAULT_OPTIONS);
+  const tags = withLocaleTags(
+    Array.from(
+      new Set([
+        ...sanityCollectionTags("posts"),
+        ...sanityCollectionTags("featured-posts"),
+        ...sanityTagsForDoc({ _type: "post" }),
+      ]),
+    ),
+    language ?? null,
+  );
+
+  return client.fetch(
+    featuredPostsQuery,
+    { language },
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
 }
 
 export async function searchPosts(params: {
