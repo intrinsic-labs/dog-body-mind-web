@@ -117,7 +117,7 @@ export function proxy(request: NextRequest) {
     log(`🎯 Case 3: No locale in path, user prefers: ${userPreferredLocale}`);
 
     // If user's preferred locale doesn't match the domain's default locale
-    // Only redirect on homepage to avoid redirect loops
+    // Only redirect on landing page to avoid redirect loops
     if (
       userPreferredLocale !== domainDefaultLocale &&
       !isDevelopment &&
@@ -125,7 +125,7 @@ export function proxy(request: NextRequest) {
     ) {
       const targetDomain = getDomainForLocale(userPreferredLocale);
       log(
-        `🏠 Case 3a: Homepage redirect to https://${targetDomain}${pathname}`,
+        `🏠 Case 3a: Landing page redirect to https://${targetDomain}${pathname}`,
       );
       return NextResponse.redirect(
         new URL(`https://${targetDomain}${pathname}`, request.url),

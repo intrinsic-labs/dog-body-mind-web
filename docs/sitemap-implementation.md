@@ -63,13 +63,13 @@ Helper functions for:
 ## SEO Best Practices
 
 ### Priority Values
-- **0.9** - Homepage (highest priority - using 0.9 instead of 1.0 for validator compatibility)
+- **0.9** - Landing page (highest priority - using 0.9 instead of 1.0 for validator compatibility)
 - **0.8** - Blog listing page
 - **0.7** - Individual blog posts
 
 ### Change Frequency
 - **daily** - Blog listing (new posts appear here)
-- **weekly** - Homepage and blog posts
+- **weekly** - Landing page and blog posts
 
 ### Last Modified
 Uses the most recent date from:
@@ -104,7 +104,7 @@ This tells search engines:
 ## Content Filtering
 
 The sitemap **includes**:
-- Homepage
+- Landing page
 - Blog listing page
 - All published blog posts
 

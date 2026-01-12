@@ -28,9 +28,9 @@ export function getBlogListingUrl(locale: Locale): string {
 }
 
 /**
- * Generate a full URL for the homepage
+ * Generate a full URL for the landing page
  */
-export function getHomepageUrl(locale: Locale): string {
+export function getLandingPageUrl(locale: Locale): string {
   return getBaseUrl(locale);
 }
 
@@ -106,11 +106,11 @@ export function createBlogListingEntry(locale: Locale): MetadataRoute.Sitemap[0]
 }
 
 /**
- * Create sitemap entry for the homepage
+ * Create sitemap entry for the landing page
  */
-export function createHomepageEntry(locale: Locale): MetadataRoute.Sitemap[0] {
+export function createLandingPageEntry(locale: Locale): MetadataRoute.Sitemap[0] {
   return {
-    url: getHomepageUrl(locale),
+    url: getLandingPageUrl(locale),
     lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 0.9,

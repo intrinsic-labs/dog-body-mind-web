@@ -2,20 +2,20 @@ import { Locale } from "@/lib/locale";
 import BlogCTA from "@/components/BlogCTA";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import BlogCard from "@/components/blog/BlogCard";
-import { getHomePageContent, getBlogCtaContent, getNewsletterContent } from "@/lib/site-settings-utils";
+import { getLandingPageContent, getBlogCtaContent, getNewsletterContent } from "@/lib/site-settings-utils";
 import { getYouTubeId } from "@/lib/youtube-utils";
 import { DataManager } from "@/lib/data-manager";
 import { transformPostForDisplay } from "@/lib/blog-types";
 
-export default async function Home({
+export default async function Landing({
   params
 }: {
   params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params;
 
-  // Fetch homepage, blog CTA, and newsletter content
-  const homeContent = await getHomePageContent(locale);
+  // Fetch landing page, blog CTA, and newsletter content
+  const landingContent = await getLandingPageContent(locale);
   const blogCtaContent = await getBlogCtaContent(locale);
   const newsletterContent = await getNewsletterContent(locale);
 
@@ -36,15 +36,15 @@ export default async function Home({
   const featuredPost = displayPosts.find(post => post.featured);
   const mostRecentPost = displayPosts[0]; // Posts are already sorted by publishedAt desc
 
-  if (!homeContent) {
+  if (!landingContent) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-foreground/60">Homepage content not configured.</p>
+        <p className="text-foreground/60">Landing page content not configured.</p>
       </div>
     );
   }
 
-  const videoId = getYouTubeId(homeContent.youtubeUrl);
+  const videoId = getYouTubeId(landingContent.youtubeUrl);
 
   return (
     <main>
@@ -52,9 +52,9 @@ export default async function Home({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Title and Subtitle */}
         <div className="mb-12 max-w-3xl">
-          <h1 className="text-left mb-3">{homeContent.title}</h1>
+          <h1 className="text-left mb-3">{landingContent.title}</h1>
           <p className="text-left text-xl text-foreground/70">
-            {homeContent.subtitle}
+            {landingContent.subtitle}
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export default async function Home({
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-12">
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
-              title={homeContent.title}
+              title={landingContent.title}
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

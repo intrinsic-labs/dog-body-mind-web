@@ -5,9 +5,9 @@ import { sanityTagsForDoc } from "@/lib/sanity/cache-tags";
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour
 
-// Get home page settings (singleton)
-export const homePageSettingsQuery = defineQuery(`
-  *[_type == "homePageSettings"][0] {
+// Get landing page settings (singleton)
+export const landingPageSettingsQuery = defineQuery(`
+  *[_type == "landingPageSettings"][0] {
     _id,
     _type,
     title,
@@ -16,11 +16,11 @@ export const homePageSettingsQuery = defineQuery(`
   }
 `);
 
-export async function getHomePageSettings() {
-  const tags = sanityTagsForDoc({ _type: "homePageSettings" });
+export async function getLandingPageSettings() {
+  const tags = sanityTagsForDoc({ _type: "landingPageSettings" });
 
   return client.fetch(
-    homePageSettingsQuery,
+    landingPageSettingsQuery,
     {},
     {
       ...DEFAULT_OPTIONS,

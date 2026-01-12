@@ -5,7 +5,7 @@ import { getSitemapPosts, type SitemapPost } from '@/lib/queries/sitemap-queries
 import {
   postToSitemapEntry,
   createBlogListingEntry,
-  createHomepageEntry,
+  createLandingPageEntry as createLandingPageEntry,
 } from '@/lib/sitemap-utils';
 
 /**
@@ -19,7 +19,7 @@ import {
  * - etc.
  *
  * Each sitemap includes:
- * - Homepage
+ * - Landing page
  * - Blog listing page
  * - All published blog posts (excluding noIndex posts)
  *
@@ -30,7 +30,7 @@ import {
  * - Only published posts (publishedAt <= now)
  * - Excludes posts with noIndex: true
  * - Uses lastModified for accurate change tracking
- * - Proper priority values (1.0 for homepage, 0.8 for listing, 0.7 for posts)
+ * - Proper priority values (1.0 for landing page, 0.8 for listing, 0.7 for posts)
  * - Appropriate changeFrequency values
  * - Complete hreflang alternates for all locales
  */
@@ -52,8 +52,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Build sitemap entries
     const sitemapEntries: MetadataRoute.Sitemap = [
-      // Homepage - highest priority
-      createHomepageEntry(locale),
+      // Landing page - highest priority
+      createLandingPageEntry(locale),
 
       // Blog listing page - high priority, changes frequently
       createBlogListingEntry(locale),
@@ -68,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Return minimal sitemap on error to prevent sitemap from failing completely
     return [
-      createHomepageEntry(locale),
+      createLandingPageEntry(locale),
       createBlogListingEntry(locale),
     ];
   }

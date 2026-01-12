@@ -60,7 +60,7 @@ function pathForDoc(
   if (!docType) return null;
 
   // Common singleton-like docs
-  if (docType === "homePageSettings" || docType === "siteSettings") return base;
+  if (docType === "landingPageSettings" || docType === "siteSettings") return base;
 
   // Legal pages (guessing: /{locale}/legal/{slug})
   if (docType === "legalPage" && slug) return `${base}/legal/${slug}`;

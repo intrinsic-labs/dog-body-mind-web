@@ -242,9 +242,9 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
-export type HomePageSettings = {
+export type LandingPageSettings = {
   _id: string;
-  _type: "homePageSettings";
+  _type: "landingPageSettings";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -725,7 +725,7 @@ export type AllSanitySchemaTypes =
   | BlockContent
   | BlogPageSettings
   | InternationalizedArrayString
-  | HomePageSettings
+  | LandingPageSettings
   | SiteSettings
   | Organization
   | InternationalizedArrayText
@@ -1016,17 +1016,6 @@ export type ChildCategoriesQueryResult = Array<{
   description: string | null;
 }>;
 
-// Source: src/lib/queries/home-page-settings-queries.ts
-// Variable: homePageSettingsQuery
-// Query: *[_type == "homePageSettings"][0] {    _id,    _type,    title,    subtitle,    youtubeUrl  }
-export type HomePageSettingsQueryResult = {
-  _id: string;
-  _type: "homePageSettings";
-  title: InternationalizedArrayString;
-  subtitle: InternationalizedArrayString;
-  youtubeUrl: string;
-} | null;
-
 // Source: src/lib/queries/infographic-queries.ts
 // Variable: infographicByIdQuery
 // Query: *[_type == "infographic" && _id == $id][0] {    // Core document fields    _id,    _type,    _createdAt,    _updatedAt,    _rev,    // Language-specific content (with fallbacks)    "title": coalesce(      title[language == $language][0].value,      title[language == "en"][0].value,      title[0].value    ),    "description": coalesce(      description[language == $language][0].value,      description[language == "en"][0].value,      description[0].value    ),    "altText": coalesce(      altText[language == $language][0].value,      altText[language == "en"][0].value,      altText[0].value    ),    "slug": coalesce(      slug[language == $language][0].current,      slug[language == "en"][0].current,      slug[0].current    ),    // Language-specific image with flexible asset resolution    "image": coalesce(      image[language == $language][0].asset.asset->,      image[language == "en"][0].asset.asset->,      image[0].asset.asset->    ) {      _id,      url,      metadata {        dimensions {          width,          height,          aspectRatio        },        lqip,        blurHash,        hasAlpha,        isOpaque      }    },    // PDF-specific fields (with fallbacks)    "downloadFilename": coalesce(      downloadFilename[language == $language][0].value,      downloadFilename[language == "en"][0].value,      downloadFilename[0].value    ),    "pdfMetadata": coalesce(      pdfMetadata[language == $language][0],      pdfMetadata[language == "en"][0],      pdfMetadata[0]    ) {      title,      keywords,      author,      subject    }  }
@@ -1093,6 +1082,17 @@ export type InfographicLanguageAvailabilityQueryResult = {
   _id: string;
   availableLanguages: Array<"de" | "en" | "es" | "fr" | "it" | "uk">;
   hasLanguage: boolean;
+} | null;
+
+// Source: src/lib/queries/landing-page-settings-queries.ts
+// Variable: landingPageSettingsQuery
+// Query: *[_type == "landingPageSettings"][0] {    _id,    _type,    title,    subtitle,    youtubeUrl  }
+export type LandingPageSettingsQueryResult = {
+  _id: string;
+  _type: "landingPageSettings";
+  title: InternationalizedArrayString;
+  subtitle: InternationalizedArrayString;
+  youtubeUrl: string;
 } | null;
 
 // Source: src/lib/queries/legal-page-queries.ts
@@ -1727,10 +1727,10 @@ declare module "@sanity/client" {
     '\n  *[_type == "category" && slug[_key == $language][0].value.current == $slug][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Internationalized fields (language-specific extraction)\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value,\n    "description": description[_key == $language][0].value,\n    "metaDescription": metaDescription[_key == $language][0].value,\n\n    // Featured image with internationalized alt text\n    featuredImage {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n\n    // Parent category reference (kept as reference for separate resolution)\n    parent {\n      _ref,\n      _type\n    },\n\n    // Language field (managed by internationalization plugin)\n    language\n  }\n': CategoryBySlugQueryResult;
     '\n  *[_type == "category" && _id in $ids] {\n    _id,\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value\n  }\n': CategoryReferencesQueryResult;
     '\n  *[_type == "category" && parent._ref == $parentId] | order(title[_key == $language][0].value asc) {\n    _id,\n    "title": title[_key == $language][0].value,\n    "slug": slug[_key == $language][0].value,\n    "description": description[_key == $language][0].value\n  }\n': ChildCategoriesQueryResult;
-    '\n  *[_type == "homePageSettings"][0] {\n    _id,\n    _type,\n    title,\n    subtitle,\n    youtubeUrl\n  }\n': HomePageSettingsQueryResult;
     '\n  *[_type == "infographic" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "description": coalesce(\n      description[language == $language][0].value,\n      description[language == "en"][0].value,\n      description[0].value\n    ),\n    "altText": coalesce(\n      altText[language == $language][0].value,\n      altText[language == "en"][0].value,\n      altText[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with flexible asset resolution\n    "image": coalesce(\n      image[language == $language][0].asset.asset->,\n      image[language == "en"][0].asset.asset->,\n      image[0].asset.asset->\n    ) {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    "downloadFilename": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == "en"][0].value,\n      downloadFilename[0].value\n    ),\n    "pdfMetadata": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == "en"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n': InfographicByIdQueryResult;
     '\n  *[_type == "infographic" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    "image": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == "en"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n': InfographicsByIdsQueryResult;
     '\n  *[_type == "infographic" && _id == $id][0] {\n    _id,\n    "availableLanguages": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    "hasLanguage": count(title[language == $language]) > 0\n  }\n': InfographicLanguageAvailabilityQueryResult;
+    '\n  *[_type == "landingPageSettings"][0] {\n    _id,\n    _type,\n    title,\n    subtitle,\n    youtubeUrl\n  }\n': LandingPageSettingsQueryResult;
     '\n  *[_type == "legalPage" && slug.current == $slug && language == $language][0] {\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    title,\n    slug,\n    content,\n    excerpt,\n    lastUpdated,\n    metaTitle,\n    metaDescription,\n    noIndex,\n    language\n  }\n': LegalPageBySlugQueryResult;
     '\n  *[_type == "legalPage" && defined(slug.current) && language == $language] | order(title asc) {\n    _id,\n    title,\n    slug,\n    language\n  }\n': AllLegalPagesQueryResult;
     '\n  *[_type == "organization"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    "description": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n': OrganizationQueryResult;

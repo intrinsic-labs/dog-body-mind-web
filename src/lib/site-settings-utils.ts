@@ -1,6 +1,6 @@
 import { getSiteSettings } from './queries/site-settings-queries';
 import { getBlogPageSettings } from './queries/blog-page-settings-queries';
-import { getHomePageSettings } from './queries/home-page-settings-queries';
+import { getLandingPageSettings } from './queries/landing-page-settings-queries';
 import { Locale } from './locale';
 
 // Helper to extract internationalized string value
@@ -129,15 +129,15 @@ export async function getBlogCtaContent(locale: Locale): Promise<BlogCtaContent 
   }
 }
 
-export interface HomePageContent {
+export interface LandingPageContent {
   title: string;
   subtitle: string;
   youtubeUrl: string;
 }
 
-export async function getHomePageContent(locale: Locale): Promise<HomePageContent | null> {
+export async function getLandingPageContent(locale: Locale): Promise<LandingPageContent | null> {
   try {
-    const settings = await getHomePageSettings();
+    const settings = await getLandingPageSettings();
 
     if (!settings) {
       return null;
@@ -149,7 +149,7 @@ export async function getHomePageContent(locale: Locale): Promise<HomePageConten
       youtubeUrl: settings.youtubeUrl,
     };
   } catch (error) {
-    console.error('Error fetching home page content:', error);
+    console.error('Error fetching landing page content:', error);
     return null;
   }
 }

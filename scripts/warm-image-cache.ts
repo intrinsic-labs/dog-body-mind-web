@@ -180,7 +180,7 @@ async function warmCache(config: CacheWarmingConfig): Promise<WarmingStats> {
 
   // Pages to crawl
   const pagesToCrawl = [
-    config.siteUrl, // Homepage
+    config.siteUrl, // Landing Page
   ];
 
   // Discover all blog posts
