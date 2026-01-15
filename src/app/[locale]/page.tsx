@@ -2,15 +2,19 @@ import { Locale } from "@/lib/locale";
 import BlogCTA from "@/components/BlogCTA";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import BlogCard from "@/components/blog/BlogCard";
-import { getLandingPageContent, getBlogCtaContent, getNewsletterContent } from "@/lib/site-settings-utils";
+import {
+  getLandingPageContent,
+  getBlogCtaContent,
+  getNewsletterContent,
+} from "@/lib/site-settings-utils";
 import { getYouTubeId } from "@/lib/youtube-utils";
 import { DataManager } from "@/lib/data-manager";
 import { transformPostForDisplay } from "@/lib/blog-types";
 
 export default async function Landing({
-  params
+  params,
 }: {
-  params: Promise<{ locale: Locale }>
+  params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
 
@@ -29,17 +33,19 @@ export default async function Landing({
     posts.map(async (post) => {
       const postWithReferences = await dataManager.getPost(post.slug.current);
       return transformPostForDisplay(postWithReferences);
-    })
+    }),
   );
 
   // Find featured and most recent posts
-  const featuredPost = displayPosts.find(post => post.featured);
+  const featuredPost = displayPosts.find((post) => post.featured);
   const mostRecentPost = displayPosts[0]; // Posts are already sorted by publishedAt desc
 
   if (!landingContent) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-foreground/60">Landing page content not configured.</p>
+        <p className="text-foreground/60">
+          Landing page content not configured.
+        </p>
       </div>
     );
   }
@@ -73,9 +79,7 @@ export default async function Landing({
       </div>
 
       {/* Blog CTA */}
-      {blogCtaContent && (
-        <BlogCTA content={blogCtaContent} locale={locale} />
-      )}
+      {blogCtaContent && <BlogCTA content={blogCtaContent} locale={locale} />}
 
       {/* Newsletter Signup - Full Width */}
       {/*{newsletterContent && (

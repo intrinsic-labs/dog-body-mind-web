@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { DisplayPost } from "@/lib/blog-types";
 import { Locale } from "@/lib/locale";
-import { NewsletterContent } from "@/lib/site-settings-utils";
 import CategoryFilter from "./CategoryFilter";
-import BlogCard from "./BlogCard";
-import NewsletterSignup from "@/components/NewsletterSignup";
+import TinifyImage from "@/components/TinifyImage";
+
 import { HiOutlineSearch } from "react-icons/hi";
 
 interface Category {
@@ -20,7 +20,6 @@ interface FilterableBlogListProps {
   posts: DisplayPost[];
   categories: Category[];
   currentLocale: Locale;
-  newsletterContent?: NewsletterContent | null;
 }
 
 type SearchApiPost = {
@@ -151,11 +150,75 @@ function updateSearchParams(
   router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
 }
 
+type CarouselCategoryRow = {
+  key: string;
+  title: string;
+  categoryId: string | null;
+  posts: DisplayPost[];
+};
+
+function BlogCarouselCard({
+  post,
+  currentLocale,
+}: {
+  post: DisplayPost;
+  currentLocale: Locale;
+}) {
+  const postUrl = `/${currentLocale}/blog/${post.slug}`;
+
+  return (
+    <article className="relative snap-start shrink-0 w-[220px] sm:w-[240px] md:w-[260px] group focus-within:w-[520px] hover:w-[520px] transition-[width] duration-300 ease-out">
+      <Link
+        href={postUrl}
+        className="block h-[320px] sm:h-[340px] md:h-[360px] rounded-xl bg-white border border-foreground/10 overflow-hidden shadow-sm hover:border-blue/30 focus:outline-none focus:ring-2 focus:ring-blue/30"
+      >
+        <div className="h-full w-full grid grid-rows-[1fr_auto]">
+          <div className="relative overflow-hidden bg-foreground/5">
+            {post.coverImageUrl ? (
+              <TinifyImage
+                src={post.coverImageUrl}
+                alt={post.coverImageAlt}
+                width={900}
+                height={900}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03] group-focus-within:scale-[1.03]"
+              />
+            ) : (
+              <div className="w-full h-full" />
+            )}
+
+            {/* Hover overlay with excerpt/meta */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300">
+              <div className="absolute inset-0 bg-gradient-to-t from-blue/95 via-blue/40 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <div className="hidden group-hover:block group-focus-within:block">
+                  <p className="text-white/90 text-sm leading-snug line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <div className="mt-3 flex items-center gap-2 text-xs text-white/80">
+                    <span>{post.formattedDate}</span>
+                    <span>•</span>
+                    <span>{post.readingTime}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4">
+            <h3 className="text-base sm:text-[15px] font-semibold leading-snug line-clamp-2 text-foreground group-hover:text-blue transition-colors">
+              {post.title}
+            </h3>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
 export default function FilterableBlogList({
   posts,
   categories,
   currentLocale,
-  newsletterContent,
 }: FilterableBlogListProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -174,6 +237,13 @@ export default function FilterableBlogList({
   );
   const [isSearching, setIsSearching] = useState(false);
 
+  // When set, that category row expands into a full responsive grid (and pushes content down).
+  // NOTE: This is intentionally independent from `selectedCategory` so you can expand one row
+  // while still seeing other category rows below it.
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(
+    null,
+  );
+
   const isSearchMode = urlQuery.length > 0;
 
   // Keep local input in sync when navigating back/forward or external changes.
@@ -184,6 +254,13 @@ export default function FilterableBlogList({
   // Keep category state in sync with the URL.
   useEffect(() => {
     setSelectedCategory(urlCategoryId || null);
+  }, [urlCategoryId]);
+
+  // Expansion is a purely-UI affordance. Don't automatically mirror the URL filter into it,
+  // otherwise selecting a category would hide all other rows.
+  useEffect(() => {
+    // If the user clears the category filter, also clear any expanded row.
+    if (!urlCategoryId) setExpandedCategoryId(null);
   }, [urlCategoryId]);
 
   // Debounced URL updates for search input.
@@ -252,26 +329,94 @@ export default function FilterableBlogList({
     };
   }, [isSearchMode, urlQuery, selectedCategory, currentLocale]);
 
-  // When not searching, use the original category-filtered list.
-  const filteredPosts = useMemo(() => {
-    let filtered = posts;
+  const postsToRender = isSearchMode ? searchResults || [] : posts;
 
-    if (selectedCategory) {
-      filtered = posts.filter((post) =>
-        post.categories.some((cat) => cat._id === selectedCategory),
-      );
+  const carouselRows: CarouselCategoryRow[] = useMemo(() => {
+    const byCategoryId = new Map<string, DisplayPost[]>();
+
+    for (const p of posts) {
+      for (const c of p.categories) {
+        if (!c?._id) continue;
+        const list = byCategoryId.get(c._id) || [];
+        list.push(p);
+        byCategoryId.set(c._id, list);
+      }
     }
 
-    return filtered.sort((a, b) => {
-      if (selectedCategory) {
+    const rows: CarouselCategoryRow[] = [];
+
+    // If a category filter is selected, still show all rows,
+    // but prioritize that category first and filter each row's posts to the selected category.
+    // (Net effect: you still see the other category headers/sections, but only the selected
+    // category will have posts; others will be empty and get skipped below.)
+    if (selectedCategory) {
+      const selectedCat = categories.find((c) => c._id === selectedCategory);
+      const selectedList = (byCategoryId.get(selectedCategory) || [])
+        .slice()
+        .sort((a, b) => {
+          if (a.featuredCategory && !b.featuredCategory) return -1;
+          if (!a.featuredCategory && b.featuredCategory) return 1;
+          return 0;
+        });
+
+      if (selectedCat && selectedList.length > 0) {
+        rows.push({
+          key: selectedCat._id,
+          title: selectedCat.title,
+          categoryId: selectedCat._id,
+          posts: selectedList,
+        });
+      }
+
+      // Continue building the rest of the rows as normal (most-posts-first),
+      // but we'll skip empty rows below.
+    }
+
+    // Build rows, sorted by "most posts first". If a category is selected, that category
+    // will already have been unshifted above (and we skip duplicates here).
+    const categoriesWithCounts = categories
+      .map((cat) => ({
+        cat,
+        count: (byCategoryId.get(cat._id) || []).length,
+      }))
+      .filter((x) => x.count > 0)
+      .sort((a, b) => b.count - a.count);
+
+    for (const { cat } of categoriesWithCounts) {
+      if (selectedCategory && cat._id === selectedCategory) continue;
+
+      const list = (byCategoryId.get(cat._id) || []).slice();
+      if (list.length === 0) continue;
+
+      list.sort((a, b) => {
         if (a.featuredCategory && !b.featuredCategory) return -1;
         if (!a.featuredCategory && b.featuredCategory) return 1;
-      }
-      return 0;
-    });
-  }, [posts, selectedCategory]);
+        return 0;
+      });
 
-  const postsToRender = isSearchMode ? searchResults || [] : filteredPosts;
+      rows.push({
+        key: cat._id,
+        title: cat.title,
+        categoryId: cat._id,
+        posts: list,
+      });
+    }
+
+    // Catch-all row for posts without categories
+    const uncategorized = posts.filter(
+      (p) => (p.categories || []).length === 0,
+    );
+    if (uncategorized.length > 0) {
+      rows.push({
+        key: "uncategorized",
+        title: "More",
+        categoryId: null,
+        posts: uncategorized,
+      });
+    }
+
+    return rows;
+  }, [posts, categories, selectedCategory]);
 
   if (posts.length === 0) {
     return (
@@ -333,7 +478,7 @@ export default function FilterableBlogList({
         </div>
       </div>
 
-      {/* Search mode: hide featured layout and show a regular grid */}
+      {/* Search mode: show simple grid (don’t group into carousels) */}
       {isSearchMode ? (
         <>
           {postsToRender.length === 0 && !isSearching ? (
@@ -343,96 +488,136 @@ export default function FilterableBlogList({
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {postsToRender.map((post) => (
-                <BlogCard
-                  key={post._id}
-                  post={post}
-                  currentLocale={currentLocale}
-                />
+                <article key={post._id} className="group">
+                  <Link
+                    href={`/${currentLocale}/blog/${post.slug}`}
+                    className="block rounded-xl bg-white border border-foreground/10 overflow-hidden shadow-sm hover:border-blue/30 focus:outline-none focus:ring-2 focus:ring-blue/30"
+                  >
+                    {post.coverImageUrl && (
+                      <div className="aspect-[16/10] overflow-hidden bg-foreground/5">
+                        <TinifyImage
+                          src={post.coverImageUrl}
+                          alt={post.coverImageAlt}
+                          width={700}
+                          height={450}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold leading-snug line-clamp-2 group-hover:text-blue transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-foreground/70 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                      <div className="mt-3 flex items-center gap-2 text-xs text-foreground/60">
+                        <span>{post.formattedDate}</span>
+                        <span>•</span>
+                        <span>{post.readingTime}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </article>
               ))}
             </div>
           )}
         </>
       ) : (
-        <>
-          {/* Find featured post (always from full list, not filtered) */}
-          {(() => {
-            const featuredPost =
-              posts.find((post) => post.featured) || posts[0];
-            const remainingPosts = filteredPosts.filter(
-              (post) => post._id !== featuredPost._id,
-            );
+        <div className="space-y-10">
+          {carouselRows.map((row) => {
+            // Allow expansion for both categorized rows (categoryId) and the uncategorized row (null).
+            // For uncategorized, we key expansion off the row.key.
+            const expansionKey = row.categoryId ?? row.key;
+            const isExpandable =
+              row.categoryId !== null || row.key === "uncategorized";
+            const isExpanded =
+              isExpandable && expandedCategoryId === expansionKey;
 
             return (
-              <>
-                {/* Featured + First 2 Posts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                  {/* Featured Post - Large on left, full width on mobile */}
-                  <div className="lg:row-span-2">
-                    <BlogCard
-                      key={featuredPost._id}
-                      post={featuredPost}
-                      currentLocale={currentLocale}
-                      variant="featured"
-                    />
-                  </div>
+              <section key={row.key}>
+                <div className="flex items-baseline justify-between gap-4 mb-3">
+                  <h2 className="text-xl font-semibold">{row.title}</h2>
 
-                  {/* First 2 compact posts - Right side */}
-                  {remainingPosts.slice(0, 2).map((post) => (
-                    <BlogCard
-                      key={post._id}
-                      post={post}
-                      currentLocale={currentLocale}
-                      variant="compact"
-                    />
-                  ))}
+                  {isExpandable && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextExpanded = isExpanded ? null : expansionKey;
+
+                        // Expand/collapse is purely visual; do NOT set the category filter,
+                        // otherwise we'd hide all other category rows.
+                        setExpandedCategoryId(nextExpanded);
+                      }}
+                      className="text-sm text-blue hover:underline"
+                    >
+                      {isExpanded ? "Collapse" : "See all"}
+                    </button>
+                  )}
                 </div>
 
-                {/* Newsletter Signup */}
-                {/*{newsletterContent && (
-                  <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen mb-8">
-                    <NewsletterSignup content={newsletterContent} />
-                  </div>
-                )}*/}
-
-                {/* Next 2 Posts */}
-                {remainingPosts.length > 2 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    {remainingPosts.slice(2, 4).map((post) => (
-                      <BlogCard
-                        key={post._id}
-                        post={post}
-                        currentLocale={currentLocale}
-                        variant="compact"
-                      />
+                {isExpanded ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {row.posts.map((post) => (
+                      <article key={post._id} className="group">
+                        <Link
+                          href={`/${currentLocale}/blog/${post.slug}`}
+                          className="block rounded-xl bg-white border border-foreground/10 overflow-hidden shadow-sm hover:border-blue/30 focus:outline-none focus:ring-2 focus:ring-blue/30"
+                        >
+                          {post.coverImageUrl && (
+                            <div className="aspect-[16/10] overflow-hidden bg-foreground/5">
+                              <TinifyImage
+                                src={post.coverImageUrl}
+                                alt={post.coverImageAlt}
+                                width={700}
+                                height={450}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                              />
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <h3 className="text-lg font-semibold leading-snug line-clamp-2 group-hover:text-blue transition-colors">
+                              {post.title}
+                            </h3>
+                            <p className="mt-2 text-sm text-foreground/70 line-clamp-2">
+                              {post.excerpt}
+                            </p>
+                            <div className="mt-3 flex items-center gap-2 text-xs text-foreground/60">
+                              <span>{post.formattedDate}</span>
+                              <span>•</span>
+                              <span>{post.readingTime}</span>
+                            </div>
+                          </div>
+                        </Link>
+                      </article>
                     ))}
                   </div>
-                )}
-
-                {/* Additional Posts - Regular Grid */}
-                {remainingPosts.length > 4 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-                    {remainingPosts.slice(4).map((post) => (
-                      <BlogCard
-                        key={post._id}
-                        post={post}
-                        currentLocale={currentLocale}
-                      />
-                    ))}
+                ) : (
+                  <div className="relative">
+                    <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 snap-x snap-mandatory [scrollbar-width:thin]">
+                      {row.posts.map((post) => (
+                        <BlogCarouselCard
+                          key={post._id}
+                          post={post}
+                          currentLocale={currentLocale}
+                        />
+                      ))}
+                    </div>
                   </div>
                 )}
-
-                {/* Newsletter Signup - Full Width (Bottom) */}
-                {/*{newsletterContent && (
-                  <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
-                    <NewsletterSignup content={newsletterContent} />
-                  </div>
-                )}*/}
-              </>
+              </section>
             );
-          })()}
-        </>
+          })}
+
+          {/* Newsletter Signup (kept disabled as before) */}
+          {/*{newsletterContent && (
+            <div className="relative left-1/2 right-1/2 -mx-[50vw] w-screen">
+              <NewsletterSignup content={newsletterContent} />
+            </div>
+          )}*/}
+        </div>
       )}
     </section>
   );
