@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 import { getLocaleFromDomain, Locale } from '@/lib/locale';
-import { getSitemapPosts, type SitemapPost } from '@/lib/queries/sitemap-queries';
+import { getSitemapPosts, type SitemapPost } from '@/infrastructure/sanity/queries/sitemap-queries';
 import {
   postToSitemapEntry,
   createBlogListingEntry,

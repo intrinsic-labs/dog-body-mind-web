@@ -1,6 +1,6 @@
 import { defineQuery } from "groq";
-import { client } from "@/sanity/client";
-import { sanityTagsForDoc } from "@/lib/sanity/cache-tags";
+import { client } from "@/infrastructure/sanity/client";
+import { sanityTagsForDoc } from "@/infrastructure/sanity/cache-tags";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour

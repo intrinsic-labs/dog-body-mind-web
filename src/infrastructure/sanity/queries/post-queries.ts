@@ -1,10 +1,10 @@
 import { defineQuery } from "groq";
-import { client } from "@/sanity/client";
+import { client } from "@/infrastructure/sanity/client";
 import {
   sanityCollectionTags,
   sanityTagsForDoc,
   withLocaleTags,
-} from "@/lib/sanity/cache-tags";
+} from "@/infrastructure/sanity/cache-tags";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 30 } };
@@ -409,6 +409,62 @@ export const featuredPostsQuery = defineQuery(`
   }
 `);
 
+// ===== LISTING-READY BLOG LISTING QUERY (NO N+1) =====
+//
+// Returns only the fields needed to render blog listing cards, with author/categories dereferenced
+// in a single query to avoid N+1 reference resolution.
+//
+// NOTE: Sanity TypeGen may model `title`/`slug` as internationalized arrays depending on schema.
+// For listing UI, we normalize these to plain strings via projections.
+export const blogListingPostsQuery = defineQuery(`
+  *[
+    _type == "post"
+    && defined(slug.current)
+    && language == $language
+  ]
+  | order(publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+
+    coverImage {
+      asset-> {
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    coverImageAlt,
+
+    "author": author->{
+      _id,
+      name,
+      "slug": slug.current
+    },
+
+    "categories": categories[]->{
+      _id,
+      "title": coalesce(
+        title[_key == $language][0].value,
+        title,
+        "Untitled Category"
+      ),
+      "slug": coalesce(
+        slug[_key == $language][0].value.current,
+        slug.current
+      )
+    },
+
+    tags,
+    publishedAt,
+    readingTime,
+    featured,
+    featuredCategory
+  }
+`);
+
 // ===== LISTING-READY SEARCH QUERY =====
 //
 // Searches title, excerpt, and Portable Text body content.
@@ -540,6 +596,31 @@ export async function getFeaturedPosts(language?: string) {
 
   return client.fetch(
     featuredPostsQuery,
+    { language },
+    {
+      ...DEFAULT_OPTIONS,
+      next: {
+        ...DEFAULT_OPTIONS.next,
+        tags,
+      },
+    },
+  );
+}
+
+export async function getBlogListingPosts(language: string) {
+  const tags = withLocaleTags(
+    Array.from(
+      new Set([
+        ...sanityCollectionTags("posts"),
+        ...sanityCollectionTags("blog-listing-posts"),
+        ...sanityTagsForDoc({ _type: "post" }),
+      ]),
+    ),
+    language ?? null,
+  );
+
+  return client.fetch(
+    blogListingPostsQuery,
     { language },
     {
       ...DEFAULT_OPTIONS,

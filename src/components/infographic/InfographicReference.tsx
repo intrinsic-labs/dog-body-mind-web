@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getInfographicById } from "@/lib/queries/infographic-queries";
-import { InfographicByIdQueryResult } from "@/lib/sanity.types";
+import { getInfographicById } from "@/infrastructure/sanity/queries/infographic-queries";
+import { InfographicByIdQueryResult } from "@/infrastructure/sanity/types/sanity.types";
 import { Locale } from "@/lib/locale";
 import InfographicEmbed from "./InfographicEmbed";
 

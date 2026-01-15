@@ -1,12 +1,11 @@
-import { client } from "../../sanity/client";
+import { client } from "../../infrastructure/sanity/client";
 
 const isDataManagerDebugEnabled =
   process.env.NEXT_PUBLIC_DEBUG_DATA_MANAGER === "true" ||
   process.env.DEBUG_DATA_MANAGER === "true";
 
-function dmLog(...args: any[]) {
+function dmLog(...args: unknown[]) {
   if (!isDataManagerDebugEnabled) return;
-  // eslint-disable-next-line no-console
   console.log(...args);
 }
 import {
@@ -18,17 +17,20 @@ import {
   AllCategoriesQueryResult,
   ChildCategoriesQueryResult,
   OrganizationQueryResult,
-} from "../sanity.types";
-import { allPostsQuery, postBySlugQuery } from "../queries/post-queries";
-import { allAuthorsQuery } from "../queries/author-queries";
+} from "../../infrastructure/sanity/types/sanity.types";
+import {
+  allPostsQuery,
+  postBySlugQuery,
+} from "../../infrastructure/sanity/queries/post-queries";
+import { allAuthorsQuery } from "../../infrastructure/sanity/queries/author-queries";
 import {
   allCategoriesQuery,
   childCategoriesQuery,
-} from "../queries/category-queries";
+} from "../../infrastructure/sanity/queries/category-queries";
 import {
   organizationQuery,
   organizationDebugQuery,
-} from "../queries/organization-queries";
+} from "../../infrastructure/sanity/queries/organization-queries";
 import {
   IDataManager,
   PostWithReferences,
@@ -141,7 +143,7 @@ export class DataManager implements IDataManager {
       // Resolve all categories in order (first one is primary)
       const categories: CategoryBySlugQueryResult[] = [];
       if (post.categories && post.categories.length > 0) {
-        const categoryRequests = post.categories.map((cat) => ({
+        const categoryRequests = post.categories.map((cat: { _ref: string }) => ({
           id: cat._ref,
           type: "category" as const,
         }));
@@ -326,7 +328,7 @@ export class DataManager implements IDataManager {
 
       // Convert to CategoryBySlugQueryResult format by filling missing fields
       const children: CategoryBySlugQueryResult[] = childrenData.map(
-        (child) => ({
+        (child: ChildCategoriesQueryResult[number]) => ({
           ...child,
           _type: "category" as const,
           _createdAt: "",

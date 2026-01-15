@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getInfographicById,
   validateInfographicLanguage,
-} from "@/lib/queries/infographic-queries";
+} from "@/infrastructure/sanity/queries/infographic-queries";
 import {
   generateInfographicPDF,
   generatePDFFilename,

@@ -1,5 +1,5 @@
 import { defineQuery } from "groq";
-import { client } from "@/sanity/client";
+import { client } from "@/infrastructure/sanity/client";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 30 } };

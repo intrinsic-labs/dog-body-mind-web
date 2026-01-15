@@ -3,7 +3,7 @@
 import { PortableText, PortableTextComponents } from "@portabletext/react";
 import { PortableTextBlock } from "@portabletext/types";
 import TinifyImage from "@/components/TinifyImage";
-import { urlFor } from "@/sanity/client";
+import { urlFor } from "@/infrastructure/sanity/client";
 import { InlineImage, YouTubeEmbed } from "@/lib/blog-types";
 import { getYouTubeId } from "@/lib/youtube-utils";
 import { Locale } from "@/lib/locale";
@@ -316,7 +316,9 @@ export default function PortableTextRenderer({
             backgroundColor: blockquoteStyles.pushpin.backgroundColor,
           }}
         >
-          <span className="text-2xl flex-shrink-0">{blockquoteStyles.pushpin.emoji}</span>
+          <span className="text-2xl flex-shrink-0">
+            {blockquoteStyles.pushpin.emoji}
+          </span>
           <div className="flex-1">{children}</div>
         </blockquote>
       ),
@@ -328,7 +330,9 @@ export default function PortableTextRenderer({
             backgroundColor: blockquoteStyles.warning.backgroundColor,
           }}
         >
-          <span className="text-2xl flex-shrink-0">{blockquoteStyles.warning.emoji}</span>
+          <span className="text-2xl flex-shrink-0">
+            {blockquoteStyles.warning.emoji}
+          </span>
           <div className="flex-1">{children}</div>
         </blockquote>
       ),
@@ -340,7 +344,9 @@ export default function PortableTextRenderer({
             backgroundColor: blockquoteStyles.danger.backgroundColor,
           }}
         >
-          <span className="text-2xl flex-shrink-0">{blockquoteStyles.danger.emoji}</span>
+          <span className="text-2xl flex-shrink-0">
+            {blockquoteStyles.danger.emoji}
+          </span>
           <div className="flex-1">{children}</div>
         </blockquote>
       ),
@@ -352,7 +358,9 @@ export default function PortableTextRenderer({
             backgroundColor: blockquoteStyles.announcement.backgroundColor,
           }}
         >
-          <span className="text-2xl flex-shrink-0">{blockquoteStyles.announcement.emoji}</span>
+          <span className="text-2xl flex-shrink-0">
+            {blockquoteStyles.announcement.emoji}
+          </span>
           <div className="flex-1">{children}</div>
         </blockquote>
       ),

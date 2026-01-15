@@ -1,14 +1,14 @@
-import { client } from '../../sanity/client'
+import { client } from '@/infrastructure/sanity/client'
 import { 
   AuthorBySlugQueryResult,
   CategoryBySlugQueryResult 
-} from '../sanity.types'
+} from '@/infrastructure/sanity/types/sanity.types'
 import { 
   allAuthorsQuery 
-} from '../queries/author-queries'
+} from '@/infrastructure/sanity/queries/author-queries'
 import { 
   allCategoriesQuery 
-} from '../queries/category-queries'
+} from '@/infrastructure/sanity/queries/category-queries'
 import { 
   ReferenceRequest, 
   ResolvedReference, 

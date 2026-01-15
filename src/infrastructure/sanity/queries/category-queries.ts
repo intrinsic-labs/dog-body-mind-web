@@ -1,11 +1,11 @@
 import { defineQuery } from "next-sanity";
-import { client } from "@/sanity/client";
-import { Locale } from "../locale";
+import { client } from "@/infrastructure/sanity/client";
+import { Locale } from "@/lib/locale";
 import {
   sanityCollectionTags,
   sanityTagsForDoc,
   withLocaleTags,
-} from "@/lib/sanity/cache-tags";
+} from "@/infrastructure/sanity/cache-tags";
 
 // Default query options for caching
 const DEFAULT_OPTIONS = { next: { revalidate: 3600 } }; // Cache for 1 hour

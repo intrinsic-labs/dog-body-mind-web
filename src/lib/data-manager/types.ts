@@ -6,7 +6,7 @@ import {
   CategoryBySlugQueryResult,
   AllCategoriesQueryResult,
   OrganizationQueryResult
-} from '../sanity.types'
+} from '../../infrastructure/sanity/types/sanity.types'
 
 // Resolved data types (what DataManager methods return)
 // These contain query result types with document references resolved

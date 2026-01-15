@@ -1,6 +1,6 @@
-import { getSiteSettings } from './queries/site-settings-queries';
-import { getBlogPageSettings } from './queries/blog-page-settings-queries';
-import { getLandingPageSettings } from './queries/landing-page-settings-queries';
+import { getSiteSettings } from '../infrastructure/sanity/queries/site-settings-queries';
+import { getBlogPageSettings } from '../infrastructure/sanity/queries/blog-page-settings-queries';
+import { getLandingPageSettings } from '../infrastructure/sanity/queries/landing-page-settings-queries';
 import { Locale } from './locale';
 
 // Helper to extract internationalized string value

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchPosts } from "@/lib/queries/post-queries";
+import { searchPosts } from "@/infrastructure/sanity/queries/post-queries";
 import { locales, type Locale, isValidLocale } from "@/lib/locale";
 
 function jsonError(

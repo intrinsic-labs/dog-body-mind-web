@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PortableTextBlock } from '@portabletext/types';
 import { Locale } from '@/lib/locale';
-import { getLegalPageBySlug, getAllLegalPages } from '@/lib/queries/legal-page-queries';
+import { getLegalPageBySlug, getAllLegalPages } from '@/infrastructure/sanity/queries/legal-page-queries';
 import PortableTextRenderer from '@/components/blog/PortableTextRenderer';
 
 export async function generateStaticParams() {

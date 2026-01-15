@@ -2,7 +2,7 @@ import {
   AuthorBySlugQueryResult,
   CategoryBySlugQueryResult, 
   OrganizationQueryResult 
-} from '../sanity.types'
+} from '../../infrastructure/sanity/types/sanity.types'
 import { DataManagerCache } from './types'
 
 export class DataManagerCacheManager {

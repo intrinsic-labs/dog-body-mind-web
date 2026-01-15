@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import TinifyImage from '@/components/TinifyImage';
 import { FiShare2, FiDownload, FiLink, FiX } from 'react-icons/fi';
-import { InfographicByIdQueryResult } from '@/lib/sanity.types';
+import { InfographicByIdQueryResult } from '@/infrastructure/sanity/types/sanity.types';
 import { Locale } from '@/lib/locale';
 
 interface InfographicEmbedProps {

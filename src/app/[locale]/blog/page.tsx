@@ -3,15 +3,15 @@ import React, { Suspense } from "react";
 
 import { DataManager } from "@/lib/data-manager";
 import { generateArticleListingMetadata } from "@/lib/metadata/article-metadata";
-import { transformPostForDisplay } from "@/lib/blog-types";
 import FilterableBlogList from "@/components/blog/FilterableBlogList";
-import NewsletterSignup from "@/components/NewsletterSignup";
+import { DisplayPost } from "@/lib/blog-types";
 import { Locale } from "@/lib/locale";
 import {
   getNewsletterContent,
   getBlogPageContent,
 } from "@/lib/site-settings-utils";
-import { getAllCategories } from "@/lib/queries/category-queries";
+import { getAllCategories } from "@/infrastructure/sanity/queries/category-queries";
+import { getBlogListingPosts } from "@/infrastructure/sanity/queries/post-queries";
 
 type CategoryLike = {
   _id?: unknown;
@@ -19,19 +19,100 @@ type CategoryLike = {
   slug?: unknown;
 };
 
+type ListingAuthor = { _id: string; name: string; slug?: string };
+type ListingCategory = { _id: string; title: string; slug?: string };
+type ListingPost = {
+  _id: string;
+  title: string;
+  slug?: string;
+  excerpt?: string | null;
+  coverImage?: {
+    asset?: { url?: string | null } | null;
+    alt?: string | null;
+  } | null;
+  coverImageAlt?: string | null;
+  author?: ListingAuthor | null;
+  categories?: ListingCategory[] | null;
+  tags?: string[] | null;
+  publishedAt?: string | null;
+  readingTime?: number | null;
+  featured?: boolean | null;
+  featuredCategory?: boolean | null;
+};
+
 async function loadBlogPageData(locale: Locale) {
   // All data fetching happens at build time / server
+  // NOTE: We still use DataManager for organization + shared initialization work,
+  // but we avoid N+1 post fetching on the listing page.
   const dataManager = new DataManager(locale);
   await dataManager.initialize();
 
-  const posts = await dataManager.getAllPosts();
+  // Fetch listing-ready posts in a single query (author/categories already dereferenced)
+  const posts = (await getBlogListingPosts(locale)) as unknown as ListingPost[];
 
-  const displayPosts = await Promise.all(
-    posts.map(async (post) => {
-      const postWithReferences = await dataManager.getPost(post.slug.current);
-      return transformPostForDisplay(postWithReferences);
-    }),
-  );
+  // Adapt listing results into the existing DisplayPost shape expected by UI components.
+  // We intentionally do NOT fetch full post bodies here.
+  const displayPosts: DisplayPost[] = posts.map((post: ListingPost) => {
+    const slugCurrent = post.slug;
+
+    if (!slugCurrent) {
+      throw new Error("Post slug is required for blog listing");
+    }
+
+    const author = post.author;
+    if (!author) {
+      throw new Error(
+        `Author is required for blog listing post: ${slugCurrent}`,
+      );
+    }
+
+    const authorSlug = author.slug;
+    if (!authorSlug) {
+      throw new Error(
+        `Author slug is required for blog listing post: ${slugCurrent}`,
+      );
+    }
+
+    const publishedAt = post.publishedAt || new Date().toISOString();
+
+    return {
+      _id: post._id,
+      title: post.title,
+      slug: slugCurrent,
+      excerpt: post.excerpt || "",
+      content: [],
+      coverImageUrl: post.coverImage?.asset?.url || null,
+      coverImageAlt: post.coverImageAlt || post.coverImage?.alt || "",
+      author: {
+        _id: author._id,
+        name: author.name,
+        slug: authorSlug,
+      },
+      categories: Array.isArray(post.categories)
+        ? post.categories
+            .filter((c) => c && c._id && c.title && c.slug)
+            .map((c) => ({
+              _id: c._id,
+              title: c.title,
+              slug: c.slug!,
+            }))
+        : [],
+      tags: Array.isArray(post.tags) ? post.tags : [],
+      publishedAt,
+      formattedDate: new Date(publishedAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      readingTime:
+        typeof post.readingTime === "number"
+          ? `${post.readingTime} min read`
+          : "Quick read",
+      featured: Boolean(post.featured),
+      featuredCategory: Boolean(post.featuredCategory),
+      references: undefined,
+    };
+  });
 
   const newsletterContent = await getNewsletterContent(locale);
   const blogPageContent = await getBlogPageContent(locale);
