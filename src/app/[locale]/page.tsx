@@ -1,11 +1,10 @@
 import { Locale } from "@/lib/locale";
 import BlogCTA from "@/components/BlogCTA";
-import NewsletterSignup from "@/components/NewsletterSignup";
+
 import BlogCard from "@/components/blog/BlogCard";
 import {
   getLandingPageContent,
   getBlogCtaContent,
-  getNewsletterContent,
 } from "@/lib/site-settings-utils";
 import { getYouTubeId } from "@/lib/youtube-utils";
 import { DataManager } from "@/lib/data-manager";
@@ -21,7 +20,6 @@ export default async function Landing({
   // Fetch landing page, blog CTA, and newsletter content
   const landingContent = await getLandingPageContent(locale);
   const blogCtaContent = await getBlogCtaContent(locale);
-  const newsletterContent = await getNewsletterContent(locale);
 
   // Fetch blog posts
   const dataManager = new DataManager(locale);

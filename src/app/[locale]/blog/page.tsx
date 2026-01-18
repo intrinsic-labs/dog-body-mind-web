@@ -7,7 +7,6 @@ import FilterableBlogList from "@/components/blog/FilterableBlogList";
 import { DisplayPost } from "@/lib/blog-types";
 import { Locale } from "@/lib/locale";
 import {
-  getNewsletterContent,
   getBlogPageContent,
 } from "@/lib/site-settings-utils";
 import { getAllCategories } from "@/infrastructure/sanity/queries/category-queries";
