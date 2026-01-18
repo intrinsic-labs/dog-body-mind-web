@@ -114,7 +114,6 @@ async function loadBlogPageData(locale: Locale) {
     };
   });
 
-  const newsletterContent = await getNewsletterContent(locale);
   const blogPageContent = await getBlogPageContent(locale);
   const allCategories = await getAllCategories(locale);
 
@@ -139,7 +138,6 @@ async function loadBlogPageData(locale: Locale) {
   return {
     displayPosts,
     categories,
-    newsletterContent,
     blogPageContent,
   };
 }
@@ -185,7 +183,7 @@ export default async function BlogPage({
   const { locale } = await params;
 
   // Do not construct JSX inside try/catch. Keep error handling in the data layer.
-  const { displayPosts, categories, newsletterContent, blogPageContent } =
+  const { displayPosts, categories, blogPageContent } =
     await loadBlogPageData(locale);
 
   return (
@@ -221,7 +219,6 @@ export default async function BlogPage({
             posts={displayPosts}
             categories={categories}
             currentLocale={locale}
-            newsletterContent={newsletterContent}
           />
         </Suspense>
       </div>
