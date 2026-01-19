@@ -5,6 +5,7 @@ import { Locale } from "@domain/locale";
 import { CarouselCategoryRow } from "./categoryRowsBuilder";
 import { ListingCarouselCard, ListingGridCard } from "./ListingCards";
 import { scrollToWithOffset } from "./scrollToWithOffset";
+import { getUiString } from "@/presentation/strings";
 
 type Props = {
   rows: CarouselCategoryRow[];
@@ -69,9 +70,12 @@ export default function CategoryRows({
                       });
                     }
                   }}
-                  className="text-sm text-blue hover:underline"
+                  className="text-sm text-blue hover:underline whitespace-nowrap flex-shrink-0"
                 >
-                  {isExpanded ? "Collapse" : "See all"}
+                  {isExpanded
+                    ? getUiString({ locale: currentLocale, target: "collapse" })
+                    : getUiString({ locale: currentLocale, target: "seeAll"})
+                  }
                 </button>
               )}
             </div>
@@ -88,7 +92,7 @@ export default function CategoryRows({
               </div>
             ) : (
               <div className="relative">
-                <div className="flex gap-4 overflow-x-auto pb-3 px-4 snap-x snap-mandatory [scrollbar-width:thin] ">
+                <div className={`flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory [scrollbar-width:thin] ${row.posts.length > 1 ? 'px-4' : 'pr-4'}`}>
                   {row.posts.map((post) => (
                     <ListingCarouselCard
                       key={post._id}

@@ -93,7 +93,6 @@ export default async function Landing({
                 post={featuredPost}
                 currentLocale={locale}
                 labelTarget="featuredPost"
-                className=""
               />
             </div>
           )}

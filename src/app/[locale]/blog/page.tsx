@@ -1,12 +1,13 @@
 import { Metadata } from "next";
 import React, { Suspense } from "react";
 
-import { Locale } from "@/domain/locale";
+import { Locale } from "@domain/locale";
 import {
   loadBlogListingData,
   generateBlogListingMetadata,
-} from "@/application/blog-listing";
+} from "@application/blog-listing";
 import FilterableBlogList from "@/components/blog/FilterableBlogList";
+import { LabeledCard } from "@/components/blog/listing/ListingCards";
 
 /**
  * Generate metadata for the blog listing page
@@ -36,6 +37,8 @@ export default async function BlogPage({
   // Load all blog listing data from the application layer
   const { displayPosts, categories, blogPageContent } =
     await loadBlogListingData(locale);
+  const featuredPost = displayPosts.find((post) => post.featured)
+  const displayPostsWithoutFeatured = displayPosts.filter((post) => !post.featured)
 
   return (
     <main>
@@ -59,8 +62,18 @@ export default async function BlogPage({
             </section>
           }
         >
+          
+          {featuredPost && (
+            <LabeledCard
+              post={featuredPost}
+              currentLocale={locale}
+              labelTarget="featuredPost"
+              className="mb-4"
+            />
+          )}
+          
           <FilterableBlogList
-            posts={displayPosts}
+            posts={displayPostsWithoutFeatured}
             categories={categories}
             currentLocale={locale}
           />

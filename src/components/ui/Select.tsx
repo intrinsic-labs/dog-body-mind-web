@@ -222,7 +222,7 @@ export default function Select({
           aria-labelledby={controlId}
           onKeyDown={onListboxKeyDown}
           className={[
-            "absolute z-50 mt-2 w-full overflow-hidden rounded-sm border border-foreground/10",
+            "absolute z-60 mt-2 w-full overflow-hidden rounded-sm border border-foreground/10",
             "bg-white shadow-sm",
           ].join(" ")}
         >
