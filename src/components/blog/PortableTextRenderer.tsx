@@ -41,7 +41,7 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
         </p>
       )}
 
-      <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+      <div className="relative w-full aspect-video rounded-sm overflow-hidden">
         <iframe
           src={`https://www.youtube.com/embed/${videoId}`}
           title={displayTitle || "YouTube video"}
@@ -55,7 +55,7 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
       {value.keyMoments && value.keyMoments.length > 0 && (
         <div className="mt-6">
           <h5 className="font-medium mb-4 text-lg">Video Chapters:</h5>
-          <ul className="space-y-3 bg-foreground/5 rounded-xl p-4">
+          <ul className="space-y-3 bg-foreground/5 rounded-sm p-4">
             {value.keyMoments.map((moment, index) => {
               const minutes = Math.floor(moment.time / 60);
               const seconds = moment.time % 60;
@@ -92,7 +92,7 @@ function YouTubeEmbedComponent({ value }: { value: YouTubeEmbed }) {
           <summary className="cursor-pointer font-medium text-lg mb-4 hover:text-blue transition-colors">
             Video Transcript
           </summary>
-          <div className="mt-4 p-6 bg-foreground/5 rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
+          <div className="mt-4 p-6 bg-foreground/5 rounded-sm text-sm whitespace-pre-wrap leading-relaxed">
             {value.transcript}
           </div>
         </details>
@@ -126,7 +126,7 @@ function InlineImageComponent({ value }: { value: InlineImage }) {
   return (
     <figure className={`my-8 ${sizeClass}`}>
       <div
-        className={`${value.enableOverflow ? "overflow-x-auto" : ""} rounded-2xl overflow-hidden`}
+        className={`${value.enableOverflow ? "overflow-x-auto" : ""} rounded-sm overflow-hidden`}
       >
         <TinifyImage
           src={imageUrl}
@@ -304,14 +304,14 @@ export default function PortableTextRenderer({
         <p className="mb-6 leading-relaxed">{children}</p>
       ),
       blockquote: ({ children }) => (
-        <blockquote className="my-8 pl-6 border-l-4 border-blue bg-blue/5 py-4 rounded-r-xl">
+        <blockquote className="my-8 pl-6 border-l-4 border-blue bg-blue/5 py-4 rounded-sm">
           {children}
         </blockquote>
       ),
       // Custom blockquote styles with emojis
       pushpin: ({ children }) => (
         <blockquote
-          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-sm flex items-start gap-3"
           style={{
             borderColor: blockquoteStyles.pushpin.borderColor,
             backgroundColor: blockquoteStyles.pushpin.backgroundColor,
@@ -325,7 +325,7 @@ export default function PortableTextRenderer({
       ),
       warning: ({ children }) => (
         <blockquote
-          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-sm flex items-start gap-3"
           style={{
             borderColor: blockquoteStyles.warning.borderColor,
             backgroundColor: blockquoteStyles.warning.backgroundColor,
@@ -339,7 +339,7 @@ export default function PortableTextRenderer({
       ),
       danger: ({ children }) => (
         <blockquote
-          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-sm flex items-start gap-3"
           style={{
             borderColor: blockquoteStyles.danger.borderColor,
             backgroundColor: blockquoteStyles.danger.backgroundColor,
@@ -353,7 +353,7 @@ export default function PortableTextRenderer({
       ),
       announcement: ({ children }) => (
         <blockquote
-          className="my-8 pl-6 border-l-4 py-4 rounded-r-xl flex items-start gap-3"
+          className="my-8 pl-6 border-l-4 py-4 rounded-r-sm flex items-start gap-3"
           style={{
             borderColor: blockquoteStyles.announcement.borderColor,
             backgroundColor: blockquoteStyles.announcement.backgroundColor,
@@ -403,7 +403,7 @@ export default function PortableTextRenderer({
       ),
       em: ({ children }) => <em className="italic">{children}</em>,
       code: ({ children }) => (
-        <code className="px-2 py-1 bg-foreground/10 rounded-md text-sm font-mono">
+        <code className="px-2 py-1 bg-foreground/10 rounded-sm text-sm font-mono">
           {children}
         </code>
       ),

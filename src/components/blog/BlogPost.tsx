@@ -107,7 +107,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
 
         {/* Cover image */}
         {post.coverImageUrl && (
-          <div className="mb-8 rounded-2xl overflow-hidden w-full">
+          <div className="mb-8 rounded-sm overflow-hidden w-full">
             <TinifyImage
               src={post.coverImageUrl}
               alt={post.coverImageAlt}
@@ -121,7 +121,7 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
 
         {/* Excerpt */}
         {post.excerpt && (
-          <div className="text-lg text-foreground/80 leading-relaxed border-l-4 border-blue pl-6 py-4 bg-blue/5 rounded-r-lg max-w-2xl">
+          <div className="text-lg text-foreground/80 leading-relaxed border-l-4 border-blue pl-6 py-4 bg-blue/5 max-w-2xl rounded-r-sm">
             <p>{post.excerpt}</p>
           </div>
         )}

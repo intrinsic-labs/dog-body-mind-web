@@ -148,14 +148,13 @@
 
 /* ============================================
    DESIGN SYSTEM - BUTTONS & CARDS
-   ============================================ */
+   ============================================ */  
 
 /* Base button styles - shared across all button types */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9999px;
   padding: 0.625rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
@@ -299,7 +298,6 @@
 .card {
   background-color: var(--background);
   border: 1px solid rgba(59, 59, 59, 0.1);
-  border-radius: 0.5rem;
   padding: 1.5rem;
   transition: all 0.3s ease-in-out;
 }

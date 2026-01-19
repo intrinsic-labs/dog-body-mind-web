@@ -88,7 +88,7 @@ export default function CategoryRows({
               </div>
             ) : (
               <div className="relative">
-                <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 snap-x snap-mandatory [scrollbar-width:thin]">
+                <div className="flex gap-4 overflow-x-auto pb-3 px-4 snap-x snap-mandatory [scrollbar-width:thin] ">
                   {row.posts.map((post) => (
                     <ListingCarouselCard
                       key={post._id}

@@ -58,7 +58,7 @@ export default function InfographicReference({
   if (loading) {
     return (
       <div className="my-8 w-full">
-        <div className="animate-pulse bg-foreground/10 rounded-2xl aspect-[4/3] w-full flex items-center justify-center">
+        <div className="animate-pulse bg-foreground/10 rounded-sm aspect-[4/3] w-full flex items-center justify-center">
           <div className="text-foreground/50 text-sm">
             Loading infographic...
           </div>
@@ -76,7 +76,7 @@ export default function InfographicReference({
   if (error) {
     return (
       <div className="my-8 w-full">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-sm p-6 text-center">
           <div className="text-red-600 text-sm font-medium">{error}</div>
         </div>
       </div>

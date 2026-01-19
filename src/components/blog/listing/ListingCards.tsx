@@ -5,10 +5,12 @@ import TinifyImage from "@/components/TinifyImage";
 import { DisplayPost } from "../presenter-models/DisplayPost";
 import { Locale } from "@domain/locale";
 import { useEffect, useRef, useState } from "react";
+import { getUiString, StringTarget } from "@/presentation/strings";
 
 type BaseProps = {
   post: DisplayPost;
   currentLocale: Locale;
+  labelTarget?: StringTarget;
   className?: string;
 };
 
@@ -93,12 +95,12 @@ export function ListingCarouselCard({
                 "transition-opacity duration-300",
               )}
             >
-              <div className="absolute inset-0 bg-blue/90" />
-              <div className="absolute inset-0 p-4">
+              <div className="absolute inset-0 bg-blue/50" />
+              {/*<div className="absolute inset-0 p-4">
                 <p className="text-white/90 text-md leading-snug line-clamp-4 w-[320px]">
                   {post.excerpt}
                 </p>
-              </div>
+              </div>*/}
             </div>
           </div>
 
@@ -157,6 +159,52 @@ export function ListingGridCard({ post, currentLocale, className }: BaseProps) {
 
           {post.excerpt ? (
             <p className="mt-2 text-sm text-foreground/70 line-clamp-2">
+              {post.excerpt}
+            </p>
+          ) : null}
+
+          <div className="mt-3 flex items-center gap-2 text-xs text-foreground/60">
+            <span>{post.formattedDate}</span>
+            <span>•</span>
+            <span>{post.readingTime}</span>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+export function LabeledCard({ post, currentLocale, labelTarget, className }: BaseProps) {
+  return (
+    <article className={cx("group", className)}>
+      <Link
+        href={postUrl(currentLocale, post.slug)}
+        className={cx("block bg-white overflow-hidden", "focus:outline-none", "flex flex-col sm:flex-row")}
+      >
+        {post.coverImageUrl && (
+          <div className="sm:w-1/2 aspect-[16/10] overflow-hidden bg-foreground/5 shrink-0">
+            <TinifyImage
+              src={post.coverImageUrl}
+              alt={post.coverImageAlt}
+              width={700}
+              height={450}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          </div>
+        )}
+
+        <div className="p-4 flex flex-col justify-center">
+          {labelTarget && (
+            <p className="mb-4 uppercase text-sm tracking-widest">{
+              getUiString({ locale: currentLocale, target: labelTarget })
+            }</p>
+          )}
+          <h3 className="text-3xl font-semibold leading-snug group-hover:text-blue transition-colors">
+            {post.title}
+          </h3>
+
+          {post.excerpt ? (
+            <p className="mt-2 text-md text-foreground/70">
               {post.excerpt}
             </p>
           ) : null}

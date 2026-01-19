@@ -1,7 +1,5 @@
 import { Locale } from "@/domain/locale";
 import BlogCTA from "@/components/BlogCTA";
-
-import BlogCard from "@/components/blog/BlogCard";
 import {
   getLandingPageContent,
   getBlogCtaContent,
@@ -9,6 +7,7 @@ import {
 import { getYouTubeId } from "@/infrastructure/youtube/youtube-utils";
 import { DataManager } from "@/application/data-manager";
 import { transformPostForDisplay } from "@application/mappers/transforPostForDisplay";
+import { LabeledCard, ListingGridCard } from "@/components/blog/listing/ListingCards";
 
 export default async function Landing({
   params,
@@ -53,7 +52,7 @@ export default async function Landing({
   return (
     <main>
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Title and Subtitle */}
         <div className="mb-12 max-w-3xl">
           <h1 className="text-left mb-3">{landingContent.title}</h1>
@@ -64,7 +63,7 @@ export default async function Landing({
 
         {/* YouTube Video */}
         {videoId && (
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-12">
+          <div className="relative w-full aspect-video overflow-hidden mb-12 rounded-sm">
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
               title={landingContent.title}
@@ -85,16 +84,16 @@ export default async function Landing({
       )}*/}
 
       {/* Featured & Recent Blog Posts */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
           {/* Featured Post */}
           {featuredPost && (
             <div>
-              <h2 className="mb-6">Featured Post</h2>
-              <BlogCard
+              <LabeledCard
                 post={featuredPost}
                 currentLocale={locale}
-                variant="featured"
+                labelTarget="featuredPost"
+                className=""
               />
             </div>
           )}
@@ -102,12 +101,10 @@ export default async function Landing({
           {/* Most Recent Post */}
           {mostRecentPost && mostRecentPost._id !== featuredPost?._id && (
             <div>
-              <h2 className="mb-6">Latest Post</h2>
-              { /* Needs to migrate to ListingCard */}
-              <BlogCard
+              <LabeledCard
                 post={mostRecentPost}
                 currentLocale={locale}
-                variant="featured"
+                labelTarget="latestPost"
               />
             </div>
           )}

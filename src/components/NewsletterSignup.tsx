@@ -51,7 +51,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
       <div className="w-full bg-blue py-6 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-5xl">
           {status === 'success' ? (
-            <div className="text-center rounded-lg bg-white/20 px-4 py-3 text-white">
+            <div className="text-center bg-white/20 px-4 py-3 text-white">
               {content.successMessage || 'Thank you for subscribing!'}
             </div>
           ) : (
@@ -64,7 +64,7 @@ export default function NewsletterSignup({ content, variant = 'default' }: Newsl
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={content.placeholder}
-                className="w-full sm:w-auto sm:flex-1 sm:max-w-sm rounded-full border-2 border-white/30 bg-white/10 px-6 py-2.5 text-white placeholder:text-white/60 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="w-full sm:w-auto sm:flex-1 sm:max-w-sm border-2 border-white/30 bg-white/10 px-6 py-2.5 text-white placeholder:text-white/60 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50"
                 disabled={status === 'loading'}
                 required
               />

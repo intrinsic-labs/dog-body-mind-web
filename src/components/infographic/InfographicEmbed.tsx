@@ -108,7 +108,7 @@ export default function InfographicEmbed({
       <div className="absolute top-4 right-4 z-10" ref={dropdownRef}>
         <button
           onClick={() => setIsShareOpen(!isShareOpen)}
-          className={`bg-white/90 backdrop-blur-sm hover:bg-white border border-foreground/20 hover:border-foreground/30 rounded-lg p-2 shadow-lg transition-all duration-200 ${showButton ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+          className={`bg-white/90 backdrop-blur-sm hover:bg-white border border-foreground/20 hover:border-foreground/30 rounded-sm p-2 shadow-lg transition-all duration-200 ${showButton ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
           aria-label="Share infographic"
         >
           {isShareOpen ? (
@@ -120,7 +120,7 @@ export default function InfographicEmbed({
 
         {/* Dropdown Menu */}
         {isShareOpen && (
-          <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-foreground/20 rounded-lg shadow-xl overflow-hidden z-20">
+          <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-foreground/20 rounded-sm shadow-xl overflow-hidden z-20">
             {blogPostUrl && (
               <button
                 onClick={handleShareLink}
@@ -149,7 +149,7 @@ export default function InfographicEmbed({
 
       {/* Main Infographic Image */}
       <div
-        className="w-full rounded-2xl overflow-hidden cursor-pointer"
+        className="w-full rounded-sm overflow-hidden cursor-pointer"
         onClick={handleImageTap}
       >
         <TinifyImage

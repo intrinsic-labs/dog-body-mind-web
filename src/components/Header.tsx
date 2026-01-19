@@ -29,7 +29,7 @@ const Header = ({ locale }: HeaderProps) => {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
             href={`/${locale}/blog`}
-            className="btn btn-primary-outline btn-sm sm:btn"
+            className="text-foreground font-bold font-rubik hover:underline hover:text-blue transition-all ease-out-200"
           >
             Blog
           </Link>
