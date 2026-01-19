@@ -103,6 +103,7 @@ export default async function Landing({
           {mostRecentPost && mostRecentPost._id !== featuredPost?._id && (
             <div>
               <h2 className="mb-6">Latest Post</h2>
+              { /* Needs to migrate to ListingCard */}
               <BlogCard
                 post={mostRecentPost}
                 currentLocale={locale}

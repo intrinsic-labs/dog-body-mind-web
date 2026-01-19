@@ -339,3 +339,4 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,windows,visualstudiocode,react,nextjs,vercel,node
 docs/Screenshot 2026-01-08 at 3.45.10 PM.png
+.screenshots/

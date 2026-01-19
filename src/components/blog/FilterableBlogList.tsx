@@ -70,6 +70,7 @@ export default function FilterableBlogList({
   }, [urlCategoryId]);
 
   // Debounced URL updates for search input.
+  // This is very buggy right now; needs attention.
   useEffect(() => {
     const handle = setTimeout(() => {
       const nextQ = searchInput.trim();
@@ -183,7 +184,7 @@ export default function FilterableBlogList({
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search articles..."
-                className="w-full rounded-full border-2 border-foreground/10 bg-white/70 py-3 pl-12 pr-6 text-foreground placeholder:text-foreground/50 transition hover:border-blue/30 focus:border-blue/40 focus:outline-none focus:ring-2 focus:ring-blue/30"
+                className="w-full border-2 border-white bg-white py-3 pl-12 pr-6 text-foreground placeholder:text-foreground/50 transition hover:border-blue/50 focus:outline-none"
               />
             </div>
 

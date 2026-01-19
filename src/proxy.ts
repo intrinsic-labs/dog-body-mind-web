@@ -11,7 +11,7 @@ import {
 } from "@domain/locale";
 
 // Enable/disable middleware logging
-const ENABLE_MIDDLEWARE_LOGGING = true;
+const ENABLE_MIDDLEWARE_LOGGING = false;
 
 function log(...args: unknown[]) {
   if (ENABLE_MIDDLEWARE_LOGGING) {

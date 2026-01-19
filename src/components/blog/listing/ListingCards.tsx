@@ -4,6 +4,7 @@ import Link from "next/link";
 import TinifyImage from "@/components/TinifyImage";
 import { DisplayPost } from "../presenter-models/DisplayPost";
 import { Locale } from "@domain/locale";
+import { useEffect, useRef, useState } from "react";
 
 type BaseProps = {
   post: DisplayPost;
@@ -29,21 +30,41 @@ export function ListingCarouselCard({
   currentLocale,
   className,
 }: BaseProps) {
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [minTitleHeight, setMinTitleHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    const measureTitle = () => {
+      if (!titleRef.current) return;
+
+      const lineHeight = parseFloat(
+        getComputedStyle(titleRef.current).lineHeight,
+      );
+      // Always allocate space for 2 lines to ensure consistent height
+      const twoLineHeight = lineHeight * 2;
+      setMinTitleHeight(twoLineHeight);
+    };
+
+    measureTitle();
+    window.addEventListener("resize", measureTitle);
+    return () => window.removeEventListener("resize", measureTitle);
+  }, []);
+
   return (
     <article
       className={cx(
-        "relative snap-start shrink-0 w-[220px] sm:w-[240px] md:w-[260px] group",
+        "relative snap-start shrink-0 w-[220px] sm:w-[240px] md:w-[300px] group",
         // Expand on hover/focus to a landscape-ish card
-        "focus-within:w-[520px] hover:w-[520px] transition-[width] duration-300 ease-out",
+        "focus-within:w-[350px] hover:w-[350px] transition-[width] duration-300 ease-out",
         className,
       )}
     >
       <Link
         href={postUrl(currentLocale, post.slug)}
         className={cx(
-          "block h-[320px] sm:h-[340px] md:h-[360px]",
-          "rounded-xl bg-white border border-foreground/10 overflow-hidden shadow-sm",
-          "hover:border-blue/30 focus:outline-none focus:ring-2 focus:ring-blue/30",
+          "block h-[320px] sm:h-[340px] md:h-[260px]",
+          "bg-white overflow-hidden",
+          "focus:outline-none",
         )}
       >
         <div className="h-full w-full grid grid-rows-[1fr_auto]">
@@ -72,22 +93,30 @@ export function ListingCarouselCard({
                 "transition-opacity duration-300",
               )}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-blue/95 via-blue/40 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="text-white/90 text-sm leading-snug line-clamp-3">
+              <div className="absolute inset-0 bg-blue/90" />
+              <div className="absolute inset-0 p-4">
+                <p className="text-white/90 text-md leading-snug line-clamp-4 w-[320px]">
                   {post.excerpt}
                 </p>
-                <div className="mt-3 flex items-center gap-2 text-xs text-white/80">
-                  <span>{post.formattedDate}</span>
-                  <span>•</span>
-                  <span>{post.readingTime}</span>
-                </div>
               </div>
             </div>
           </div>
 
-          <div className="p-4">
-            <h3 className="text-base sm:text-[15px] font-semibold leading-snug line-clamp-2 text-foreground group-hover:text-blue transition-colors">
+          <div className="p-4 flex flex-col">
+            <div className="mb-3 flex items-center gap-2 text-xs text-foreground/50">
+              <span>{post.formattedDate}</span>
+              <span>•</span>
+              <span>{post.readingTime}</span>
+            </div>
+            <h3
+              ref={titleRef}
+              className="text-lg leading-snug line-clamp-2 text-foreground group-hover:text-blue transition-colors w-[195px] sm:w-[215px] md:w-[270px]"
+              style={
+                minTitleHeight
+                  ? { minHeight: `${minTitleHeight}px` }
+                  : undefined
+              }
+            >
               {post.title}
             </h3>
           </div>
@@ -107,10 +136,7 @@ export function ListingGridCard({ post, currentLocale, className }: BaseProps) {
     <article className={cx("group", className)}>
       <Link
         href={postUrl(currentLocale, post.slug)}
-        className={cx(
-          "block rounded-xl bg-white border border-foreground/10 overflow-hidden shadow-sm",
-          "hover:border-blue/30 focus:outline-none focus:ring-2 focus:ring-blue/30",
-        )}
+        className={cx("block bg-white overflow-hidden", "focus:outline-none")}
       >
         {post.coverImageUrl && (
           <div className="aspect-[16/10] overflow-hidden bg-foreground/5">

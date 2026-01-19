@@ -184,10 +184,10 @@ export default function Select({
         onKeyDown={onButtonKeyDown}
         className={[
           // Match the NewsletterSignup pill vibe but in site background
-          "w-full rounded-full border-2 px-5 py-3 text-left transition",
-          "bg-white/70 border-foreground/10",
-          "hover:border-blue/30",
-          "focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue/40",
+          "w-full border-2 px-5 py-3 text-left transition",
+          "bg-white border-white",
+          "hover:border-blue/50",
+          "focus:outline-none",
           disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
         ].join(" ")}
       >
