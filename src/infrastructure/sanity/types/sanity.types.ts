@@ -242,17 +242,6 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
-export type LandingPageSettings = {
-  _id: string;
-  _type: "landingPageSettings";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title: InternationalizedArrayString;
-  subtitle: InternationalizedArrayString;
-  youtubeUrl: string;
-};
-
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -372,7 +361,26 @@ export type InternationalizedArrayReferenceValue = {
         _type: "reference";
         _weak?: boolean;
         [internalGroqTypeReferenceTo]?: "legalPage";
+      }
+    | {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "landingPageSettings";
       };
+};
+
+export type LandingPageSettings = {
+  _id: string;
+  _type: "landingPageSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  subtitle: string;
+  youtubeUrl: string;
+  content?: BlockContent;
+  language?: string;
 };
 
 export type LegalPage = {
@@ -725,13 +733,13 @@ export type AllSanitySchemaTypes =
   | BlockContent
   | BlogPageSettings
   | InternationalizedArrayString
-  | LandingPageSettings
   | SiteSettings
   | Organization
   | InternationalizedArrayText
   | TranslationMetadata
   | InternationalizedArrayReference
   | InternationalizedArrayReferenceValue
+  | LandingPageSettings
   | LegalPage
   | Post
   | Category
@@ -1086,13 +1094,15 @@ export type InfographicLanguageAvailabilityQueryResult = {
 
 // Source: src/infrastructure/sanity/queries/landing-page-settings-queries.ts
 // Variable: landingPageSettingsQuery
-// Query: *[_type == "landingPageSettings"][0] {    _id,    _type,    title,    subtitle,    youtubeUrl  }
+// Query: *[_type == "landingPageSettings" && language == $language][0] {    _id,    _type,    title,    subtitle,    youtubeUrl,    content,    language  }
 export type LandingPageSettingsQueryResult = {
   _id: string;
   _type: "landingPageSettings";
-  title: InternationalizedArrayString;
-  subtitle: InternationalizedArrayString;
+  title: string;
+  subtitle: string;
   youtubeUrl: string;
+  content: BlockContent | null;
+  language: string | null;
 } | null;
 
 // Source: src/infrastructure/sanity/queries/legal-page-queries.ts
@@ -1764,7 +1774,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "infographic" && _id == $id][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "description": coalesce(\n      description[language == $language][0].value,\n      description[language == "en"][0].value,\n      description[0].value\n    ),\n    "altText": coalesce(\n      altText[language == $language][0].value,\n      altText[language == "en"][0].value,\n      altText[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image with flexible asset resolution\n    "image": coalesce(\n      image[language == $language][0].asset.asset->,\n      image[language == "en"][0].asset.asset->,\n      image[0].asset.asset->\n    ) {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip,\n        blurHash,\n        hasAlpha,\n        isOpaque\n      }\n    },\n\n    // PDF-specific fields (with fallbacks)\n    "downloadFilename": coalesce(\n      downloadFilename[language == $language][0].value,\n      downloadFilename[language == "en"][0].value,\n      downloadFilename[0].value\n    ),\n    "pdfMetadata": coalesce(\n      pdfMetadata[language == $language][0],\n      pdfMetadata[language == "en"][0],\n      pdfMetadata[0]\n    ) {\n      title,\n      keywords,\n      author,\n      subject\n    }\n  }\n': InfographicByIdQueryResult;
     '\n  *[_type == "infographic" && _id in $ids] {\n    // Core document fields\n    _id,\n    _type,\n\n    // Language-specific content (with fallbacks)\n    "title": coalesce(\n      title[language == $language][0].value,\n      title[language == "en"][0].value,\n      title[0].value\n    ),\n    "slug": coalesce(\n      slug[language == $language][0].current,\n      slug[language == "en"][0].current,\n      slug[0].current\n    ),\n\n    // Language-specific image for preview\n    "image": coalesce(\n      image[language == $language][0].asset.asset,\n      image[language == "en"][0].asset.asset,\n      image[0].asset.asset\n    ) -> {\n      _id,\n      url,\n      metadata {\n        dimensions {\n          width,\n          height,\n          aspectRatio\n        },\n        lqip\n      }\n    }\n  }\n': InfographicsByIdsQueryResult;
     '\n  *[_type == "infographic" && _id == $id][0] {\n    _id,\n    "availableLanguages": array::unique([\n      ...title[].language,\n      ...image[].language,\n      ...description[].language\n    ]),\n    "hasLanguage": count(title[language == $language]) > 0\n  }\n': InfographicLanguageAvailabilityQueryResult;
-    '\n  *[_type == "landingPageSettings"][0] {\n    _id,\n    _type,\n    title,\n    subtitle,\n    youtubeUrl\n  }\n': LandingPageSettingsQueryResult;
+    '\n  *[_type == "landingPageSettings" && language == $language][0] {\n    _id,\n    _type,\n    title,\n    subtitle,\n    youtubeUrl,\n    content,\n    language\n  }\n': LandingPageSettingsQueryResult;
     '\n  *[_type == "legalPage" && slug.current == $slug && language == $language][0] {\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    title,\n    slug,\n    content,\n    excerpt,\n    lastUpdated,\n    metaTitle,\n    metaDescription,\n    noIndex,\n    language\n  }\n': LegalPageBySlugQueryResult;
     '\n  *[_type == "legalPage" && defined(slug.current) && language == $language] | order(title asc) {\n    _id,\n    title,\n    slug,\n    language\n  }\n': AllLegalPagesQueryResult;
     '\n  *[_type == "organization"][0] {\n    // Core document fields\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    _rev,\n    \n    // Basic organization info\n    name,\n    legalName,\n    url,\n    foundingDate,\n    organizationType,\n    \n    // Internationalized fields (language-specific extraction)\n    "description": description[_key == $language][0].value,\n    \n    // Logo with internationalized alt text\n    logo {\n      asset-> {\n        _id,\n        url,\n        metadata {\n          dimensions {\n            width,\n            height,\n            aspectRatio\n          },\n          lqip,\n          blurHash,\n          hasAlpha,\n          isOpaque\n        }\n      },\n      hotspot,\n      crop,\n      "alt": alt[_key == $language][0].value\n    },\n    \n    // Contact information (nested object)\n    contactInfo {\n      email,\n      telephone,\n      address {\n        streetAddress,\n        addressLocality,\n        addressRegion,\n        postalCode,\n        addressCountry\n      }\n    },\n    \n    // Social profiles array\n    socialProfiles\n  }\n': OrganizationQueryResult;

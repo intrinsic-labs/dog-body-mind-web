@@ -7,7 +7,9 @@ import {
 import { getYouTubeId } from "@/infrastructure/youtube/youtube-utils";
 import { DataManager } from "@/application/data-manager";
 import { transformPostForDisplay } from "@application/mappers/transforPostForDisplay";
-import { LabeledCard, ListingGridCard } from "@/components/blog/listing/ListingCards";
+import { LabeledCard } from "@/components/blog/listing/ListingCards";
+import PortableTextRenderer from "@/components/blog/PortableTextRenderer";
+import { PortableTextBlock } from "@portabletext/types";
 
 export default async function Landing({
   params,
@@ -70,6 +72,16 @@ export default async function Landing({
               className="absolute inset-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+            />
+          </div>
+        )}
+
+        {/* Page Content */}
+        {landingContent.content && (
+          <div className="prose prose-lg max-w-5xl mx-auto">
+            <PortableTextRenderer
+              content={landingContent.content as PortableTextBlock[]}
+              language={locale}
             />
           </div>
         )}

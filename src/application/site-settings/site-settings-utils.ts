@@ -1,25 +1,26 @@
-import { getSiteSettings } from '@infrastructure/sanity/queries/site-settings-queries';
-import { getBlogPageSettings } from '@infrastructure/sanity/queries/blog-page-settings-queries';
-import { getLandingPageSettings } from '@infrastructure/sanity/queries/landing-page-settings-queries';
-import { Locale } from '@domain/locale';
+import { getSiteSettings } from "@infrastructure/sanity/queries/site-settings-queries";
+import { getBlogPageSettings } from "@infrastructure/sanity/queries/blog-page-settings-queries";
+import { getLandingPageSettings } from "@infrastructure/sanity/queries/landing-page-settings-queries";
+import { Locale } from "@domain/locale";
+import { BlockContent } from "@infrastructure/sanity/types/sanity.types";
 
 // Helper to extract internationalized string value
 function getLocalizedValue(
   intlArray: Array<{ _key: string; value?: string }> | undefined | null,
-  locale: Locale
+  locale: Locale,
 ): string {
-  if (!intlArray || !Array.isArray(intlArray)) return '';
+  if (!intlArray || !Array.isArray(intlArray)) return "";
 
   // Try to find the exact locale
-  const exactMatch = intlArray.find(item => item._key === locale);
+  const exactMatch = intlArray.find((item) => item._key === locale);
   if (exactMatch?.value) return exactMatch.value;
 
   // Fallback to English
-  const englishMatch = intlArray.find(item => item._key === 'en');
+  const englishMatch = intlArray.find((item) => item._key === "en");
   if (englishMatch?.value) return englishMatch.value;
 
   // Return first available value
-  return intlArray.find(item => item.value)?.value || '';
+  return intlArray.find((item) => item.value)?.value || "";
 }
 
 export interface NewsletterContent {
@@ -37,7 +38,9 @@ export interface SocialLink {
   label?: string | null;
 }
 
-export async function getNewsletterContent(locale: Locale): Promise<NewsletterContent | null> {
+export async function getNewsletterContent(
+  locale: Locale,
+): Promise<NewsletterContent | null> {
   try {
     const settings = await getSiteSettings();
 
@@ -56,7 +59,7 @@ export async function getNewsletterContent(locale: Locale): Promise<NewsletterCo
       errorMessage: getLocalizedValue(newsletter.errorMessage, locale),
     };
   } catch (error) {
-    console.error('Error fetching newsletter content:', error);
+    console.error("Error fetching newsletter content:", error);
     return null;
   }
 }
@@ -70,11 +73,11 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     }
 
     // Filter out any invalid entries and return
-    return settings.socialLinks.filter((link: SocialLink) =>
-      link && link.platform && link.url
+    return settings.socialLinks.filter(
+      (link: SocialLink) => link && link.platform && link.url,
     );
   } catch (error) {
-    console.error('Error fetching social links:', error);
+    console.error("Error fetching social links:", error);
     return [];
   }
 }
@@ -84,7 +87,9 @@ export interface BlogPageContent {
   subtitle: string;
 }
 
-export async function getBlogPageContent(locale: Locale): Promise<BlogPageContent | null> {
+export async function getBlogPageContent(
+  locale: Locale,
+): Promise<BlogPageContent | null> {
   try {
     const settings = await getBlogPageSettings();
 
@@ -97,7 +102,7 @@ export async function getBlogPageContent(locale: Locale): Promise<BlogPageConten
       subtitle: getLocalizedValue(settings.subtitle, locale),
     };
   } catch (error) {
-    console.error('Error fetching blog page content:', error);
+    console.error("Error fetching blog page content:", error);
     return null;
   }
 }
@@ -108,7 +113,9 @@ export interface BlogCtaContent {
   buttonText: string;
 }
 
-export async function getBlogCtaContent(locale: Locale): Promise<BlogCtaContent | null> {
+export async function getBlogCtaContent(
+  locale: Locale,
+): Promise<BlogCtaContent | null> {
   try {
     const settings = await getSiteSettings();
 
@@ -124,7 +131,7 @@ export async function getBlogCtaContent(locale: Locale): Promise<BlogCtaContent 
       buttonText: getLocalizedValue(blogCta.buttonText, locale),
     };
   } catch (error) {
-    console.error('Error fetching blog CTA content:', error);
+    console.error("Error fetching blog CTA content:", error);
     return null;
   }
 }
@@ -133,23 +140,27 @@ export interface LandingPageContent {
   title: string;
   subtitle: string;
   youtubeUrl: string;
+  content?: BlockContent | null;
 }
 
-export async function getLandingPageContent(locale: Locale): Promise<LandingPageContent | null> {
+export async function getLandingPageContent(
+  locale: Locale,
+): Promise<LandingPageContent | null> {
   try {
-    const settings = await getLandingPageSettings();
+    const settings = await getLandingPageSettings(locale);
 
     if (!settings) {
       return null;
     }
 
     return {
-      title: getLocalizedValue(settings.title, locale),
-      subtitle: getLocalizedValue(settings.subtitle, locale),
+      title: settings.title,
+      subtitle: settings.subtitle,
       youtubeUrl: settings.youtubeUrl,
+      content: settings.content,
     };
   } catch (error) {
-    console.error('Error fetching landing page content:', error);
+    console.error("Error fetching landing page content:", error);
     return null;
   }
 }
