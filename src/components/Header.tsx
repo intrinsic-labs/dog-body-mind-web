@@ -5,13 +5,16 @@ import { useState, useEffect } from "react";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import TinifyImage from "./TinifyImage";
+import SocialLinks from "./SocialLinks";
 import { Locale } from "@domain/locale";
+import type { SocialLink } from "@/application/site-settings/site-settings-utils";
 
 interface HeaderProps {
   locale: Locale;
+  socialLinks?: SocialLink[];
 }
 
-const Header = ({ locale }: HeaderProps) => {
+const Header = ({ locale, socialLinks = [] }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Disable scroll when mobile menu is open
@@ -86,14 +89,25 @@ const Header = ({ locale }: HeaderProps) => {
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col pt-8 px-8">
-          <Link
-            href={`/${locale}/blog`}
-            onClick={closeMobileMenu}
-            className="text-foreground font-bold font-rubik text-3xl py-6 text-left hover:text-blue transition-colors"
-          >
-            Blog
-          </Link>
+        <div className="flex flex-col h-full justify-between">
+          {/* Navigation Links */}
+          <div className="flex flex-col pt-8 px-8">
+            <Link
+              href={`/${locale}/blog`}
+              onClick={closeMobileMenu}
+              className="text-foreground font-bold font-rubik text-3xl py-6 text-left hover:text-blue transition-colors"
+            >
+              Blog
+            </Link>
+          </div>
+
+          {/* Social Links at Bottom */}
+          {socialLinks.length > 0 && (
+            <div className="px-8 pb-8 border-t border-foreground/10 pt-6">
+              <p className="text-sm text-foreground/70 mb-4">Follow us:</p>
+              <SocialLinks links={socialLinks} size="md" variant="minimal" />
+            </div>
+          )}
         </div>
       </div>
     </>

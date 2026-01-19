@@ -1,9 +1,15 @@
 import "../globals.css";
 import { rubik, helvetica } from "@presentation/fonts/fonts";
-import { Locale, locales, localeToLanguageTag, isValidLocale } from "@domain/locale";
+import {
+  Locale,
+  locales,
+  localeToLanguageTag,
+  isValidLocale,
+} from "@domain/locale";
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getSocialLinks } from "@/application/site-settings/site-settings-utils";
 import { notFound } from "next/navigation";
 
 // Revalidate all pages every hour (3600 seconds)
@@ -43,6 +49,8 @@ export default async function LocaleLayout({
   const { locale: rawLocale } = await params;
   const locale = isValidLocale(rawLocale) ? rawLocale : notFound();
 
+  const socialLinks = await getSocialLinks();
+
   return (
     <html lang={localeToLanguageTag[locale]}>
       <body
@@ -52,7 +60,7 @@ export default async function LocaleLayout({
           antialiased
         `}
       >
-        <Header locale={locale} />
+        <Header locale={locale} socialLinks={socialLinks} />
         <main className="min-h-screen">{children}</main>
         <Footer locale={locale} />
       </body>
