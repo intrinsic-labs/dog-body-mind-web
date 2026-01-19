@@ -4,12 +4,13 @@ import { PortableText, PortableTextComponents } from "@portabletext/react";
 import { PortableTextBlock } from "@portabletext/types";
 import TinifyImage from "@/components/TinifyImage";
 import { urlFor } from "@/infrastructure/sanity/client";
-import { InlineImage, YouTubeEmbed } from "@/lib/blog-types";
-import { getYouTubeId } from "@/lib/youtube-utils";
-import { Locale } from "@/lib/locale";
+import { InlineImage } from "@/components/blog/presenter-models/InlineImage";
+import { YouTubeEmbed } from "./presenter-models/YouTubeEmbed";
+import { getYouTubeId } from "@/infrastructure/youtube/youtube-utils";
+import { Locale } from "@domain/locale";
 import InfographicReference from "../infographic/InfographicReference";
 import { blockquoteStyles } from "../../../shared/blockquote-styles";
-import { parseMarkdownTable } from "@/lib/markdown-table-parser";
+import { parseMarkdownTable } from "@/components/blog/utils/markdown-table-parser";
 
 interface PortableTextRendererProps {
   content: PortableTextBlock[];

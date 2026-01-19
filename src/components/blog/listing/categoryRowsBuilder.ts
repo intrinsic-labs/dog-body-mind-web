@@ -1,4 +1,4 @@
-import { DisplayPost } from "@/lib/blog-types";
+import { DisplayPost } from "../presenter-models/DisplayPost";
 
 export type ListingCategory = {
   _id: string;

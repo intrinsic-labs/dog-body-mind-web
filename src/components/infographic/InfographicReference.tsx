@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getInfographicById } from "@/infrastructure/sanity/queries/infographic-queries";
 import { InfographicByIdQueryResult } from "@/infrastructure/sanity/types/sanity.types";
-import { Locale } from "@/lib/locale";
+import { Locale } from "@domain/locale";
 import InfographicEmbed from "./InfographicEmbed";
 
 interface InfographicReferenceProps {

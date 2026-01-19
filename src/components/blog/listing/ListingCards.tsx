@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import TinifyImage from "@/components/TinifyImage";
-import { DisplayPost } from "@/lib/blog-types";
-import { Locale } from "@/lib/locale";
+import { DisplayPost } from "../presenter-models/DisplayPost";
+import { Locale } from "@domain/locale";
 
 type BaseProps = {
   post: DisplayPost;

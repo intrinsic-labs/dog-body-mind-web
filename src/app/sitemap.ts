@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
-import { getLocaleFromDomain, Locale } from '@/lib/locale';
+import { getLocaleFromDomain, Locale } from '@domain/locale';
 import { getSitemapPosts, type SitemapPost } from '@/infrastructure/sanity/queries/sitemap-queries';
 import {
   postToSitemapEntry,
   createBlogListingEntry,
   createLandingPageEntry as createLandingPageEntry,
-} from '@/lib/sitemap-utils';
+} from '@/application/sitemap/sitemap-utils';
 
 /**
  * Generate domain-specific sitemap

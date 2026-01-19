@@ -8,7 +8,7 @@ import {
   getDomainForLocale,
   isValidLocale,
   type Locale,
-} from "@/lib/locale";
+} from "@domain/locale";
 
 // Enable/disable middleware logging
 const ENABLE_MIDDLEWARE_LOGGING = true;

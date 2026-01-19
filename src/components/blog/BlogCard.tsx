@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import TinifyImage from '@/components/TinifyImage';
-import { DisplayPost } from '@/lib/blog-types';
-import { Locale } from '@/lib/locale';
+import { DisplayPost } from '@/components/blog/presenter-models/DisplayPost';
+import { Locale } from '@/domain/locale';
 
 interface BlogCardProps {
   post: DisplayPost;

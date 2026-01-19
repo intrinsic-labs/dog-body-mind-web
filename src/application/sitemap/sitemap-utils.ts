@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
-import { Locale, locales, getDomainForLocale, localeToLanguageTag } from './locale';
-import type { SitemapPost } from '../infrastructure/sanity/queries/sitemap-queries';
+import { Locale, locales, getDomainForLocale, localeToLanguageTag } from '@domain/locale';
+import type { SitemapPost } from '@infrastructure/sanity/queries/sitemap-queries';
 
 /**
  * Generate the base URL for a given locale

@@ -1,4 +1,4 @@
-import { client } from '@/infrastructure/sanity/client'
+import { client } from '@infrastructure/sanity/client'
 import { 
   AuthorBySlugQueryResult,
   CategoryBySlugQueryResult 

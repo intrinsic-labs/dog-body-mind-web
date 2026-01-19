@@ -1,8 +1,8 @@
 import TinifyImage from "@/components/TinifyImage";
 import Link from "next/link";
 import { PortableTextBlock } from "@portabletext/types";
-import { DisplayPost } from "@/lib/blog-types";
-import { Locale, getCanonicalUrl } from "@/lib/locale";
+import { DisplayPost } from '@/components/blog/presenter-models/DisplayPost';
+import { Locale, getCanonicalUrl } from "@domain/locale";
 import PortableTextRenderer from "./PortableTextRenderer";
 import ReferencesSection from "./ReferencesSection";
 

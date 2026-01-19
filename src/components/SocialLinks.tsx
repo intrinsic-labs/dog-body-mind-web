@@ -9,7 +9,7 @@ import {
   FaThreads,
   FaLink
 } from 'react-icons/fa6';
-import type { SocialLink } from '@/lib/site-settings-utils';
+import type { SocialLink } from '@/application/site-settings/site-settings-utils';
 
 interface SocialLinksProps {
   links: SocialLink[];

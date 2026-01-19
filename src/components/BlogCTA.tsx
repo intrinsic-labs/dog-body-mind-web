@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { HiArrowRight } from 'react-icons/hi';
-import { Locale } from '@/lib/locale';
+import { Locale } from '@domain/locale';
 
 interface BlogCtaContent {
   heading: string;

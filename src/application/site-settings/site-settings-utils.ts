@@ -1,7 +1,7 @@
-import { getSiteSettings } from '../infrastructure/sanity/queries/site-settings-queries';
-import { getBlogPageSettings } from '../infrastructure/sanity/queries/blog-page-settings-queries';
-import { getLandingPageSettings } from '../infrastructure/sanity/queries/landing-page-settings-queries';
-import { Locale } from './locale';
+import { getSiteSettings } from '@infrastructure/sanity/queries/site-settings-queries';
+import { getBlogPageSettings } from '@infrastructure/sanity/queries/blog-page-settings-queries';
+import { getLandingPageSettings } from '@infrastructure/sanity/queries/landing-page-settings-queries';
+import { Locale } from '@domain/locale';
 
 // Helper to extract internationalized string value
 function getLocalizedValue(

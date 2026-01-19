@@ -1,6 +1,6 @@
 import Link from "next/link";
 import TinifyImage from "./TinifyImage";
-import { Locale } from "@/lib/locale";
+import { Locale } from "@domain/locale";
 
 interface HeaderProps {
   locale: Locale;

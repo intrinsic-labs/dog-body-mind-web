@@ -1,6 +1,6 @@
 import { defineQuery } from "next-sanity";
 import { client } from "@/infrastructure/sanity/client";
-import { Locale } from "@/lib/locale";
+import { Locale } from "@domain/locale";
 import {
   sanityCollectionTags,
   sanityTagsForDoc,

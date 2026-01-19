@@ -4,7 +4,7 @@
  * Simplified version with only essential utilities for basic schema generation.
  */
 
-import type { SupportedLanguage } from '../data-manager/types'
+import type { SupportedLanguage } from '../../application/data-manager/types'
 
 /**
  * Options for generating URLs

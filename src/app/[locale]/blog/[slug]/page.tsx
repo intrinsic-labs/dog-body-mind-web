@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DataManager } from "@/lib/data-manager";
-import { generateArticleSchema } from "@/lib/schema/generators/article-schema";
-import { generateArticleMetadata } from "@/lib/metadata/article-metadata";
-import { transformPostForDisplay } from "@/lib/blog-types";
+import { DataManager } from "@/application/data-manager";
+import { generateArticleSchema } from "@presentation/schema/generators/article-schema";
+import { generateArticleMetadata } from "@presentation/metadata/article-metadata";
+import { transformPostForDisplay } from "@application/mappers/transforPostForDisplay";
 import BlogPost from "@/components/blog/BlogPost";
 import SocialLinks from "@/components/SocialLinks";
-import { Locale } from "@/lib/locale";
-import { getSocialLinks } from "@/lib/site-settings-utils";
+import { Locale } from "@/domain/locale";
+import { getSocialLinks } from "@/application/site-settings/site-settings-utils";
 
 export async function generateStaticParams() {
   // In development, don't pre-generate all params to avoid performance issues

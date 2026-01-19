@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { DisplayPost } from "@/lib/blog-types";
-import { Locale } from "@/lib/locale";
+import { DisplayPost } from '@/components/blog/presenter-models/DisplayPost';
+import { Locale } from "@domain/locale";
 import CategoryFilter from "./CategoryFilter";
 import { HiOutlineSearch } from "react-icons/hi";
 import { toDisplayPost } from "./listing/searchPostMapper";

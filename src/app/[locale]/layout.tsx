@@ -1,10 +1,9 @@
 import "../globals.css";
-import { rubik, helvetica } from "@/fonts/fonts";
-import { Locale, locales, localeToLanguageTag } from "@/lib/locale";
+import { rubik, helvetica } from "@presentation/fonts/fonts";
+import { Locale, locales, localeToLanguageTag, isValidLocale } from "@domain/locale";
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { isValidLocale } from "@/lib/locale";
 import { notFound } from "next/navigation";
 
 // Revalidate all pages every hour (3600 seconds)

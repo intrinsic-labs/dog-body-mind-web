@@ -1,4 +1,4 @@
-import { client } from "../../infrastructure/sanity/client";
+import { client } from "@infrastructure/sanity/client";
 
 const isDataManagerDebugEnabled =
   process.env.NEXT_PUBLIC_DEBUG_DATA_MANAGER === "true" ||

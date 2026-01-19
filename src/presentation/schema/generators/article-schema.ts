@@ -5,7 +5,7 @@
  * Uses @graph structure with proper TypeScript types from schema-dts.
  */
 
-import type { PostWithReferences, SupportedLanguage } from '../../data-manager/types'
+import type { PostWithReferences, SupportedLanguage } from '../../../application/data-manager/types'
 import type { Graph, Person, Organization, BlogPosting, Thing } from 'schema-dts'
 import {
   generateCanonicalUrl,

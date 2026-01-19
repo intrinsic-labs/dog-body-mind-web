@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import SocialLinks from './SocialLinks';
-import { getSocialLinks } from '@/lib/site-settings-utils';
-import { Locale } from '@/lib/locale';
+import { getSocialLinks } from '@/application/site-settings/site-settings-utils';
+import { Locale } from '@/domain/locale';
 
 interface FooterProps {
   locale: Locale;

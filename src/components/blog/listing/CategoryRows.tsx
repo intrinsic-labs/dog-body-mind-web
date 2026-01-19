@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Locale } from "@/lib/locale";
+import { Locale } from "@domain/locale";
 import { CarouselCategoryRow } from "./categoryRowsBuilder";
 import { ListingCarouselCard, ListingGridCard } from "./ListingCards";
 import { scrollToWithOffset } from "./scrollToWithOffset";

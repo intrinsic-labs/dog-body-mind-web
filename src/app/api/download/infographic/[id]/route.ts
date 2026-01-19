@@ -8,7 +8,7 @@ import {
   generatePDFFilename,
   validateInfographicData,
   validatePDFOptions,
-} from "@/lib/pdf-generator";
+} from "@/infrastructure/pdf/pdf-generator";
 
 // ===== API ROUTE HANDLER =====
 

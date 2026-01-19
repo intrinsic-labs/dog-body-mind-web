@@ -6,7 +6,7 @@
  */
 
 import type { Metadata } from 'next'
-import type { PostWithReferences, SupportedLanguage } from '../data-manager/types'
+import type { PostWithReferences, SupportedLanguage } from '../../application/data-manager/types'
 
 /**
  * Configuration options for article metadata generation

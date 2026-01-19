@@ -5,7 +5,7 @@
  * Optimized for SEO with proper semantic HTML and accessibility
  */
 
-import type { Citation } from '@/lib/schema/generators/citation-schema'
+import type { Citation } from '@/presentation/schema/generators/citation-schema'
 import CitationRenderer from './CitationRenderer'
 
 interface ReferencesSectionProps {

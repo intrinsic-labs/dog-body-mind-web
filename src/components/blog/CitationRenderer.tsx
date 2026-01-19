@@ -5,7 +5,7 @@
  * Includes DOI links, accessibility features, and SEO optimization
  */
 
-import type { Citation } from '@/lib/schema/generators/citation-schema'
+import type { Citation } from '@/presentation/schema/generators/citation-schema'
 
 interface CitationRendererProps {
   citation: Citation

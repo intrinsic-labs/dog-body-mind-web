@@ -1,8 +1,8 @@
 import BlogCard from './BlogCard';
 import NewsletterSignup from '@/components/NewsletterSignup';
-import { DisplayPost } from '@/lib/blog-types';
-import { Locale } from '@/lib/locale';
-import { NewsletterContent } from '@/lib/site-settings-utils';
+import { DisplayPost } from '@/components/blog/presenter-models/DisplayPost';
+import { Locale } from '@/domain/locale';
+import { NewsletterContent } from '@/application/site-settings/site-settings-utils';
 
 interface BlogListProps {
   posts: DisplayPost[];

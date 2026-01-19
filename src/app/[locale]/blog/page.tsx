@@ -1,14 +1,14 @@
 import { Metadata } from "next";
 import React, { Suspense } from "react";
 
-import { DataManager } from "@/lib/data-manager";
-import { generateArticleListingMetadata } from "@/lib/metadata/article-metadata";
+import { DataManager } from "@/application/data-manager";
+import { generateArticleListingMetadata } from "@presentation/metadata/article-metadata";
 import FilterableBlogList from "@/components/blog/FilterableBlogList";
-import { DisplayPost } from "@/lib/blog-types";
-import { Locale } from "@/lib/locale";
+import { DisplayPost } from "@/components/blog/presenter-models/DisplayPost";
+import { Locale } from "@/domain/locale";
 import {
   getBlogPageContent,
-} from "@/lib/site-settings-utils";
+} from "@/application/site-settings/site-settings-utils";
 import { getAllCategories } from "@/infrastructure/sanity/queries/category-queries";
 import { getBlogListingPosts } from "@/infrastructure/sanity/queries/post-queries";
 

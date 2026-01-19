@@ -1,14 +1,14 @@
-import { Locale } from "@/lib/locale";
+import { Locale } from "@/domain/locale";
 import BlogCTA from "@/components/BlogCTA";
 
 import BlogCard from "@/components/blog/BlogCard";
 import {
   getLandingPageContent,
   getBlogCtaContent,
-} from "@/lib/site-settings-utils";
-import { getYouTubeId } from "@/lib/youtube-utils";
-import { DataManager } from "@/lib/data-manager";
-import { transformPostForDisplay } from "@/lib/blog-types";
+} from "@/application/site-settings/site-settings-utils";
+import { getYouTubeId } from "@/infrastructure/youtube/youtube-utils";
+import { DataManager } from "@/application/data-manager";
+import { transformPostForDisplay } from "@application/mappers/transforPostForDisplay";
 
 export default async function Landing({
   params,

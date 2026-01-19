@@ -1,7 +1,7 @@
 "use client";
 
-import { DisplayPost } from "@/lib/blog-types";
-import { Locale } from "@/lib/locale";
+import { DisplayPost } from "../presenter-models/DisplayPost";
+import { Locale } from "@domain/locale";
 import { ListingGridCard } from "./ListingCards";
 
 type Props = {
