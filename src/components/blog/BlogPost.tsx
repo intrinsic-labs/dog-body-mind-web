@@ -80,13 +80,12 @@ export default function BlogPost({ post, currentLocale }: BlogPostProps) {
             <div className="flex flex-wrap gap-2">
               {post.categories.map(
                 (category: { _id: string; title: string; slug: string }) => (
-                  <Link
+                  <span
                     key={category._id}
-                    href={`/${currentLocale}/blog/category/${category.slug}`}
-                    className="inline-block px-3 py-1 text-sm bg-blue/10 text-blue rounded-full hover:bg-blue/20 transition-colors"
+                    className="inline-block px-3 py-1 text-sm bg-blue/10 text-blue rounded-full"
                   >
                     {category.title}
-                  </Link>
+                  </span>
                 ),
               )}
             </div>
