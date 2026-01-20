@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { match } from "@formatjs/intl-localematcher";
-import Negotiator from "negotiator";
 import {
   locales,
-  defaultLocale,
   getLocaleFromDomain,
   getDomainForLocale,
   isValidLocale,
@@ -17,21 +14,6 @@ function log(...args: unknown[]) {
   if (ENABLE_MIDDLEWARE_LOGGING) {
     console.log("[MIDDLEWARE]", ...args);
   }
-}
-
-function detectUserPreferredLocale(request: NextRequest): Locale {
-  // Try to get locale from Accept-Language header
-  const negotiatorHeaders: Record<string, string> = {};
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
-
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  const detectedLocale = match(
-    languages,
-    locales as readonly string[],
-    defaultLocale,
-  );
-
-  return detectedLocale as Locale;
 }
 
 export function proxy(request: NextRequest) {

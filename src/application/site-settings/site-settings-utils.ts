@@ -91,15 +91,15 @@ export async function getBlogPageContent(
   locale: Locale,
 ): Promise<BlogPageContent | null> {
   try {
-    const settings = await getBlogPageSettings();
+    const settings = await getBlogPageSettings(locale);
 
     if (!settings) {
       return null;
     }
 
     return {
-      title: getLocalizedValue(settings.title, locale),
-      subtitle: getLocalizedValue(settings.subtitle, locale),
+      title: settings.title || "",
+      subtitle: settings.subtitle || "",
     };
   } catch (error) {
     console.error("Error fetching blog page content:", error);

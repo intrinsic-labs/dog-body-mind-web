@@ -9,11 +9,11 @@ export const blogPageSettingsQuery = defineQuery(`
   *[_type == "blogPageSettings"][0] {
     _id,
     _type,
-    title,
-    subtitle
+    "title": title[_key == $language][0].value,
+    "subtitle": subtitle[_key == $language][0].value
   }
 `);
 
-export async function getBlogPageSettings() {
-  return client.fetch(blogPageSettingsQuery, {}, DEFAULT_OPTIONS);
+export async function getBlogPageSettings(language: string) {
+  return client.fetch(blogPageSettingsQuery, { language }, DEFAULT_OPTIONS);
 }
