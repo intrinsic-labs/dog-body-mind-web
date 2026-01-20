@@ -52,7 +52,9 @@ export function proxy(request: NextRequest) {
   // Get the domain's default locale
   const domainDefaultLocale = getLocaleFromDomain(hostname);
   const isDevelopment =
-    hostname.includes("localhost") || hostname.includes("127.0.0.1") || hostname.includes("local");
+    hostname.includes("localhost") ||
+    hostname.includes("127.0.0.1") ||
+    hostname.includes("local");
   // const isDevelopment = false
 
   log(
@@ -83,7 +85,6 @@ export function proxy(request: NextRequest) {
     log(`   Current Locale from Path: ${currentLocale}`);
   }
 
-
   // Case 1: Redundant locale path on correct domain
   // Example: dogbodymind.de/de/blog -> redirect to dogbodymind.de/blog
   if (currentLocale && currentLocale === domainDefaultLocale) {
@@ -100,7 +101,7 @@ export function proxy(request: NextRequest) {
     currentLocale !== domainDefaultLocale &&
     !shouldAllowCrossDomainAccess()
   ) {
-    const http = isDevelopment ? "http://" : "https://"
+    const http = isDevelopment ? "http://" : "https://";
     const targetDomain = getDomainForLocale(currentLocale, isDevelopment);
     const newPathname = pathname.replace(`/${currentLocale}`, "") || "/";
     log(
@@ -111,41 +112,19 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  // Case 3: No locale in path - handle domain default or auto-detection
+  // Case 3: No locale in path - rewrite to include domain's default locale
+  // This respects the user's explicit choice of domain (e.g., visiting dogbodymind.fr means they want French)
   if (!pathnameHasLocale) {
-    const userPreferredLocale = detectUserPreferredLocale(request);
-    log(`🎯 Case 3: No locale in path, user prefers: ${userPreferredLocale}`);
-
-    // If user's preferred locale doesn't match the domain's default locale
-    // Only redirect on landing page to avoid redirect loops
-    if (
-      userPreferredLocale !== domainDefaultLocale &&
-      !isDevelopment &&
-      pathname === "/"
-    ) {
-      const targetDomain = getDomainForLocale(userPreferredLocale);
-      log(
-        `🏠 Case 3a: Landing page redirect to https://${targetDomain}${pathname}`,
-      );
-      return NextResponse.redirect(
-        new URL(`https://${targetDomain}${pathname}`, request.url),
-      );
-    }
-
-    // Enhanced logic to ensure proper locale handling for all content pages
-    const newUrl = new URL(`/${domainDefaultLocale}${pathname}`, request.url);
-
-    // Log the actual URL that will be used for rendering
     log(
-      `✏️ Case 3b: Rewriting to ${newUrl.pathname} - ensuring domain locale "${domainDefaultLocale}"`,
+      `🎯 Case 3: No locale in path, using domain default: ${domainDefaultLocale}`,
     );
 
-    // Ensure any potential locale mismatch is handled properly
-    if (domainDefaultLocale !== currentLocale) {
-      log(
-        `🔄 Locale consistency check: domain expects "${domainDefaultLocale}", but we're using "${currentLocale}"`,
-      );
-    }
+    // Rewrite to add the domain's locale to the path
+    const newUrl = new URL(`/${domainDefaultLocale}${pathname}`, request.url);
+
+    log(
+      `✏️ Case 3: Rewriting to ${newUrl.pathname} - serving domain locale "${domainDefaultLocale}"`,
+    );
 
     return NextResponse.rewrite(newUrl);
   }
