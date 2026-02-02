@@ -66,6 +66,12 @@ const Header = ({ locale, socialLinks = [] }: HeaderProps) => {
             >
               Blog
             </Link>
+            <Link
+              href={`/${locale}/about`}
+              className="text-foreground font-bold font-rubik hover:underline hover:text-blue transition-all ease-out-200"
+            >
+              About
+            </Link>
           </div>
 
           {/* Mobile Hamburger Button */}
@@ -98,6 +104,13 @@ const Header = ({ locale, socialLinks = [] }: HeaderProps) => {
               className="text-foreground font-bold font-rubik text-3xl py-6 text-left hover:text-blue transition-colors"
             >
               Blog
+            </Link>
+            <Link
+              href={`/${locale}/about`}
+              onClick={closeMobileMenu}
+              className="text-foreground font-bold font-rubik text-3xl py-6 text-left hover:text-blue transition-colors"
+            >
+              About
             </Link>
           </div>
 
